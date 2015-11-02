@@ -177,22 +177,34 @@ vector<Mat> computeImages::findImages(vector<Vec4i> lines, Mat imgSource){
             Rect r = boundingRect(saved[i]);
             if(r.area()<50000)continue;
 //            cout<<r.area()<<endl;
+            
+            //wrap perspective... no useful in our case
+            
+            
             // Define the destination image
-            cv::Mat quad = cv::Mat::zeros(r.height, r.width, CV_8UC3);  
-            // Corners of the destination image  
-            std::vector<cv::Point2f> quad_pts;  
-            quad_pts.push_back(cv::Point2f(0, 0));  
-            quad_pts.push_back(cv::Point2f(quad.cols, 0));  
-            quad_pts.push_back(cv::Point2f(quad.cols, quad.rows));  
-            quad_pts.push_back(cv::Point2f(0, quad.rows));  
-            // Get transformation matrix  
-            cv::Mat transmtx = cv::getPerspectiveTransform(saved[i], quad_pts);
-            // Apply perspective transformation  
-            cv::warpPerspective(imgSource, quad, transmtx, quad.size());
-//            stringstream ss;  
-//            ss<<i<<".jpg";  
+//            cv::Mat quad = cv::Mat::zeros(r.height, r.width, CV_8UC3);  
+//            // Corners of the destination image  
+//            std::vector<cv::Point2f> quad_pts;  
+//            quad_pts.push_back(cv::Point2f(0, 0));  
+//            quad_pts.push_back(cv::Point2f(quad.cols, 0));  
+//            quad_pts.push_back(cv::Point2f(quad.cols, quad.rows));  
+//            quad_pts.push_back(cv::Point2f(0, quad.rows));  
+//            // Get transformation matrix  
+//            cv::Mat transmtx = cv::getPerspectiveTransform(saved[i], quad_pts);
+//            // Apply perspective transformation  
+//            cv::warpPerspective(imgSource, quad, transmtx, quad.size());
+            
+            
+            Mat res(imgSource, r);
+            //	Size tailleReduite_l(ligne.cols / reduction, ligne.rows / reduction);
+//            //resize(ligne, ligne, tailleReduite_l);
+//            stringstream ss;
+//            ss<<i<<".jpg";
+//
+//            	imshow("ligne" + ss.str() , res);
+
 //            cv::imshow(ss.str(), quad);
-            returnImages.push_back(quad);
+            returnImages.push_back(res);
         
         }
         return returnImages;
