@@ -22,12 +22,19 @@ public:
     Mat sourceImg;
     Mat result;
     int match_method;
+    Mat templArea;
     
-    computeImages(Mat img, int match) : sourceImg(img) , match_method(match) {}
+    
+    
+
+    
+    computeImages(Mat img, int match) : sourceImg(img) , match_method(match){}
 
     vector<Vec4i>  findLines(Mat imgSource);
     vector<Mat> findImages(vector<Vec4i> lines, Mat imgSource);
-    Mat findTemplArea(Mat templ);
+    bool findTemplArea(Mat templ, string currentName);
+    Mat getTemplArea();
+
 private:
     static bool rectComparator(std::vector<cv::Point2f>& a, std::vector<cv::Point2f>& b);
     static bool pointsComparator(Point2f a,Point2f b);

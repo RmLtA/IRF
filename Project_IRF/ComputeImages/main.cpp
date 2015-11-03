@@ -26,6 +26,8 @@ static string dirResSquaresName  = "results/squares/";
 
 vector<string> readDir(string dirName);
 string getFilename(string name);
+string getExtName(string name);
+
 
 int main(int argc, const char * argv[]) {
     // insert code here...
@@ -41,7 +43,11 @@ int main(int argc, const char * argv[]) {
     
     for(int i = 0 ; i < sourceDir.size() ; i ++ )
     {
+        
+        cout << "///////////////"<< endl;
         cout << "processing image : " << sourceDir[i] << endl;
+        cout << "///////////////"<< endl;
+
         string sourceName  = getFilename(sourceDir[i]);
         
         Mat img = imread(dirSourceName + sourceDir[i]);
@@ -51,35 +57,48 @@ int main(int argc, const char * argv[]) {
         for (int j = 0 ; j < templDir.size(); j++) {
             cout << "template : "<<dirTemplName + templDir[j] << endl;
             string templName  = getFilename(templDir[j]);
-
+          
+            
+            stringstream currentNameStream;
+            currentNameStream<<dirResSquaresName << sourceName << "-" << templName <<".jpg";
+            
             //get the img
             Mat templ = imread(dirTemplName + templDir[j]);
+            try{
             //search the template area
-            Mat area  = ll->findTemplArea(templ);
-            //get the lines from the area
-            vector<Vec4i> lines =  ll->findLines(area);
-            
-            //save the image with lines
-            Mat areaLine = area.clone();
-            for(size_t i = 0; i < lines.size(); i++ ) {
-                Vec4i l = lines[i];
-                line(areaLine, Point(l[0], l[1]), Point(l[2], l[3]), Scalar(0,0,255), 3, CV_AA);
-            }
-            stringstream ss;
-            ss<<dirResSquaresName << sourceName << "-" << templName <<".jpg";
-            imwrite(ss.str(), areaLine);
-            cout << "saving lines from : " << templName << " in " << ss.str() << endl;
+                
+                if(ll->findTemplArea(templ, currentNameStream.str())){
+                    Mat area  = ll->getTemplArea();
+                    //get the lines from the area
+                    vector<Vec4i> lines =  ll->findLines(area);
+                    
+                    //save the image with lines
+                    Mat areaLine = area.clone();
+                    for(size_t i = 0; i < lines.size(); i++ ) {
+                        Vec4i l = lines[i];
+                        line(areaLine, Point(l[0], l[1]), Point(l[2], l[3]), Scalar(0,0,255), 3, CV_AA);
+                    }
+                    imwrite(currentNameStream.str(), areaLine);
+                    cout << "saving lines from : " << templName << " in " << currentNameStream.str() << endl;
+                    
+                    //get the images
+                    vector<Mat> result =  ll->findImages(lines, area);
+                    
+                    //save the images
+                    for (int k =0 ; k < result.size(); k++) {
+                        stringstream ss;
+                        ss<<dirResImagesName << sourceName << "-" << templName << "-" << k<<".jpg";
+                        imwrite(ss.str(), result[k]);
+                       // cout << "saving  : "<<ss.str() << endl;
+                        
+                    }
 
-            //get the images
-            vector<Mat> result =  ll->findImages(lines, area);
-            
-            //save the images
-            for (int k =0 ; k < result.size(); k++) {
-                stringstream ss;
-                ss<<dirResImagesName << sourceName << "-" << templName << "-" << k<<".jpg";
-                imwrite(ss.str(), result[k]);
-                cout << "saving  : "<<ss.str() << endl;
-
+                }else{
+                    cout << "not found...  "<< endl;
+ 
+                }
+            }catch(Exception e){
+                
             }
             
         }
@@ -100,7 +119,7 @@ vector<string> readDir(string dirName){
     if (dir != NULL) {
         while ((ent = readdir (dir)) != NULL) {
             string imgName =ent->d_name;
-            if(imgName.compare(".")!= 0 && imgName.compare("..")!= 0){
+            if(getExtName(imgName) == ".jpg" || getExtName(imgName) == ".png"){
                 output.push_back (imgName) ;
             }
         }
@@ -115,4 +134,8 @@ vector<string> readDir(string dirName){
 string getFilename(string name){
     std::size_t found = name.find_last_of(".");
     return  name.substr(0,found);
+}
+string getExtName(string name){
+    std::size_t found = name.find_last_of(".");
+    return  name.substr(found, name.length());
 }

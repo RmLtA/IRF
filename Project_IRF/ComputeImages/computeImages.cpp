@@ -4,11 +4,8 @@
 //////////////////////////////////////////////////////////////////////////
 
 #include "computeImages.h"
-/**
-* @function MatchingMethod
-* @brief Trackbar callback
-*/
-Mat computeImages::findTemplArea(Mat templ)
+
+bool computeImages::findTemplArea(Mat templ, string currentName)
 {
 	/// Create the result matrix
 	int result_cols = this->sourceImg.cols - templ.cols + 1;
@@ -28,41 +25,50 @@ Mat computeImages::findTemplArea(Mat templ)
 	/// Localizing the best match with minMaxLoc
 	double minVal; double maxVal; Point minLoc; Point maxLoc;
 	Point matchLoc;
-	minMaxLoc(result, &minVal, &maxVal, &minLoc, &maxLoc, Mat());
-
-	/// For SQDIFF and SQDIFF_NORMED, the best matches are lower values. For all the other methods, the higher the better
-	if (match_method == TM_SQDIFF || match_method == TM_SQDIFF_NORMED)
-	{
-		matchLoc = minLoc;
-	}
-	else
-	{
-		matchLoc = maxLoc;
-	}
-
-	/// Show me what you got
-	//rectangle(img, matchLoc, Point(matchLoc.x + templ.cols, matchLoc.y + templ.rows), Scalar::all(0), 2, 8, 0);
-	Mat temp_founded(this->sourceImg, Rect(matchLoc, Point(matchLoc.x + templ.cols , matchLoc.y + templ.rows)));
 	
-    //imshow("", temp_founded);
+    
+    // try to find best match
+    minMaxLoc(result, &minVal, &maxVal, &minLoc, &maxLoc, Mat());
 
-	////// reseize and show
-	//Mat imreduite;
-	//int reduction =5;
-	//Size tailleReduite(this->sourceImg.cols / reduction, this->sourceImg.rows / reduction);
-	//imreduite = Mat(tailleReduite, CV_8UC3); //cree une image à 3 canaux de profondeur 8 bits chacuns
-	//resize(this->sourceImg, imreduite, tailleReduite);
-	///////
-	//imshow(image_window, imreduite);
-
-	/// affichage des lignes ROI
-	Mat ligne(this->sourceImg, Rect(Point(matchLoc.x,matchLoc.y-templ.rows), Point(matchLoc.x +this->sourceImg.cols/1.2, matchLoc.y + 2*templ.rows)));
-//	Size tailleReduite_l(ligne.cols / reduction, ligne.rows / reduction);
-	//resize(ligne, ligne, tailleReduite_l);
-//	imshow("ligne", ligne);
-
-    return ligne;
+    
+    //checking if the found image is well located
+    //TODO find better way...
+    if(minLoc.x <350 && minLoc.x > 290 && maxLoc.x < 2050 && maxLoc.x >1500  ){
+        try{
+            
+            //TODO see what this do...
+            /// For SQDIFF and SQDIFF_NORMED, the best matches are lower values. For all the other methods, the higher the better
+            if (match_method == TM_SQDIFF || match_method == TM_SQDIFF_NORMED)
+            {
+                matchLoc = minLoc;
+            }
+            else
+            {
+                matchLoc = maxLoc;
+            }
+            //drawing image from matchlocation point
+            Mat temp_founded(this->sourceImg, Rect(matchLoc, Point(matchLoc.x + templ.cols , matchLoc.y + templ.rows)));
+        
+            Mat ligne(this->sourceImg, Rect(Point(matchLoc.x,matchLoc.y-templ.rows), Point(matchLoc.x +this->sourceImg.cols/1.2, matchLoc.y + 2*templ.rows)));
+            this->templArea = ligne;
+            return true;
+            
+        }catch(Exception e){
+            std::cout << "" << e.msg <<endl ;
+            return false;
+        }
+  
+    }else{
+        cout << "not in detected values...  "
+        <<" minval : " << minLoc << " max val :: " << maxLoc << endl;
+        return false;
+    }
 }
+
+Mat computeImages::getTemplArea(){
+    return this->templArea;
+}
+
 
 
 vector<Vec4i> computeImages::findLines(Mat imgSource){
@@ -176,34 +182,11 @@ vector<Mat> computeImages::findImages(vector<Vec4i> lines, Mat imgSource){
             if(saved[i].size()<4)continue;
             Rect r = boundingRect(saved[i]);
             if(r.area()<50000)continue;
-//            cout<<r.area()<<endl;
             
-            //wrap perspective... no useful in our case
+            //removing borders...
+            Rect rr(Point(r.tl().x +  10, r.tl().y +  10) ,Point(r.br().x-10,r.br().y-10));
             
-            
-            // Define the destination image
-//            cv::Mat quad = cv::Mat::zeros(r.height, r.width, CV_8UC3);  
-//            // Corners of the destination image  
-//            std::vector<cv::Point2f> quad_pts;  
-//            quad_pts.push_back(cv::Point2f(0, 0));  
-//            quad_pts.push_back(cv::Point2f(quad.cols, 0));  
-//            quad_pts.push_back(cv::Point2f(quad.cols, quad.rows));  
-//            quad_pts.push_back(cv::Point2f(0, quad.rows));  
-//            // Get transformation matrix  
-//            cv::Mat transmtx = cv::getPerspectiveTransform(saved[i], quad_pts);
-//            // Apply perspective transformation  
-//            cv::warpPerspective(imgSource, quad, transmtx, quad.size());
-            
-            
-            Mat res(imgSource, r);
-            //	Size tailleReduite_l(ligne.cols / reduction, ligne.rows / reduction);
-//            //resize(ligne, ligne, tailleReduite_l);
-//            stringstream ss;
-//            ss<<i<<".jpg";
-//
-//            	imshow("ligne" + ss.str() , res);
-
-//            cv::imshow(ss.str(), quad);
+            Mat res(imgSource, rr);
             returnImages.push_back(res);
         
         }
@@ -215,63 +198,74 @@ vector<Mat> computeImages::findImages(vector<Vec4i> lines, Mat imgSource){
     }
   
 }
-        
-        
-        
-        
-        Point2f computeImages::computeIntersect(cv::Vec4i a, cv::Vec4i b)
-        {
-            int x1 = a[0], y1 = a[1], x2 = a[2], y2 = a[3];
-            int x3 = b[0], y3 = b[1], x4 = b[2], y4 = b[3];
-            // if not parallel
-            if (float d = ((float)(x1-x2) * (y3-y4)) - ((y1-y2) * (x3-x4)))
-            {
-                
-                Point2f pt;
-                pt.x = ((x1*y2 - y1*x2) * (x3-x4) - (x1-x2) * (x3*y4 - y3*x4)) / d;
-                pt.y = ((x1*y2 - y1*x2) * (y3-y4) - (y1-y2) * (x3*y4 - y3*x4)) / d;
-                
-                if(pt.x<min(x1,x2)-10||pt.x>max(x1,x2)+10||pt.y<min(y1,y2)-10||pt.y>max(y1,y2)+10){
-                    return Point2f(-1,-1);
-                }
-                if(pt.x<min(x3,x4)-10||pt.x>max(x3,x4)+10||pt.y<min(y3,y4)-10||pt.y>max(y3,y4)+10){
-                    return Point2f(-1,-1);
-                }
-                return pt;
-            }
-            else
-                return Point2f(-1, -1);
+
+
+//wrap perspective... no useful in our case
+// Define the destination image
+//            cv::Mat quad = cv::Mat::zeros(r.height, r.width, CV_8UC3);
+//            // Corners of the destination image
+//            std::vector<cv::Point2f> quad_pts;
+//            quad_pts.push_back(cv::Point2f(0, 0));
+//            quad_pts.push_back(cv::Point2f(quad.cols, 0));
+//            quad_pts.push_back(cv::Point2f(quad.cols, quad.rows));
+//            quad_pts.push_back(cv::Point2f(0, quad.rows));
+//            // Get transformation matrix
+//            cv::Mat transmtx = cv::getPerspectiveTransform(saved[i], quad_pts);
+//            // Apply perspective transformation
+//            cv::warpPerspective(imgSource, quad, transmtx, quad.size());
+
+
+
+Point2f computeImages::computeIntersect(cv::Vec4i a, cv::Vec4i b){
+    int x1 = a[0], y1 = a[1], x2 = a[2], y2 = a[3];
+    int x3 = b[0], y3 = b[1], x4 = b[2], y4 = b[3];
+    // if not parallel
+    if (float d = ((float)(x1-x2) * (y3-y4)) - ((y1-y2) * (x3-x4)))
+    {
+        Point2f pt;
+        pt.x = ((x1*y2 - y1*x2) * (x3-x4) - (x1-x2) * (x3*y4 - y3*x4)) / d;
+        pt.y = ((x1*y2 - y1*x2) * (y3-y4) - (y1-y2) * (x3*y4 - y3*x4)) / d;
+        if(pt.x<min(x1,x2)-10||pt.x>max(x1,x2)+10||pt.y<min(y1,y2)-10||pt.y>max(y1,y2)+10){
+            return Point2f(-1,-1);
         }
-        
-        bool computeImages::pointsComparator(Point2f a,Point2f b){
-            return a.x<b.x;
+        if(pt.x<min(x3,x4)-10||pt.x>max(x3,x4)+10||pt.y<min(y3,y4)-10||pt.y>max(y3,y4)+10){
+            return Point2f(-1,-1);
         }
-        bool computeImages::rectComparator(std::vector<cv::Point2f>& a, std::vector<cv::Point2f>& b){
-            return  a.at(0).x < b.at(0).x;
-        }
-        
-        void computeImages::sortCorners(std::vector<cv::Point2f>& corners, cv::Point2f center)
-        {
-            std::vector<cv::Point2f> top, bot;
-            for (int i = 0; i < corners.size(); i++)
-            {
-                if (corners[i].y < center.y)
-                    top.push_back(corners[i]);
-                else
-                    bot.push_back(corners[i]);
-            }
-            sort(top.begin(),top.end(),pointsComparator);
-            sort(bot.begin(),bot.end(),pointsComparator);
-            cv::Point2f tl = top[0];
-            cv::Point2f tr = top[top.size()-1];
-            cv::Point2f bl = bot[0];
-            cv::Point2f br = bot[bot.size()-1];
-            corners.clear();
-            corners.push_back(tl);
-            corners.push_back(tr);
-            corners.push_back(br);
-            corners.push_back(bl);
-        }
+        return pt;
+    }
+    else
+        return Point2f(-1, -1);
+}
+
+
+bool computeImages::pointsComparator(Point2f a,Point2f b){
+    return a.x<b.x;
+}
+bool computeImages::rectComparator(std::vector<cv::Point2f>& a, std::vector<cv::Point2f>& b){
+    return  a.at(0).x < b.at(0).x;
+}
+
+void computeImages::sortCorners(std::vector<cv::Point2f>& corners, cv::Point2f center){
+    std::vector<cv::Point2f> top, bot;
+    for (int i = 0; i < corners.size(); i++)
+    {
+        if (corners[i].y < center.y)
+            top.push_back(corners[i]);
+        else
+            bot.push_back(corners[i]);
+    }
+    sort(top.begin(),top.end(),pointsComparator);
+    sort(bot.begin(),bot.end(),pointsComparator);
+    cv::Point2f tl = top[0];
+    cv::Point2f tr = top[top.size()-1];
+    cv::Point2f bl = bot[0];
+    cv::Point2f br = bot[bot.size()-1];
+    corners.clear();
+    corners.push_back(tl);
+    corners.push_back(tr);
+    corners.push_back(br);
+    corners.push_back(bl);
+}
         
 
 
