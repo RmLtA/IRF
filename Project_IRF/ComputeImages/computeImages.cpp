@@ -8,22 +8,15 @@
 Mat computeImages::getTemplArea(){
     return this->currentTemplArea;
 }
-int computeImages::getPosition(){
-    return this->currentPosition;
+int computeImages::getPositionY(){
+    return this->templPos.y;
     
 }
 int image = 1;
 int templa = 1;
 
 void computeImages::removeZone(){
-    rectangle(processingImg,templPos.max,Point(templPos.max.x+200,templPos.max.y+200) ,Scalar(255,0,0) , -1);
-}
-//blank zone that we are no interrested in
-// todo "remove" really the zone...
-Mat computeImages::getTemplateMatchingZone(){
-    Mat res = this->processingImg.clone();
-      rectangle(res,Point(800, 10),Point(this->processingImg.cols-10,this->processingImg.rows-10) ,Scalar(255,255,255) , -1);
-    return res;
+    rectangle(processingImg,templPos,Point(templPos.x+200,templPos.y+200) ,Scalar(255,0,0) , -1);
 }
 
 void computeImages::showFinalImage(string imageName){
@@ -48,34 +41,25 @@ bool computeImages::findTemplArea(Mat templ, string currentName)
     double minVal; double maxVal; Point minLoc; Point maxLoc;
     Point matchLoc;
     Mat result;
+    Mat gref, gsrc;
 	/// Create the result matrix
 	int result_cols = this->processingImg.cols - templ.cols + 1;
 	int result_rows = this->processingImg.rows - templ.rows + 1;
 	result.create(result_rows, result_cols, CV_32FC1);
 
-	//convert both images to GRAY
-	Mat gref, gsrc;
-    
-    
+	
     
     //reducing the searching zone
     Mat zone(this->processingImg.clone(), Rect(Point(0,0), Point(this->processingImg.cols /4 ,this->processingImg.rows )));
-
-    //Mat zone = getTemplateMatchingZone();
-    //imshow("zone", zone);
-    //waitKey();
-
+    //convert both images to GRAY
 	cvtColor(zone, gref, CV_BGR2GRAY);
 	cvtColor(templ, gsrc, CV_BGR2GRAY);
 
-    
+    //matching templates
     matchTemplate(gref, gsrc, result, match_method);
-	
-    /// Localizing the best match with minMaxLoc
-   
-
+	//see threshold method...
     threshold(result, result, thresh, maxValue, THRESH_TOZERO);
-        
+    /// Localizing the best match with minMaxLoc
     minMaxLoc(result, &minVal, &maxVal, &minLoc, &maxLoc);
 
     bool founded = false;
@@ -84,22 +68,12 @@ bool computeImages::findTemplArea(Mat templ, string currentName)
     {
         founded = true;
         matchLoc = maxLoc;
-    
-        //match loc = top left position of fonded template
-        //we want to store onle the rigth area
-        //store the position of the area;
-       // Mat ligne(this->processingImg, Rect(Point(matchLoc.x,matchLoc.y-templ.rows), Point(matchLoc.x +this->processingImg.cols/1.2, matchLoc.y + 2*templ.rows)));
-        
-        // rect( positionTrouvee.
+        //get the area with the "imagettes"
         Mat ligne(this->processingImg, Rect(Point(matchLoc.x+templ.cols,matchLoc.y-templ.rows), Point(this->processingImg.cols, matchLoc.y + templ.rows*2)));
         
-        //imshow("mat", ligne);
-        //waitKey();
-
-        
+        //save area and position
         this->currentTemplArea = ligne;
-        this->currentPosition = maxLoc.y;
-        this->templPos.max = maxLoc;
+        this->templPos = maxLoc;
       
     }
     
@@ -204,21 +178,18 @@ vector<Mat> computeImages::findImages(vector<Vec4i> lines, Mat imgSource){
             }
         }
         
-        //if(verbose) cout << "... " <<endl;;
 
         vector<vector<cv::Point2f> > saved ;
 
         for(int i=0;i<corners.size();i++){
             cv::Point2f center(0,0);
             if(corners[i].size()>4){
-                //if(verbose) cout << "... " << i <<endl;;
 
                 for(int j=0;j<corners[i].size();j++){
                     center += corners[i][j];
                 }
 
                 center *= (1. / corners[i].size());
-                //if(verbose) cout << "... " << center <<endl;;
 
                 sortCorners(corners[i], center);
 

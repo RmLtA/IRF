@@ -66,7 +66,7 @@ int main(int argc, const char * argv[]) {
                 //on enregistre les zones a traiter
                 templateArea curr;
 				curr.image = ll->getTemplArea().clone();;
-				curr.position = ll->getPosition();
+				curr.position = ll->getPositionY();
                 curr.name = templateCourante;
 				
 
@@ -116,7 +116,6 @@ int main(int argc, const char * argv[]) {
             if(VERBOSE) cout << endl;
 
             if(RESULT){
-                
                 stringstream sgs; sgs <<totalImagettes << "/35";
                 cout << " found :  " << imagesCount << "/7 templates => imagettes : "
                 << ss.str() << " \t total : " << niceOutput(sgs.str(), totalImagettes) << endl;
@@ -127,9 +126,6 @@ int main(int argc, const char * argv[]) {
         }
         totaltotal += totalImagettes;
 
-            
-            
-            
         }catch(Exception e){
             cout << "error with image : " << pageCourante << endl;;
             cout << " " << e.what()<< endl;;

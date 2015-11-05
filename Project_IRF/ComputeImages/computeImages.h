@@ -25,11 +25,6 @@ struct templateArea{
     string name;
     int position;
 };
-struct posTempl{
-    Point min;
-    Point max;
-};
-
 
 inline bool compareStruct(templateArea a,templateArea b){
     return a.position<b.position;
@@ -42,7 +37,7 @@ public:
     Mat sourceImg;
     int match_method;
     Mat processingImg;
-    posTempl templPos;
+    Point templPos;
     bool verbose;
     
     
@@ -56,7 +51,7 @@ public:
     bool findTemplArea(Mat templ, string currentName);
     
     Mat getTemplArea();
-    int getPosition();
+    int getPositionY();
 
     void removeZone();
     void showFinalImage(string imageName);
