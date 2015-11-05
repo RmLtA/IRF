@@ -16,30 +16,62 @@ using namespace cv;
 *
 */
 
+static int matchMethod =CV_TM_CCOEFF_NORMED;
+//CV_TM_CCOEFF_NORMED;
+
+
+struct templateArea{
+    Mat image;
+    string name;
+    int position;
+};
+struct posTempl{
+    Point min;
+    Point max;
+};
+
+
+inline bool compareStruct(templateArea a,templateArea b){
+    return a.position<b.position;
+}
+
+
 class computeImages{
 
 public:
     Mat sourceImg;
-    Mat result;
     int match_method;
-    Mat templArea;
+    Mat processingImg;
+    posTempl templPos;
+    bool verbose;
     
     
-    
-
-    
-    computeImages(Mat img, int match) : sourceImg(img) , match_method(match){}
+    computeImages(Mat img, bool ver) : sourceImg(img), verbose(ver) , match_method(matchMethod)
+    {
+        processingImg = sourceImg.clone();
+    }
 
     vector<Vec4i>  findLines(Mat imgSource);
     vector<Mat> findImages(vector<Vec4i> lines, Mat imgSource);
     bool findTemplArea(Mat templ, string currentName);
+    
     Mat getTemplArea();
+    int getPosition();
 
+    void removeZone();
+    void showFinalImage(string imageName);
 private:
+    Mat currentTemplArea;
+    int currentPosition;
+    Mat getTemplateMatchingZone();
+
+    
     static bool rectComparator(std::vector<cv::Point2f>& a, std::vector<cv::Point2f>& b);
     static bool pointsComparator(Point2f a,Point2f b);
     void sortCorners(std::vector<cv::Point2f>& corners, cv::Point2f center);
     Point2f computeIntersect(cv::Vec4i a, cv::Vec4i b) ;
+    
+    ~computeImages(){};
 
 };
 

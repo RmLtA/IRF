@@ -5,69 +5,118 @@
 
 #include "computeImages.h"
 
+Mat computeImages::getTemplArea(){
+    return this->currentTemplArea;
+}
+int computeImages::getPosition(){
+    return this->currentPosition;
+    
+}
+int image = 1;
+int templa = 1;
+
+void computeImages::removeZone(){
+    rectangle(processingImg,templPos.max,Point(templPos.max.x+200,templPos.max.y+200) ,Scalar(255,0,0) , -1);
+}
+//blank zone that we are no interrested in
+// todo "remove" really the zone...
+Mat computeImages::getTemplateMatchingZone(){
+    Mat res = this->processingImg.clone();
+      rectangle(res,Point(800, 10),Point(this->processingImg.cols-10,this->processingImg.rows-10) ,Scalar(255,255,255) , -1);
+    return res;
+}
+
+void computeImages::showFinalImage(string imageName){
+    Mat imreduite;
+    int reduction =8;
+    Size tailleReduite(this->processingImg.cols / reduction, this->processingImg.rows / reduction);
+    imreduite = Mat(tailleReduite, CV_8UC3); //cree une image à 3 canaux de profondeur 8 bits chacuns
+    resize(this->processingImg, imreduite, tailleReduite);
+    imshow(imageName, imreduite);
+}
+
+
+
 bool computeImages::findTemplArea(Mat templ, string currentName)
 {
+    //valeur de seuil
+    double myThresholdVal= 0.51;
+    //params threshold
+    double thresh = 0.1;
+    double maxValue = 1.;
+    
+    double minVal; double maxVal; Point minLoc; Point maxLoc;
+    Point matchLoc;
+    Mat result;
 	/// Create the result matrix
-	int result_cols = this->sourceImg.cols - templ.cols + 1;
-	int result_rows = this->sourceImg.rows - templ.rows + 1;
+	int result_cols = this->processingImg.cols - templ.cols + 1;
+	int result_rows = this->processingImg.rows - templ.rows + 1;
 	result.create(result_rows, result_cols, CV_32FC1);
 
 	//convert both images to GRAY
 	Mat gref, gsrc;
     
-	cvtColor(this->sourceImg, gref, CV_BGR2GRAY);
+    
+    
+    //reducing the searching zone
+    Mat zone(this->processingImg.clone(), Rect(Point(0,0), Point(this->processingImg.cols /4 ,this->processingImg.rows )));
+
+    //Mat zone = getTemplateMatchingZone();
+    //imshow("zone", zone);
+    //waitKey();
+
+	cvtColor(zone, gref, CV_BGR2GRAY);
 	cvtColor(templ, gsrc, CV_BGR2GRAY);
 
-	/// Do the Matching and Normalize
-	matchTemplate(gref, gsrc, result, match_method);
-	normalize(result, result, 0, 1, NORM_MINMAX, -1, Mat());
-	
-	/// Localizing the best match with minMaxLoc
-	double minVal; double maxVal; Point minLoc; Point maxLoc;
-	Point matchLoc;
-	
     
-    // try to find best match
-    minMaxLoc(result, &minVal, &maxVal, &minLoc, &maxLoc, Mat());
+    matchTemplate(gref, gsrc, result, match_method);
+	
+    /// Localizing the best match with minMaxLoc
+   
 
-    
-    //checking if the found image is well located
-    //TODO find better way...
-    if(minLoc.x <350 && minLoc.x > 290 && maxLoc.x < 2050 && maxLoc.x >1500  ){
-        try{
-            
-            //TODO see what this do...
-            /// For SQDIFF and SQDIFF_NORMED, the best matches are lower values. For all the other methods, the higher the better
-            if (match_method == TM_SQDIFF || match_method == TM_SQDIFF_NORMED)
-            {
-                matchLoc = minLoc;
-            }
-            else
-            {
-                matchLoc = maxLoc;
-            }
-            //drawing image from matchlocation point
-            Mat temp_founded(this->sourceImg, Rect(matchLoc, Point(matchLoc.x + templ.cols , matchLoc.y + templ.rows)));
+    threshold(result, result, thresh, maxValue, THRESH_TOZERO);
         
-            Mat ligne(this->sourceImg, Rect(Point(matchLoc.x,matchLoc.y-templ.rows), Point(matchLoc.x +this->sourceImg.cols/1.2, matchLoc.y + 2*templ.rows)));
-            this->templArea = ligne;
-            return true;
-            
-        }catch(Exception e){
-            std::cout << "" << e.msg <<endl ;
-            return false;
-        }
-  
-    }else{
-        cout << "not in detected values...  "
-        <<" minval : " << minLoc << " max val :: " << maxLoc << endl;
-        return false;
+    minMaxLoc(result, &minVal, &maxVal, &minLoc, &maxLoc);
+
+    bool founded = false;
+
+    if(maxVal >= myThresholdVal)
+    {
+        founded = true;
+        matchLoc = maxLoc;
+    
+        //match loc = top left position of fonded template
+        //we want to store onle the rigth area
+        //store the position of the area;
+       // Mat ligne(this->processingImg, Rect(Point(matchLoc.x,matchLoc.y-templ.rows), Point(matchLoc.x +this->processingImg.cols/1.2, matchLoc.y + 2*templ.rows)));
+        
+        // rect( positionTrouvee.
+        Mat ligne(this->processingImg, Rect(Point(matchLoc.x+templ.cols,matchLoc.y-templ.rows), Point(this->processingImg.cols, matchLoc.y + templ.rows*2)));
+        
+        //imshow("mat", ligne);
+        //waitKey();
+
+        
+        this->currentTemplArea = ligne;
+        this->currentPosition = maxLoc.y;
+        this->templPos.max = maxLoc;
+      
     }
+    
+    if(verbose)
+    {   stringstream ss;
+
+        cout << " \t\t "
+        << (founded ? "//////" : "||||||");
+        ss<< "  values ::" <<" minLoc : " << minLoc << "  maxLoc : " << maxLoc << " \t minVal : " << minVal << "  maxVal : " << maxVal;
+        string s = ss.str(); s.resize(100, ' ');
+        cout << s << "" << (founded ? "found " : " not found ");
+    }
+    return founded;
+    
 }
 
-Mat computeImages::getTemplArea(){
-    return this->templArea;
-}
+
 
 
 
@@ -91,11 +140,9 @@ vector<Vec4i> computeImages::findLines(Mat imgSource){
         
     }catch(Exception e){
         
-        std::cout << "" << e.msg <<endl ;
+        std::cout << "computeImages::findLines error ::: " << e.msg <<endl ;
         throw e;
-        // return 0;
     }
-    
 }
     
 
@@ -157,27 +204,35 @@ vector<Mat> computeImages::findImages(vector<Vec4i> lines, Mat imgSource){
             }
         }
         
+        //if(verbose) cout << "... " <<endl;;
+
         vector<vector<cv::Point2f> > saved ;
 
-      //  if we have more than 3 corners => it's a rectangle :)
         for(int i=0;i<corners.size();i++){
             cv::Point2f center(0,0);
-            if(corners[i].size()>=3){
-               
+            if(corners[i].size()>4){
+                //if(verbose) cout << "... " << i <<endl;;
+
                 for(int j=0;j<corners[i].size();j++){
                     center += corners[i][j];
                 }
+
                 center *= (1. / corners[i].size());
+                //if(verbose) cout << "... " << center <<endl;;
+
                 sortCorners(corners[i], center);
+
                 saved.push_back(std::vector<cv::Point2f>(corners[i]));
+
             }
         }
+
         sort(saved.begin(),saved.end(),rectComparator);
 
         
         vector<Mat> returnImages ;
         //process retransformation
-        
+
         for(int i=0;i<saved.size();i++){
             if(saved[i].size()<4)continue;
             Rect r = boundingRect(saved[i]);
@@ -190,29 +245,39 @@ vector<Mat> computeImages::findImages(vector<Vec4i> lines, Mat imgSource){
             returnImages.push_back(res);
         
         }
+        
+        
+//        if(verbose){
+//            
+//            Mat area = this->getTemplArea();
+//            for(size_t i = 0; i < lines.size(); i++ ) {
+//                Vec4i l = lines[i];
+//                line(area, Point(l[0], l[1]), Point(l[2], l[3]), Scalar(0,0,255), 3, CV_AA);
+//            }
+//            
+//            Mat imreduite;
+//            int reduction =5;
+//            Size tailleReduite(area.cols / reduction, area.rows / reduction);
+//            imreduite = Mat(tailleReduite, CV_8UC3); //cree une image à 3 canaux de profondeur 8 bits chacuns
+//            resize(area, imreduite, tailleReduite);
+//            stringstream ss;
+//            ss << "image :: " << image << " " << templa++ ;
+//
+//            
+//            imshow(ss.str(), imreduite);
+//            
+//            
+//            
+//            
+//        }
         return returnImages;
     }catch(Exception e){
-        
-        std::cout << "" << e.msg <<endl ; 
+        std::cout << "computeImages::findImages" <<endl ;
         throw e;
     }
   
 }
 
-
-//wrap perspective... no useful in our case
-// Define the destination image
-//            cv::Mat quad = cv::Mat::zeros(r.height, r.width, CV_8UC3);
-//            // Corners of the destination image
-//            std::vector<cv::Point2f> quad_pts;
-//            quad_pts.push_back(cv::Point2f(0, 0));
-//            quad_pts.push_back(cv::Point2f(quad.cols, 0));
-//            quad_pts.push_back(cv::Point2f(quad.cols, quad.rows));
-//            quad_pts.push_back(cv::Point2f(0, quad.rows));
-//            // Get transformation matrix
-//            cv::Mat transmtx = cv::getPerspectiveTransform(saved[i], quad_pts);
-//            // Apply perspective transformation
-//            cv::warpPerspective(imgSource, quad, transmtx, quad.size());
 
 
 
@@ -245,6 +310,8 @@ bool computeImages::rectComparator(std::vector<cv::Point2f>& a, std::vector<cv::
     return  a.at(0).x < b.at(0).x;
 }
 
+
+
 void computeImages::sortCorners(std::vector<cv::Point2f>& corners, cv::Point2f center){
     std::vector<cv::Point2f> top, bot;
     for (int i = 0; i < corners.size(); i++)
@@ -266,6 +333,23 @@ void computeImages::sortCorners(std::vector<cv::Point2f>& corners, cv::Point2f c
     corners.push_back(br);
     corners.push_back(bl);
 }
+
+
+//wrap perspective... no useful in our case
+// Define the destination image
+//            cv::Mat quad = cv::Mat::zeros(r.height, r.width, CV_8UC3);
+//            // Corners of the destination image
+//            std::vector<cv::Point2f> quad_pts;
+//            quad_pts.push_back(cv::Point2f(0, 0));
+//            quad_pts.push_back(cv::Point2f(quad.cols, 0));
+//            quad_pts.push_back(cv::Point2f(quad.cols, quad.rows));
+//            quad_pts.push_back(cv::Point2f(0, quad.rows));
+//            // Get transformation matrix
+//            cv::Mat transmtx = cv::getPerspectiveTransform(saved[i], quad_pts);
+//            // Apply perspective transformation
+//            cv::warpPerspective(imgSource, quad, transmtx, quad.size());
+
+
         
 
 
