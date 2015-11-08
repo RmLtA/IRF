@@ -5,13 +5,22 @@
 
 #include "computeImages.h"
 
+
+/**
+ * \fn getTemplArea()
+ * \brief retourne l'image (matrice) courante de la zone contenant les imagettes définie par le template
+ * \return Mat
+ */
 Mat computeImages::getTemplArea(){
     return this->currentTemplArea;
 }
-
+/**
+ * \fn getTemplArea()
+ * \brief retourne la position Y courante de la zone contenant les imagettes définie par le template
+ * \return int
+ */
 int computeImages::getPositionY(){
     return this->templPos.y;
-    
 }
 
 /**
@@ -20,13 +29,12 @@ int computeImages::getPositionY(){
 *
 */
 void computeImages::removeZone(){
-    rectangle(processingImg,templPos,Point(templPos.x+200,templPos.y+200) ,Scalar(255,0,0) , -1);
+    rectangle(processingImg,templPos,Point(templPos.x+(200),templPos.y+(200)) ,Scalar(255,0,0) , -1);
 }
 
 /**
 * \fn showFinalImage(string imageName)
-* \brief Pré-traitement de l'image source : Réduction
-*
+* \brief affichage de l'image courante reduite
 * \param imageName 
 */
 void computeImages::showFinalImage(string imageName){
@@ -36,6 +44,20 @@ void computeImages::showFinalImage(string imageName){
     imreduite = Mat(tailleReduite, CV_8UC3); //cree une image à 3 canaux de profondeur 8 bits chacuns
     resize(this->processingImg, imreduite, tailleReduite);
     imshow(imageName, imreduite);
+}
+
+/**
+ * \fn reduceImage(Mat image)
+ * \brief reduit l'image avec un coefficient de reduction @REDUCTION
+ * \param Mat image
+ * \return Mat reduite
+ */
+Mat computeImages::reduceImage(Mat image){
+    Mat imreduite;
+    Size tailleReduite(image.cols / REDUCTION, image.rows / REDUCTION);
+    imreduite = Mat(tailleReduite, CV_8UC3); //cree une image à 3 canaux de profondeur 8 bits chacuns
+    resize(image, imreduite, tailleReduite);
+    return imreduite;
 }
 
 
@@ -50,7 +72,7 @@ void computeImages::showFinalImage(string imageName){
 bool computeImages::findTemplArea(Mat templ, string currentName)
 {
     //valeur de seuil
-    double myThresholdVal= 0.51;
+    double myThresholdVal= THRESHOLD_VAL;
     //params threshold
     double thresh = 0.1;
     double maxValue = 1.;
@@ -59,19 +81,23 @@ bool computeImages::findTemplArea(Mat templ, string currentName)
     Point matchLoc;
     Mat result;
     Mat gref, gsrc;
+    
+    Mat reducedMat = reduceImage(this->processingImg);
+    Mat reducedTempl = reduceImage(templ);
 	/// Create the result matrix
-	int result_cols = this->processingImg.cols - templ.cols + 1;
-	int result_rows = this->processingImg.rows - templ.rows + 1;
+	int result_cols = reducedMat.cols - reducedTempl.cols + 1; /* why +1 ? */
+	int result_rows = reducedMat.rows - reducedTempl.rows + 1; /* why +1 ? */
 	result.create(result_rows, result_cols, CV_32FC1);
 
 	
     
     //reducing the searching zone
-    Mat zone(this->processingImg.clone(), Rect(Point(0,0), Point(this->processingImg.cols /4 ,this->processingImg.rows )));
+    Mat zone(reducedMat, Rect(Point(0,0), Point(reducedMat.cols /4 ,reducedMat.rows )));
     //convert both images to GRAY
 	cvtColor(zone, gref, CV_BGR2GRAY);
-	cvtColor(templ, gsrc, CV_BGR2GRAY);
-
+	cvtColor(reducedTempl, gsrc, CV_BGR2GRAY);
+   // imshow("aa" , zone);
+   // waitKey();
     //matching templates
     matchTemplate(gref, gsrc, result, match_method);
 	//see threshold method...
@@ -84,13 +110,16 @@ bool computeImages::findTemplArea(Mat templ, string currentName)
     if(maxVal >= myThresholdVal)
     {
         founded = true;
-        matchLoc = maxLoc;
+        //matchLoc = maxLoc;
+        Point matchLoc = Point(maxLoc.x * REDUCTION , maxLoc.y * REDUCTION);
         //get the area with the "imagettes"
-        Mat ligne(this->processingImg, Rect(Point(matchLoc.x+templ.cols,matchLoc.y-templ.rows), Point(this->processingImg.cols, matchLoc.y + templ.rows*2)));
-        
+        Mat ligne(this->processingImg, Rect(Point(matchLoc.x+templ.cols,matchLoc.y-templ.rows/1.5), Point(this->processingImg.cols, matchLoc.y + templ.rows*2)));
+       
         //save area and position
         this->currentTemplArea = ligne;
-        this->templPos = maxLoc;
+        this->templPos = matchLoc;
+        
+         if(verbose)  imshow(currentName, ligne);
       
     }
     
@@ -102,6 +131,8 @@ bool computeImages::findTemplArea(Mat templ, string currentName)
         ss<< "  values ::" <<" minLoc : " << minLoc << "  maxLoc : " << maxLoc << " \t minVal : " << minVal << "  maxVal : " << maxVal;
         string s = ss.str(); s.resize(100, ' ');
         cout << s << "" << (founded ? "found " : " not found ");
+      
+
     }
     return founded;
     
@@ -123,7 +154,7 @@ vector<Vec4i> computeImages::findLines(Mat imgSource){
         //convert to grayscale
         
         //Apply blur to smooth edges and use adapative thresholding
-        Size size(3,3);
+        //Size size(3,3);
         //GaussianBlur(imgSource,img,size,0);
         cv::cvtColor(imgSource, img, CV_BGR2GRAY);
         //apply
@@ -154,7 +185,7 @@ vector<Vec4i> computeImages::findLines(Mat imgSource){
 * \param imgSource
 * \return vector<Mat>
 */
-
+int templ = 0;
 
 vector<Mat> computeImages::findImages(vector<Vec4i> lines, Mat imgSource){
     try{
@@ -164,12 +195,12 @@ vector<Mat> computeImages::findImages(vector<Vec4i> lines, Mat imgSource){
         
         
         int curPoly = 0;
+
         vector<vector<cv::Point2f> > corners;
         for (int i = 0; i < lines.size(); i++)
         {
             for (int j = i+1; j < lines.size(); j++)
             {
-                
                 cv::Point2f pt = computeIntersect(lines[i], lines[j]);
                 //if inside the image
                 if (pt.x > 1 && pt.y > 1 && pt.x<imgSource.size().width && pt.y<imgSource.size().height){
@@ -224,59 +255,66 @@ vector<Mat> computeImages::findImages(vector<Vec4i> lines, Mat imgSource){
                 for(int j=0;j<corners[i].size();j++){
                     center += corners[i][j];
                 }
-
                 center *= (1. / corners[i].size());
-
-                sortCorners(corners[i], center);
-
-                saved.push_back(std::vector<cv::Point2f>(corners[i]));
-
+                if(sortCorners(corners[i], center)){
+                    //saving matching rectangles
+                    saved.push_back(std::vector<cv::Point2f>(corners[i]));
+                }
             }
         }
 
         sort(saved.begin(),saved.end(),rectComparator);
 
-        
+
         vector<Mat> returnImages ;
         //process retransformation
 
         for(int i=0;i<saved.size();i++){
             if(saved[i].size()<4)continue;
             Rect r = boundingRect(saved[i]);
-            if(r.area()<50000)continue;
-            
+            if(r.area()<50000){
+                continue;
+            }
             //removing borders...
             Rect rr(Point(r.tl().x +  10, r.tl().y +  10) ,Point(r.br().x-10,r.br().y-10));
             
             Mat res(imgSource, rr);
+            
+            
+            if(verbose){
+                stringstream ss;
+                ss << "imagette :: " << " " << templ << " " << i ;
+                
+                imshow(ss.str(), res);
+            }
             returnImages.push_back(res);
         
         }
         
         
-//        if(verbose){
-//            
-//            Mat area = this->getTemplArea();
-//            for(size_t i = 0; i < lines.size(); i++ ) {
-//                Vec4i l = lines[i];
-//                line(area, Point(l[0], l[1]), Point(l[2], l[3]), Scalar(0,0,255), 3, CV_AA);
-//            }
-//            
-//            Mat imreduite;
-//            int reduction =5;
-//            Size tailleReduite(area.cols / reduction, area.rows / reduction);
-//            imreduite = Mat(tailleReduite, CV_8UC3); //cree une image à 3 canaux de profondeur 8 bits chacuns
-//            resize(area, imreduite, tailleReduite);
-//            stringstream ss;
-//            ss << "image :: " << image << " " << templa++ ;
-//
-//            
-//            imshow(ss.str(), imreduite);
-//            
-//            
-//            
-//            
-//        }
+        if(verbose){
+            //affichage lignes trouvées
+            Mat area = imgSource.clone();
+            for(size_t i = 0; i < lines.size(); i++ ) {
+                Vec4i l = lines[i];
+                line(area, Point(l[0], l[1]), Point(l[2], l[3]), Scalar(0,0,255), 3, CV_AA);
+            }
+            
+            Mat imreduite;
+            int reduction =2;
+            Size tailleReduite(area.cols / reduction, area.rows / reduction);
+            imreduite = Mat(tailleReduite, CV_8UC3); //cree une image à 3 canaux de profondeur 8 bits chacuns
+            resize(area, imreduite, tailleReduite);
+            stringstream ss;
+            ss << "image :: " << " " << templ++ ;
+
+            
+            imshow(ss.str(), imreduite);
+            
+            
+            
+            
+        }
         return returnImages;
     }catch(Exception e){
         std::cout << "computeImages::findImages" <<endl ;
@@ -291,16 +329,18 @@ vector<Mat> computeImages::findImages(vector<Vec4i> lines, Mat imgSource){
 Point2f computeImages::computeIntersect(cv::Vec4i a, cv::Vec4i b){
     int x1 = a[0], y1 = a[1], x2 = a[2], y2 = a[3];
     int x3 = b[0], y3 = b[1], x4 = b[2], y4 = b[3];
+    //variable d'intersection
+    int avg = AVG_INTERSECTION;
     // if not parallel
     if (float d = ((float)(x1-x2) * (y3-y4)) - ((y1-y2) * (x3-x4)))
     {
         Point2f pt;
         pt.x = ((x1*y2 - y1*x2) * (x3-x4) - (x1-x2) * (x3*y4 - y3*x4)) / d;
         pt.y = ((x1*y2 - y1*x2) * (y3-y4) - (y1-y2) * (x3*y4 - y3*x4)) / d;
-        if(pt.x<min(x1,x2)-10||pt.x>max(x1,x2)+10||pt.y<min(y1,y2)-10||pt.y>max(y1,y2)+10){
+        if(pt.x<min(x1,x2)-avg||pt.x>max(x1,x2)+avg||pt.y<min(y1,y2)-avg||pt.y>max(y1,y2)+avg){
             return Point2f(-1,-1);
         }
-        if(pt.x<min(x3,x4)-10||pt.x>max(x3,x4)+10||pt.y<min(y3,y4)-10||pt.y>max(y3,y4)+10){
+        if(pt.x<min(x3,x4)-avg||pt.x>max(x3,x4)+avg||pt.y<min(y3,y4)-avg||pt.y>max(y3,y4)+avg){
             return Point2f(-1,-1);
         }
         return pt;
@@ -319,49 +359,41 @@ bool computeImages::rectComparator(std::vector<cv::Point2f>& a, std::vector<cv::
 
 /**
 * \fn sortCorners(std::vector<cv::Point2f>& corners, cv::Point2f center)
-* \brief Trie les coins de chaque rectangle dans le sens horaire
+* \brief Trie les coins de chaque rectangle dans le sens horaire si possible
 *
 * \param corners 
 * \param center
+* \return success
 */
-void computeImages::sortCorners(std::vector<cv::Point2f>& corners, cv::Point2f center){
+bool computeImages::sortCorners(std::vector<cv::Point2f>& corners, cv::Point2f center){
     std::vector<cv::Point2f> top, bot;
     for (int i = 0; i < corners.size(); i++)
     {
-        if (corners[i].y < center.y)
+        if (corners[i].y <= center.y)
             top.push_back(corners[i]);
         else
             bot.push_back(corners[i]);
     }
-    sort(top.begin(),top.end(),pointsComparator);
-    sort(bot.begin(),bot.end(),pointsComparator);
-    cv::Point2f tl = top[0];
-    cv::Point2f tr = top[top.size()-1];
-    cv::Point2f bl = bot[0];
-    cv::Point2f br = bot[bot.size()-1];
-    corners.clear();
-    corners.push_back(tl);
-    corners.push_back(tr);
-    corners.push_back(br);
-    corners.push_back(bl);
+    // least 2 points top and bottom
+    if(top.size()>1 && bot.size()>1)
+    {
+        sort(top.begin(),top.end(),pointsComparator);
+        sort(bot.begin(),bot.end(),pointsComparator);
+        cv::Point2f tl = top[0];
+        cv::Point2f tr = top[top.size()-1];
+        cv::Point2f bl = bot[0];
+        cv::Point2f br = bot[bot.size()-1];
+        corners.clear();
+        corners.push_back(tl);
+        corners.push_back(tr);
+        corners.push_back(br);
+        corners.push_back(bl);
+        return true;
+    }else{
+        return false;
+    }
+        
 }
 
-
-//wrap perspective... no useful in our case
-// Define the destination image
-//            cv::Mat quad = cv::Mat::zeros(r.height, r.width, CV_8UC3);
-//            // Corners of the destination image
-//            std::vector<cv::Point2f> quad_pts;
-//            quad_pts.push_back(cv::Point2f(0, 0));
-//            quad_pts.push_back(cv::Point2f(quad.cols, 0));
-//            quad_pts.push_back(cv::Point2f(quad.cols, quad.rows));
-//            quad_pts.push_back(cv::Point2f(0, quad.rows));
-//            // Get transformation matrix
-//            cv::Mat transmtx = cv::getPerspectiveTransform(saved[i], quad_pts);
-//            // Apply perspective transformation
-//            cv::warpPerspective(imgSource, quad, transmtx, quad.size());
-
-
-        
 
 

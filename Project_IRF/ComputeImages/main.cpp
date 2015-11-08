@@ -5,30 +5,61 @@
 
 #include <iostream>
 #include <string.h>
-#include "opencv2/imgproc/imgproc.hpp"
-#include "opencv2/highgui/highgui.hpp"
+#include <opencv2/imgproc/imgproc.hpp>
+#include <opencv2/highgui/highgui.hpp>
 #include <opencv2/core/core.hpp>
+#include <ctime>
 #include "fileOp.h"
 #include "computeImages.h"
 
 using namespace std;
 using namespace cv;
 static const int MAXIMAGETTE = 7 ;
-
-string niceOutput(string output, int maxVal);
+string niceOutput(string output, bool ok);
 
 
 //debugging on console
-static const bool VERBOSE = false;
-static const bool RESULT = true;
+static bool VERBOSE = false;
+static bool RESULT = true;
 
+/*unused*/
 //use folder test or default folder
-static const bool TEST = false;
+static  bool TEST = false;
 
+/*
+ USAGE ::
+ ./projetIRF -v [mode verbose]
+ ./projetIRF -r [mode resultats]
+ ./projetIRF -a [mode resultats + verbose]
+ */
+ /* si en mode test (sources des images sources/test)
+    ./projetIRF -a [mode resultats + verbose]
+ */
 
 int main(int argc, const char * argv[]) {
+    if(argc > 0){
+        string a = argv[1];
+        if(a== "verbose" || a=="-v") {
+            VERBOSE =true;
+        }else if(a == "result" || a=="-r"){
+            RESULT =true;
+        }else if(a=="-a"){
+            RESULT =true;
+            VERBOSE = true;
+        }
+        if(argc == 3){
+            string a = argv[2];
+            if(a == "-test" || a =="-t") TEST =true;
+        }
+    }
+   
+        
     cout << "Start..." <<endl;
     fileOp *  op = new fileOp(TEST);
+    clock_t start, end, prog_b, prog_e;
+    double cpuTime;
+    
+    prog_b = clock();
 
     //recupere le nom des images sources (feuilles de test)
     vector<string> sourcesImages = op->getSourcesImages();
@@ -43,9 +74,10 @@ int main(int argc, const char * argv[]) {
         try{
 				Mat img = imread(sourcesImages[i]);
 				pageCourante = op->getFilename(sourcesImages[i]);
-
+                start = clock();
 				if(VERBOSE)cout << "Traitement de la source : "<<sourcesImages[i]  << " ( " << pageCourante << " )" <<endl;
-				if(RESULT && !VERBOSE)cout << pageCourante << "::";
+                if(RESULT && !VERBOSE)cout << pageCourante << " ::";
+
 
 				vector<templateArea> foundTemplate;
 				computeImages * ll = new computeImages(img, VERBOSE);
@@ -58,7 +90,7 @@ int main(int argc, const char * argv[]) {
 					if(imagesCount ==MAXIMAGETTE)break;
              
 					string templateCourante = op->getFilename(templatesImages[j]);
-					stringstream currentNameStream ; currentNameStream <<pageCourante << "-" << templateCourante;
+					stringstream currentNameStream ; currentNameStream <<pageCourante << "-" << templateCourante << "-" << imagesCount;
 					string s = currentNameStream.str();s.resize(17, ' ');
 					if(VERBOSE)cout << "\t template ( " << s << " ) : ";
     
@@ -76,20 +108,24 @@ int main(int argc, const char * argv[]) {
 						imagesCount++;
 						//on supprime la zone deja matchée...
 						ll->removeZone();
+                        //if(VERBOSE)ll->showFinalImage(currentNameStream.str());
 						//on recommence avec le meme template afin de voir s'il existe le meme template à une autre position
 						j--;
                 
 					}
-					if(VERBOSE) cout << endl;
+                     if(VERBOSE) cout << endl ;
 
 				}
         
-        //if(VERBOSE) ll->showFinalImage(pageCourante);
-        
+            if(VERBOSE){
+                ll->showFinalImage(pageCourante);
+                clock_t middle = clock();
+                cpuTime = (double) ((middle - start) / (double)CLOCKS_PER_SEC);
+                cout << endl << "time for template matching" << cpuTime ;
+            }
 			int totalImagettes =0;
 			if(foundTemplate.size() >0){
 				stringstream ss;
-				//if(VERBOSE)cout << "ordonnancement des templates..." << endl; //sort templ avec position
 				// on reordonne les zones matchées
 				sort(foundTemplate.begin(), foundTemplate.end() , compareStruct);
 				// pour chaque zone
@@ -112,15 +148,20 @@ int main(int argc, const char * argv[]) {
 						op->writeTxtFile(foundTemplate[ligne].name, pageCourante, ligne, col, result[col], false);
                    
 					}
-					if(RESULT)ss<< "\t "<< ligne <<" : " << result.size() << "/5" ;;
-					totalImagettes += result.size();
+                    if(RESULT){
+                        stringstream sgs; sgs <<result.size() << "/5";
+                        ss<< "\t "<< ligne+1 <<" : " << niceOutput(sgs.str(), result.size() == 5) ;;
+                    }
+                    totalImagettes += result.size();
 				}
 				if(VERBOSE) cout << endl;
 
 				if(RESULT){
+                    end = clock();
+                    cpuTime = (double) ((end - start) / (double)CLOCKS_PER_SEC);
 					stringstream sgs; sgs <<totalImagettes << "/35";
 					cout << " found :  " << imagesCount << "/7 templates => imagettes : "
-					<< ss.str() << " \t total : " << niceOutput(sgs.str(), totalImagettes) << endl;
+					<< ss.str() << " \t total : " << niceOutput(sgs.str(), totalImagettes == 35) << "\t time : " << cpuTime << " s"  << endl;
 				}
 			}else{
 
@@ -135,7 +176,11 @@ int main(int argc, const char * argv[]) {
      
 	}
     
-    cout << endl << "Total imagettes : " << totaltotal << " / " << 35*sourcesImages.size() << endl;;
+    
+    prog_e = clock();
+    cpuTime = (double) ((prog_e - prog_b) / (double)CLOCKS_PER_SEC);
+
+    cout << endl << "Total imagettes : " << totaltotal << " / " << 35*sourcesImages.size() << "\t" << "| Temps d'exec.: " << cpuTime/60  <<" min" << endl;;
        
 
     waitKey(0);
@@ -143,12 +188,12 @@ int main(int argc, const char * argv[]) {
 }
 
 
-string niceOutput(string output, int maxVal){
+ string niceOutput(string output, bool ok){
     stringstream ss;
     int  FG_RED      = 31;
     int FG_GREEN    = 32;
     ss << "\033[";
-    if(maxVal == 35){
+    if(ok){
         ss << FG_GREEN << "m" << output;
     }else{
         ss << FG_RED << "m"  << output;
@@ -156,5 +201,6 @@ string niceOutput(string output, int maxVal){
     
     ss << " \033[0m";
     return ss.str();
-
 }
+
+
