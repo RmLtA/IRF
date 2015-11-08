@@ -1,0 +1,49 @@
+Projet IRF : Traitement d'images et reconnaissance des formes.
+5INFO
+INSA Rennes
+2015-2016
+
+Membre du groupe : Cyrille, Gaëlle, Nour, Justin, Liantsoa.
+	
+Step 1 : création de la base de données
+
+Input : Images des scans du dossiers /sources
+Output : Imagettes + fichier de description dans /results/images
+		 results.html : bilan de la performance 
+
+Explications de la méthode utilisée: 
+
+1. Reconnaissance des templates et définition des zone de recherche
+
+	1 - Extraction des templates des feuilles de la base de test fournies de manière à pouvoir utiliser la fonction matchTemplate d’OpenCV.
+	2 - Pré-traitement de l'image source : 
+			- Conversion de l'image source en échelles de gris par la fonction cvtColor(InputArray src, OutputArray dst, int code, int dstCn=0) avec code = BGR2GRAY
+			- Utilisation de la méthode matchTemplate(InputArray imageSource, InputArray template, OutputArray result, int method) avec method = CVTMCOEFFNORMED.
+			- Application de la méthode threshold d'openCV sur le résultat pour obtenir une meilleure approximation.
+	3 - Limitation de la zone de recherche pour chaque icône à une ligne. L'intérêt est d'obtenir les 5 imagettes correspondantes à une icône.
+			- Etape exécutée au maximum 7 fois sur la même feuille de manière à trouver toutes les occurences de l'icône à  des lignes différentes.
+
+
+2. Extraction des imagettes
+
+	1 - Pré-traitement de l'image, la méthode utilisée est la même qu'en 1.2.
+	2 - Extraction des imagettes : 
+			- Détection des lignes présentes dans la feuille fournie par la méthode findLines(Mat imgSource).
+			- Détection des rectangles (formés par les lignes de l'étape précédentes).
+			- Verification de l'aire du rectangle et extraction de l'image bordée par un rectangle. 
+
+3. Enregistrement des imagettes dans le dossier : /results/images
+	- un fichier (.jpg)
+	- un fichier de description (.txt)
+
+Dossiers : 
+	/sources : feuilles de la base de test
+	/results : 
+		- /images : imagettes récupées (.jpg) + fichiers de description (.txt)
+		- results.html : bilan de la performance :
+			exemple : 
+				01121:: found :  7/7 templates => imagettes : 	 0 : 5/5	 1 : 5/5	 2 : 4/5	 3 : 5/5	 4 : 5/5	 5 : 5/5	 6 : 5/5 	 total : 34/35  
+				(explications)
+	/templates : images des templates
+
+
