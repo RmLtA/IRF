@@ -43,7 +43,8 @@ Dossiers :
 		- results.html : bilan de la performance :
 			exemple : 
 				01121:: found :  7/7 templates => imagettes : 	 0 : 5/5	 1 : 5/5	 2 : 4/5	 3 : 5/5	 4 : 5/5	 5 : 5/5	 6 : 5/5 	 total : 34/35  
-				(explications)
+			signification : 
+				Pour la feuille identifiée par 01121, 7 templates sur les 7 existants ont été trouvés sur la feuille. 0,1,2 ... sont les ID des templates (fire, bomb, etc ...). Pour le template 0 : les 5 imagettes ont été récupérés sur les 5 présents sur la feuille. 
 	/templates : images des templates
 
 
