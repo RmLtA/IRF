@@ -1,27 +1,37 @@
-//////////////////////////////////////////////////////////////////////////
-// Module IRF, 5-iNFO
-// Class computeImages
-//////////////////////////////////////////////////////////////////////////
+//
+//	computeImages.cpp
+//  projectIRF
+//
 
 #include "computeImages.h"
 
 Mat computeImages::getTemplArea(){
     return this->currentTemplArea;
 }
+
 int computeImages::getPositionY(){
     return this->templPos.y;
     
 }
-int image = 1;
-int templa = 1;
 
+/**
+* \fn removeZone()
+* \brief Suppression de la zone définie par un rectangle où des imagettes des icônes ont été détectés 
+*
+*/
 void computeImages::removeZone(){
     rectangle(processingImg,templPos,Point(templPos.x+200,templPos.y+200) ,Scalar(255,0,0) , -1);
 }
 
+/**
+* \fn showFinalImage(string imageName)
+* \brief Pré-traitement de l'image source : Réduction
+*
+* \param imageName 
+*/
 void computeImages::showFinalImage(string imageName){
     Mat imreduite;
-    int reduction =8;
+    int reduction = 8;
     Size tailleReduite(this->processingImg.cols / reduction, this->processingImg.rows / reduction);
     imreduite = Mat(tailleReduite, CV_8UC3); //cree une image à 3 canaux de profondeur 8 bits chacuns
     resize(this->processingImg, imreduite, tailleReduite);
@@ -29,7 +39,14 @@ void computeImages::showFinalImage(string imageName){
 }
 
 
-
+/**
+* \fn findTemplArea(Mat templ, string currentName)
+* \brief Reconnaissance des icones modèles 
+*		 Définition d'une région de recherche des icones reproduites 
+*
+* \param imageName
+* \return bool : TRUE si template trouvée 
+*/
 bool computeImages::findTemplArea(Mat templ, string currentName)
 {
     //valeur de seuil
@@ -92,8 +109,14 @@ bool computeImages::findTemplArea(Mat templ, string currentName)
 
 
 
-
-
+/**
+* \fn vector<Vec4i> computeImages::findLines(Mat imgSource)
+* \brief Détection des lignes dans la feuille de test grâce au transformée de Hough (HoughLinesP). 
+*		 L'algorithme regarde tous les points d’une image et vérifie tous les angles entre ceux ci pour déterminer les points qui forment des lignes. 
+*
+* \param imgSource
+* \return vector de lignes 
+*/
 vector<Vec4i> computeImages::findLines(Mat imgSource){
     try{
         Mat img;
@@ -118,7 +141,20 @@ vector<Vec4i> computeImages::findLines(Mat imgSource){
         throw e;
     }
 }
-    
+  
+/**
+* \fn vector<Mat> computeImages::findImages(vector<Vec4i> lines, Mat imgSource)
+* \brief Détection des lignes formant des polygones en particulier des rectangles.
+*		 La vérification se base sur un calcul d’intersection de segments.
+*		 En classant les segments qui s’intersectent dans le même groupe, on regroupe les segments qui appartiennent au même polygone.
+*		 On trouve également la position des coins des polygones.
+*		 Si on a plus de 3 coins le polygone, on classe le polygone comme un rectangle.
+*
+* \param lines : vector de lignes
+* \param imgSource
+* \return vector<Mat>
+*/
+
 
 vector<Mat> computeImages::findImages(vector<Vec4i> lines, Mat imgSource){
     try{
@@ -281,8 +317,13 @@ bool computeImages::rectComparator(std::vector<cv::Point2f>& a, std::vector<cv::
     return  a.at(0).x < b.at(0).x;
 }
 
-
-
+/**
+* \fn sortCorners(std::vector<cv::Point2f>& corners, cv::Point2f center)
+* \brief Trie les coins de chaque rectangle dans le sens horaire
+*
+* \param corners 
+* \param center
+*/
 void computeImages::sortCorners(std::vector<cv::Point2f>& corners, cv::Point2f center){
     std::vector<cv::Point2f> top, bot;
     for (int i = 0; i < corners.size(); i++)

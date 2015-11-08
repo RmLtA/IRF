@@ -44,11 +44,6 @@ void fileOp::writeTxtFile(string templ, string sourceName, int row, int columm, 
 	pFile.close();
 }
 
-
-
-
-
-
 ///Retourne les images sources
 vector<string> fileOp::getSourcesImages(){
     vector<string> sourceDir = readDir(dirSourceName);
@@ -60,8 +55,6 @@ vector<string> fileOp::getTemplImages(){
     vector<string> templDir = readDir(dirTemplName);
 	return templDir;
 }
-
-
 
 ///Fonction utilitaire pour lire dans le dir
 vector<string> fileOp::readDir(string dirName){

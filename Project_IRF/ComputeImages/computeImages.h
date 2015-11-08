@@ -1,8 +1,5 @@
-
-
 #ifndef COMPUTEIMAGES_H_
 #define COMPUTEIMAGES_H_
-
 
 #include "opencv2/highgui/highgui.hpp"
 #include "opencv2/imgproc/imgproc.hpp"
@@ -11,14 +8,7 @@ using namespace std;
 using namespace cv;
 
 
-
-/*
-*
-*/
-
 static int matchMethod =CV_TM_CCOEFF_NORMED;
-//CV_TM_CCOEFF_NORMED;
-
 
 struct templateArea{
     Mat image;
@@ -55,6 +45,7 @@ public:
 
     void removeZone();
     void showFinalImage(string imageName);
+
 private:
     Mat currentTemplArea;
     int currentPosition;
