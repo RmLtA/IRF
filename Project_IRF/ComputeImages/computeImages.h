@@ -55,7 +55,7 @@ public:
 
     void removeZone();
     void showFinalImage(string imageName);
-
+    ~computeImages(){};
 private:
     Mat currentTemplArea;
     int currentPosition;
@@ -67,7 +67,7 @@ private:
     bool sortCorners(std::vector<cv::Point2f>& corners, cv::Point2f center);
     Point2f computeIntersect(cv::Vec4i a, cv::Vec4i b) ;
     
-    ~computeImages(){};
+    
 
 };
 
