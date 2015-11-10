@@ -71,8 +71,10 @@ int main(int argc, const char * argv[]) {
     int totaltotal = 0;
     string pageCourante;
     for(int i=0 ; i < sourcesImages.size() ; i++){
+    	Mat img = imread(sourcesImages[i]);
+    	computeImages * ll = new computeImages(img, VERBOSE);
         try{
-				Mat img = imread(sourcesImages[i]);
+			
 				pageCourante = op->getFilename(sourcesImages[i]);
                 start = clock();
 				if(VERBOSE)cout << "Traitement de la source : "<<sourcesImages[i]  << " ( " << pageCourante << " )" <<endl;
@@ -80,7 +82,7 @@ int main(int argc, const char * argv[]) {
 
 
 				vector<templateArea> foundTemplate;
-				computeImages * ll = new computeImages(img, VERBOSE);
+				
 
 				int imagesCount = 0;
 
@@ -168,11 +170,12 @@ int main(int argc, const char * argv[]) {
 				if(VERBOSE)cout << "no templates founded " << endl; //sort templ avec position
 			}
 			totaltotal += totalImagettes;
-			delete ll;
+			
 			}catch(Exception e){
 				cout << "error with image : " << pageCourante << endl;;
 				cout << " " << e.what()<< endl;;
 			}
+			delete ll;
 	
      
 	}
