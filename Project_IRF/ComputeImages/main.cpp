@@ -37,7 +37,7 @@ static  bool TEST = false;
  */
 
 int main(int argc, const char * argv[]) {
-    if(argc > 0){
+    if(argc > 1){
         string a = argv[1];
         if(a== "verbose" || a=="-v") {
             VERBOSE =true;
@@ -168,11 +168,12 @@ int main(int argc, const char * argv[]) {
 				if(VERBOSE)cout << "no templates founded " << endl; //sort templ avec position
 			}
 			totaltotal += totalImagettes;
-
+			delete ll;
 			}catch(Exception e){
 				cout << "error with image : " << pageCourante << endl;;
 				cout << " " << e.what()<< endl;;
 			}
+	
      
 	}
     
@@ -182,7 +183,7 @@ int main(int argc, const char * argv[]) {
 
     cout << endl << "Total imagettes : " << totaltotal << " / " << 35*sourcesImages.size() << "\t" << "| Temps d'exec.: " << cpuTime/60  <<" min" << endl;;
        
-
+    delete op;
     waitKey(0);
     return 0; 
 }
