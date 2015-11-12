@@ -52,9 +52,9 @@ void computeImages::showFinalImage(string imageName){
  * \param Mat image
  * \return Mat reduite
  */
-Mat computeImages::reduceImage(Mat image){
+Mat computeImages::reduceImage(Mat image, double reduction){
     Mat imreduite;
-    Size tailleReduite(image.cols / REDUCTION, image.rows / REDUCTION);
+    Size tailleReduite(image.cols / reduction, image.rows / reduction);
     imreduite = Mat(tailleReduite, CV_8UC3); //cree une image à 3 canaux de profondeur 8 bits chacuns
     resize(image, imreduite, tailleReduite);
     return imreduite;
@@ -69,24 +69,36 @@ Mat computeImages::reduceImage(Mat image){
 * \param imageName
 * \return bool : TRUE si template trouvée 
 */
-bool computeImages::findTemplArea(Mat templ, string currentName)
+bool computeImages::findTemplArea(Mat templ, string currentName, bool secondPass)
 {
+    double reduction;
+    double myThresholdVal;
+    if(secondPass){
+        myThresholdVal=NO_R_THRESHOLD_VAL;
+        reduction = NO_REDUCE;
+
+    }else{
+        reduction = REDUCTION;
+        myThresholdVal = THRESHOLD_VAL;
+    }
+    
+    
     //valeur de seuil
-    double myThresholdVal= THRESHOLD_VAL;
     //params threshold
     double thresh = 0.1;
     double maxValue = 1.;
+    double acceptance = 0.10;
     
     double minVal; double maxVal; Point minLoc; Point maxLoc;
     Point matchLoc;
     Mat result;
     Mat gref, gsrc;
     
-    Mat reducedMat = reduceImage(this->processingImg);
-    Mat reducedTempl = reduceImage(templ);
+    Mat reducedMat = reduceImage(this->processingImg, reduction);
+    Mat reducedTempl = reduceImage(templ, reduction);
 	/// Create the result matrix
-	int result_cols = reducedMat.cols - reducedTempl.cols + 1; /* why +1 ? */
-	int result_rows = reducedMat.rows - reducedTempl.rows + 1; /* why +1 ? */
+    int result_cols = reducedMat.cols - reducedTempl.cols ;//+ 1; /* why +1 ? */
+    int result_rows = reducedMat.rows - reducedTempl.rows ;//+ 1; /* why +1 ? */
 	result.create(result_rows, result_cols, CV_32FC1);
 
 	
@@ -111,7 +123,7 @@ bool computeImages::findTemplArea(Mat templ, string currentName)
     {
         founded = true;
         //matchLoc = maxLoc;
-        Point matchLoc = Point(maxLoc.x * REDUCTION , maxLoc.y * REDUCTION);
+        Point matchLoc = Point(maxLoc.x * reduction , maxLoc.y * reduction);
         //get the area with the "imagettes"
         Mat ligne(this->processingImg, Rect(Point(matchLoc.x+templ.cols,matchLoc.y-templ.rows/1.5), Point(this->processingImg.cols, matchLoc.y + templ.rows*2)));
        
@@ -121,12 +133,23 @@ bool computeImages::findTemplArea(Mat templ, string currentName)
         
          if(verbose)  imshow(currentName, ligne);
       
+    }else if(maxVal > (myThresholdVal - acceptance ) && secondPass != true){
+        if(verbose)
+        {   stringstream ss;
+            
+            cout << " \t\t ~~~~~~";
+            ss<< "  values ::" <<" minLoc : " << minLoc << "  maxLoc : " << maxLoc << " \t minVal : " << minVal << "  maxVal : " << maxVal;
+            string s = ss.str(); s.resize(100, ' ');
+            cout << s << " trying again..." << endl;;
+            
+        }
+        return findTemplArea(templ, currentName, true);
     }
     
     if(verbose)
     {   stringstream ss;
 
-        cout << " \t\t "
+        cout << (secondPass ? " \t\t\t\t\t\t\t ===> " :" \t\t ")
         << (founded ? "//////" : "||||||");
         ss<< "  values ::" <<" minLoc : " << minLoc << "  maxLoc : " << maxLoc << " \t minVal : " << minVal << "  maxVal : " << maxVal;
         string s = ss.str(); s.resize(100, ' ');

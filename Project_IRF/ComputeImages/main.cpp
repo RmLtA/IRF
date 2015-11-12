@@ -70,11 +70,15 @@ int main(int argc, const char * argv[]) {
 	//boucle de traitement des images sources
     int totaltotal = 0;
     string pageCourante;
+    int nErroImg = 0;
     for(int i=0 ; i < sourcesImages.size() ; i++){
     	Mat img = imread(sourcesImages[i]);
     	computeImages * ll = new computeImages(img, VERBOSE);
+       
+        int imagesCount = 0;
+
+        
         try{
-			
 				pageCourante = op->getFilename(sourcesImages[i]);
                 start = clock();
 				if(VERBOSE)cout << "Traitement de la source : "<<sourcesImages[i]  << " ( " << pageCourante << " )" <<endl;
@@ -84,8 +88,7 @@ int main(int argc, const char * argv[]) {
 				vector<templateArea> foundTemplate;
 				
 
-				int imagesCount = 0;
-
+			
 				//On recupere en premier lieu les zones matchées par les templates afin de les ordonner
 				 for(int j=0 ; j < templatesImages.size() ; j++)
 				 {
@@ -97,7 +100,7 @@ int main(int argc, const char * argv[]) {
 					if(VERBOSE)cout << "\t template ( " << s << " ) : ";
     
 					Mat templ = imread(templatesImages[j]);
-					if(ll->findTemplArea(templ, currentNameStream.str()))
+					if(ll->findTemplArea(templ, currentNameStream.str(), false))
 					{
 						//on enregistre les zones a traiter
 						templateArea curr;
@@ -123,27 +126,29 @@ int main(int argc, const char * argv[]) {
                 ll->showFinalImage(pageCourante);
                 clock_t middle = clock();
                 cpuTime = (double) ((middle - start) / (double)CLOCKS_PER_SEC);
-                cout << endl << "time for template matching" << cpuTime ;
+                cout << endl << "Time for template matching : " << cpuTime << "s"<<endl;;
             }
+           
 			int totalImagettes =0;
 			if(foundTemplate.size() >0){
+                if(VERBOSE) cout << "saving... " <<endl;;
 				stringstream ss;
 				// on reordonne les zones matchées
 				sort(foundTemplate.begin(), foundTemplate.end() , compareStruct);
 				// pour chaque zone
 				for(int ligne=0 ; ligne < foundTemplate.size() ; ligne++)
 				{
-					if(VERBOSE) cout << "recuperation de ligne potentielles... pour  " << foundTemplate[ligne].name<<endl;;
+					//if(VERBOSE) cout << "recuperation de ligne potentielles... pour  " << foundTemplate[ligne].name<<endl;;
 
 					//on récupère les lignes étant potentiellement nos imagettes à enregistrer
 					vector<Vec4i> res =  ll->findLines(foundTemplate[ligne].image);
                 
-					if(VERBOSE) cout << "recuperation des imagettes... " <<endl;;
+					//if(VERBOSE) cout << "recuperation des imagettes... " <<endl;;
 
 					//on récupère les imagettes
 					vector<Mat> result =  ll->findImages(res, foundTemplate[ligne].image);
                 
-					if(VERBOSE) cout << "enregistrement... " <<endl;;
+				
 
 					//pour chaque image on enregistre le .jpg + txt avec les informations correspondantes
 					for (int col =0 ; col < result.size(); col++) {
@@ -167,7 +172,9 @@ int main(int argc, const char * argv[]) {
 				}
 			}else{
 
-				if(VERBOSE)cout << "no templates founded " << endl; //sort templ avec position
+				if(VERBOSE || RESULT)cout << niceOutput(" Error, image rejected", false) << endl; //sort templ avec position
+                nErroImg++;
+                
 			}
 			totaltotal += totalImagettes;
 			
@@ -184,7 +191,7 @@ int main(int argc, const char * argv[]) {
     prog_e = clock();
     cpuTime = (double) ((prog_e - prog_b) / (double)CLOCKS_PER_SEC);
 
-    cout << endl << "Total imagettes : " << totaltotal << " / " << 35*sourcesImages.size() << "\t" << "| Temps d'exec.: " << cpuTime/60  <<" min" << endl;;
+    cout << endl << "Total imagettes : " << totaltotal << " / " << 35*(sourcesImages.size()-nErroImg) << "\t" << "| Temps d'exec.: " << cpuTime/60  <<" min" << endl;;
        
     delete op;
     waitKey(0);

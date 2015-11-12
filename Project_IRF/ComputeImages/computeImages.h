@@ -16,7 +16,12 @@ static const int matchMethod = CV_TM_CCOEFF_NORMED;
 /*redution lors du matching template*/
 static const double REDUCTION = 2;
 /*valeur de seuil du threshold lors du matching template avec les templates*/
-static const double THRESHOLD_VAL = 0.51;
+static const double THRESHOLD_VAL = 0.60;
+
+/*redution lors du matching template*/
+static const double NO_REDUCE = 1;
+/*valeur de seuil du threshold lors du matching template avec les templates*/
+static const double NO_R_THRESHOLD_VAL = 0.51;
 
 /*valeur d'ajustement lors de l'intersection entre deux lignes*/
 static const int AVG_INTERSECTION = 39;
@@ -48,7 +53,7 @@ public:
 
     vector<Vec4i>  findLines(Mat imgSource);
     vector<Mat> findImages(vector<Vec4i> lines, Mat imgSource);
-    bool findTemplArea(Mat templ, string currentName);
+    bool findTemplArea(Mat templ, string currentName, bool reduce);
     
     Mat getTemplArea();
     int getPositionY();
@@ -61,7 +66,7 @@ private:
     int currentPosition;
     Mat getTemplateMatchingZone();
 
-    static Mat reduceImage(Mat image);
+    static Mat reduceImage(Mat image, double reduction);
     static bool rectComparator(std::vector<cv::Point2f>& a, std::vector<cv::Point2f>& b);
     static bool pointsComparator(Point2f a,Point2f b);
     bool sortCorners(std::vector<cv::Point2f>& corners, cv::Point2f center);
