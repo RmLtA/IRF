@@ -25,10 +25,14 @@ Explications de la méthode utilisée:
 	2 - Pré-traitement de l'image source : 
 			- Réduction de l’image par 2
 			- Conversion de l'image source en échelles de gris par la fonction cvtColor(InputArray src, OutputArray dst, int code, int dstCn=0) avec code = BGR2GRAY 
-			- Utilisation de la méthode matchTemplate(InputArray imageSource, InputArray template, OutputArray result, int method) avec method = CVTMCOEFFNORMED.
-			- Application de la méthode threshold d'openCV sur le résultat pour obtenir une meilleure approximation.
-	3 - Limitation de la zone de recherche pour chaque icône à une ligne. L'intérêt est d'obtenir les 5 imagettes correspondantes à une icône.
-			- Etape exécutée au maximum 7 fois sur la même feuille de manière à trouver toutes les occurences de l'icône à des lignes différentes.
+	3 - Recherche de correspondance :
+		- Utilisation de la méthode matchTemplate(InputArray imageSource, InputArray template, OutputArray result, int method) avec method = CVTMCOEFFNORMED.
+		- Application de la méthode threshold d'openCV sur le résultat pour obtenir une meilleure approximation.
+		 	=>L’image est accepté si l’approximation du résultat obtenu est largement supérieure à la valeur de seuil, sinon on ré-éffectue le traitement sans réduction 			d’image et avec un valeur de seuil plus faible afin de confirmer la correspondance du template.
+		
+	4 - Extraction de la zone de recherche des imagettes :
+		- Limitation, pour chaque icône à une ligne. L'intérêt est d'obtenir les 5 imagettes correspondantes à une icône.
+Etape exécutée jusqu’à ce que la template courante ne soit plus retrouvée et au maximum 7 fois sur la même feuille de manière à trouver toutes les occurences de l'icône à des lignes différentes.
 
 
 2. Extraction des imagettes
