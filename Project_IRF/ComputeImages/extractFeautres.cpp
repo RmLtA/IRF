@@ -54,7 +54,8 @@ int main(int argc, char** argv)
 	int accumulatorThreshold = 30;
 	int cannyThreshold = 97;
 	
-	HoughDetection(src_gray, src, cannyThreshold, accumulatorThreshold);
+	int number=HoughDetection(src_gray, src, cannyThreshold, accumulatorThreshold);
+	cout << number;
 	//
 	waitKey(0);
 	return 0;
