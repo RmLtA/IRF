@@ -192,7 +192,41 @@ int main(int argc, const char * argv[]) {
     cpuTime = (double) ((prog_e - prog_b) / (double)CLOCKS_PER_SEC);
 
     cout << endl << "Total imagettes : " << totaltotal << " / " << 35*(sourcesImages.size()-nErroImg) << "\t" << "| Temps d'exec.: " << cpuTime/60  <<" min" << endl;;
-       
+    
+    /*
+    //A décommenter en cas de test
+	// Test feature for black_pixel 
+	vector<string> resultImagesToComputeBlackPixelAttribute = op->getResultImages();
+	cout << "Taille result : "  << resultImagesToComputeBlackPixelAttribute.size() << endl;
+	
+	string current;
+	//add attributes
+	op->v_attributes.push_back("black_pixel");
+	op->v_attributes.push_back("HarrisCorners");
+	op->v_attributes.push_back("class");
+
+	//add values to vector of attributes
+	for (int i = 0; i < resultImagesToComputeBlackPixelAttribute.size(); i++){
+		Mat img = imread(resultImagesToComputeBlackPixelAttribute[i]);
+		current = op->getFilename(resultImagesToComputeBlackPixelAttribute[i]);
+		cout << "Process... : " << current<< endl;
+		cout << i << endl;
+		//ajout de la classe de l'icon
+		op->addclasstov_class_icon(current);
+
+		//ajout des features       
+		feature* f = new feature(img);
+		op->v_nb_black_pixels.push_back(f->countBlackPixel(img));
+		op->v_nb_harris_corners.push_back(f->countHarrisCorners(img));
+
+	}
+
+	op->writeARFFFile();
+
+	cout << "Finished..." << endl;
+
+
+    */
     delete op;
     waitKey(0);
     return 0; 

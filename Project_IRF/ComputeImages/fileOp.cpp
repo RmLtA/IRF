@@ -50,6 +50,11 @@ vector<string> fileOp::getSourcesImages(){
 	return sourceDir;
 }
 
+vector<string> fileOp::getResultImages(){
+    vector<string> resultDir = readDir(dirResImagesName);
+    return resultDir;
+}
+
 ///Retourne les imagettes templates sources
 vector<string> fileOp::getTemplImages(){
     vector<string> templDir = readDir(dirTemplName);
@@ -93,3 +98,56 @@ string fileOp::getExtName(string name){
     return "null";
 }
 
+void fileOp::writeARFFFile(){
+    ofstream pFile("IRF.arff", ios::out);
+
+    pFile << "%1. Title : " << endl;
+    pFile << "%" << endl;
+    pFile << "%2. Sources : " << endl;
+    pFile << "%" << endl;
+    pFile << "%" << endl;
+    pFile << "%" << endl;
+    pFile << "@RELATION Imagette" << endl;
+    pFile << endl;
+
+    for (int i = 0; i < v_attributes.size()-1; i++){
+        pFile << "@ATTRIBUTE " << v_attributes[i]<< " NUMERIC" <<endl;
+    }
+    pFile << "@ATTRIBUTE " << v_attributes[v_attributes.size()-1] << " {accident, bomb, car, casualty, electricity, fire-brigade, flood, gas, injury, paramedics, person police, road-block}" << endl;
+
+    pFile << endl;
+    pFile << "@DATA" << endl;
+    //normalement tous les vector de values of attributes on la même taille
+
+        for (int i = 0; i < v_nb_black_pixels.size(); i++){
+            pFile <<v_nb_black_pixels[i];
+            pFile << ",";
+            pFile << v_nb_harris_corners[i];
+            pFile << ",";
+            pFile << v_class_icon[i];
+            pFile << endl;
+
+        }
+    
+    pFile.close();
+    
+
+}
+
+void fileOp::addclasstov_class_icon(string current){
+
+    if (current.find("accident") != string::npos) v_class_icon.push_back("accident");
+    if (current.find("bomb") != string::npos) v_class_icon.push_back("bomb");
+    if (current.find("car") != string::npos) v_class_icon.push_back("car");
+    if (current.find("casualty") != string::npos) v_class_icon.push_back("casualty");
+    if (current.find("electricity") != string::npos) v_class_icon.push_back("electricity");
+    if (current.find("fire-brigade") != string::npos) v_class_icon.push_back("fire-brigade");
+    if (current.find("fire") != string::npos) v_class_icon.push_back("fire");
+    if (current.find("flood") != string::npos) v_class_icon.push_back("flood");
+    if (current.find("gas") != string::npos) v_class_icon.push_back("gas");
+    if (current.find("injury") != string::npos) v_class_icon.push_back("injury");
+    if (current.find("paramedics") != string::npos) v_class_icon.push_back("paramedics");
+    if (current.find("person") != string::npos) v_class_icon.push_back("person");
+    if (current.find("police") != string::npos) v_class_icon.push_back("police");
+    if (current.find("road-block") != string::npos) v_class_icon.push_back("road-block");
+}

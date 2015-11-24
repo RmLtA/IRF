@@ -46,8 +46,17 @@ public:
     
     vector<string> getSourcesImages();
     vector<string> getTemplImages();
+    vector<string> getResultImages();
+    
+    //For features
+    vector<string> v_attributes;
+    vector<int> v_nb_black_pixels;
+    vector<int> v_nb_harris_corners;
+    vector<string> v_class_icon;
     
     void writeTxtFile(string templ, string scripter_number, int row, int columm, Mat image, bool verbose = false);
+    void writeARFFFile();
+    void addclasstov_class_icon(string current);
     
 private:
     vector<string> readDir(string dirName);
