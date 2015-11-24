@@ -135,14 +135,19 @@ void fileOp::writeARFFFile(){
 }
 
 void fileOp::addclasstov_class_icon(string current){
-
+    bool flag = false;
     if (current.find("accident") != string::npos) v_class_icon.push_back("accident");
     if (current.find("bomb") != string::npos) v_class_icon.push_back("bomb");
     if (current.find("car") != string::npos) v_class_icon.push_back("car");
     if (current.find("casualty") != string::npos) v_class_icon.push_back("casualty");
     if (current.find("electricity") != string::npos) v_class_icon.push_back("electricity");
-    if (current.find("fire-brigade") != string::npos) v_class_icon.push_back("fire-brigade");
-    if (current.find("fire") != string::npos) v_class_icon.push_back("fire");
+    if (current.find("brigade") != string::npos){
+        flag = true;
+        v_class_icon.push_back("fire-brigade");
+    }
+    if (current.find("fire") != string::npos && flag != true){
+        v_class_icon.push_back("fire");
+    }
     if (current.find("flood") != string::npos) v_class_icon.push_back("flood");
     if (current.find("gas") != string::npos) v_class_icon.push_back("gas");
     if (current.find("injury") != string::npos) v_class_icon.push_back("injury");
@@ -151,3 +156,4 @@ void fileOp::addclasstov_class_icon(string current){
     if (current.find("police") != string::npos) v_class_icon.push_back("police");
     if (current.find("road-block") != string::npos) v_class_icon.push_back("road-block");
 }
+
