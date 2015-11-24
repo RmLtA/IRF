@@ -35,12 +35,12 @@ static bool RESULT = false;
 
 /*unused*/
 //use folder test or default folder
-static  bool TEST = true;
+static  bool TEST = false;
 
 
 
 static bool PART_1 = false;
-static bool PART_2 = true;
+static bool PART_2 = false;
 
 /*
  // USAGE ::
@@ -57,7 +57,7 @@ static bool PART_2 = true;
 
 int main(int argc, const char * argv[]) {
 
-    //get_args(argc, argv);
+    get_args(argc, argv);
     
     
     if(PART_1){
@@ -79,26 +79,26 @@ int main(int argc, const char * argv[]) {
 /// ./projetIRF -none -part2 -test
 
 void get_args(int argc, const char * argv[]){
-    if(argc >= 2){
-        string a = argv[1];
-        if      (a== "-verbose"  || a=="-v") VERBOSE =true;
-        else if (a=="-result"    || a=="-r") RESULT =true;
-        else if (a=="-all"       || a=="-a") RESULT = VERBOSE =true;
-        else if (a=="-none"      || a=="-n") RESULT = VERBOSE =false;
-        
-        if(argc == 3){
-            string a = argv[2];
-            if(a == "-1" || a =="-part1") PART_1 =true;
-            if(a == "-2" || a =="-part2") PART_2 =true;
-            if(a == "-a" || a =="-all") PART_2 = PART_1 = true;
+    cout << argc << endl;;
+        for(int i=1 ; i<argc ; i++){
+            string a = argv[i];
+            cout <<a << endl;
+            if      (a== "-verbose"  || a=="-v") VERBOSE =true;
+            else if (a=="-result"    || a=="-r") RESULT =true;
+            else if (a=="-none"      || a=="-n") RESULT = VERBOSE =false;
+            else if(a == "-1" || a =="-part1") PART_1 =true;
+            else if(a == "-2" || a =="-part2") PART_2 =true;
+            else if(a == "-a" || a =="-all") PART_2 = PART_1 = true;
+            else if(a == "-test" || a =="-t") TEST =true;
+            
+        }
+    cout << "VERBOSE : " << VERBOSE;
+    cout << " RESULT : " << RESULT;
+    cout << " PART1 : " << PART_1;
+    cout << " PART2 : " << PART_2;
+    cout << " TEST : " << TEST;
+    cout <<endl;
 
-        }
-        if(argc == 4){
-            string a = argv[3];
-            cout << "TEST Files" <<endl;
-            if(a == "-test" || a =="-t") TEST =true;
-        }
-    }
 }
 
 
