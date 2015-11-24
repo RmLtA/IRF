@@ -39,6 +39,8 @@ public:
         if(isTest){
             dirSourceName += "test/";
             dirTemplName += "test/";
+            dirResImagesName += "test/";
+
         }
     };
     string getFilename(string name);
@@ -53,6 +55,8 @@ public:
     vector<int> v_nb_black_pixels;
     vector<int> v_nb_harris_corners;
     vector<string> v_class_icon;
+    vector<double>v_nb_area;
+    vector<double>v_nb_lenght;
     
     void writeTxtFile(string templ, string scripter_number, int row, int columm, Mat image, bool verbose = false);
     void writeARFFFile();

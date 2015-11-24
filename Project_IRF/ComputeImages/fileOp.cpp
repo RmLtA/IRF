@@ -50,6 +50,8 @@ vector<string> fileOp::getSourcesImages(){
 	return sourceDir;
 }
 
+
+///Retourne les imagettes
 vector<string> fileOp::getResultImages(){
     vector<string> resultDir = readDir(dirResImagesName);
     return resultDir;
@@ -123,6 +125,10 @@ void fileOp::writeARFFFile(){
             pFile <<v_nb_black_pixels[i];
             pFile << ",";
             pFile << v_nb_harris_corners[i];
+            pFile << ",";
+            pFile << v_nb_area[i];
+            pFile << ",";
+            pFile << v_nb_lenght[i];
             pFile << ",";
             pFile << v_class_icon[i];
             pFile << endl;

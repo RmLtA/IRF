@@ -7,31 +7,50 @@
 using namespace std;
 using namespace cv;
 
+static int thresh = 100;
+
 class feature{
 
 public:
 	Mat sourceImg;
-	Mat gray;
-	Mat bw;
-	vector<Point> black_pixels;
+	Mat graySourceImg;
+    Mat binaryImage;
+
+    //TODO see if this is useful
+    vector<Point> black_pixels;
 	vector<Vec4i> hierarchy;
 	vector<vector<Point> > contours;
+    vector<Moments> imMoments;
 
 
-	int thresh = 200;
 
 	
 	feature(Mat img) : sourceImg(img){
+         cvtColor( img, this->graySourceImg, CV_BGR2GRAY);
+
 	}
 
 	// Count the number of black pixels
-	int countBlackPixel(Mat img);
+	int countBlackPixel();
 
 	//Count the number of white pixels;
-	int countWhitePixel(Mat img);
+	int countWhitePixel();
 
 	// Count the number of Harris Corner
-	int countHarrisCorners(Mat img);
+	int countHarrisCorners();
+   // int findMoments();
+    
+    
+    Point2f countMassCenter();
+    double countLengthArea();
+    double countArea();
+
+
+
+    
+private:
+    void computeBlackPixels();
+
 
 };
 
