@@ -10,7 +10,7 @@
 @ATTRIBUTE HarrisCorners NUMERIC
 @ATTRIBUTE Airs NUMERIC
 @ATTRIBUTE Taille_coutours NUMERIC
-@ATTRIBUTE class {accident, bomb, car, casualty, electricity, fire-brigade, flood, gas, injury, paramedics, person police, road-block}
+@ATTRIBUTE class {accident, bomb, car, casualty, electricity, fire-brigade, fire, flood, gas, injury, paramedics, person police, road-block}
 
 @DATA
 1465,57550,114,917.796,accident

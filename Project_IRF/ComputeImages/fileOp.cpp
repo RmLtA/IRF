@@ -115,7 +115,7 @@ void fileOp::writeARFFFile(){
     for (int i = 0; i < v_attributes.size()-1; i++){
         pFile << "@ATTRIBUTE " << v_attributes[i]<< " NUMERIC" <<endl;
     }
-    pFile << "@ATTRIBUTE " << v_attributes[v_attributes.size()-1] << " {accident, bomb, car, casualty, electricity, fire-brigade, flood, gas, injury, paramedics, person police, road-block}" << endl;
+    pFile << "@ATTRIBUTE " << v_attributes[v_attributes.size()-1] << " {accident, bomb, car, casualty, electricity, fire-brigade, fire, flood, gas, injury, paramedics, person police, road-block}" << endl;
 
     pFile << endl;
     pFile << "@DATA" << endl;
