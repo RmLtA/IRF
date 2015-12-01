@@ -79,10 +79,10 @@ int main(int argc, const char * argv[]) {
 /// ./projetIRF -none -part2 -test
 
 void get_args(int argc, const char * argv[]){
-    cout << argc << endl;;
+   // cout << argc << endl;;
         for(int i=1 ; i<argc ; i++){
             string a = argv[i];
-            cout <<a << endl;
+           // cout <<a << endl;
             if      (a== "-verbose"  || a=="-v") VERBOSE =true;
             else if (a=="-result"    || a=="-r") RESULT =true;
             else if (a=="-none"      || a=="-n") RESULT = VERBOSE =false;
@@ -240,6 +240,8 @@ void process_part_two()
     fileOp *  op = new fileOp(TEST);
     try{
         
+        
+        
         //A décommenter en cas de test
         // Test feature for black_pixel
         vector<string> resultImagesToComputeBlackPixelAttribute = op->getResultImages();
@@ -259,20 +261,25 @@ void process_part_two()
             current = op->getFilename(resultImagesToComputeBlackPixelAttribute[i]);
             cout << "Process... : " << current<< endl;
             cout << i << endl;
+            
+            
             //ajout de la classe de l'icon
-            op->addclasstov_class_icon(current);
+            //op->addclasstov_class_icon(current);
             
             //ajout des features
             feature* f = new feature(img);
+            vector<Mat> v = f->splitImage(16);
+            
+        /*
             op->v_nb_black_pixels.push_back(f->countBlackPixel());
             op->v_nb_harris_corners.push_back(f->countHarrisCorners());
             op->v_nb_area.push_back(f->countArea());
             op->v_nb_lenght.push_back(f->countLengthArea());
-            
+            */
             
         }
         
-        op->writeARFFFile();
+       // op->writeARFFFile();
         
         
         
