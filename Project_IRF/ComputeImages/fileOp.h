@@ -61,6 +61,7 @@ public:
     void writeTxtFile(string templ, string scripter_number, int row, int columm, Mat image, bool verbose = false);
     void writeARFFFile();
     void addclasstov_class_icon(string current);
+    void writeFile(string nam,Mat img,bool verbose);
     
 private:
     vector<string> readDir(string dirName);
