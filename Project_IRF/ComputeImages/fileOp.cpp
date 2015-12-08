@@ -1,15 +1,25 @@
 
 #include "fileOp.h"
 
+void fileOp::writeFile(string nam, Mat img, bool verbose){
+	stringstream name_img,name;
+	name << nam;
+	name_img << dirResImagesName <<name.str()<< ".jpg";
+
+	//if (verbose)cout << "  " << getFilename(name_img.str());
+	//enregistrment de l'imagette
+	imwrite(name_img.str(), img);
+
+}
 /**
 * \fn void write_txtfile(string icone, int scripter_number, int page_number, int row, int columm)
-* \brief Fonction de création et de remplissage du fichier ".txt" associé aux imagettes
+* \brief Fonction de crÃ©ation et de remplissage du fichier ".txt" associÃ© aux imagettes
 *
 * \param string templ Le nom du symbole de l'imagette
-* \param int scripter_number Le numéro du scripter
-* \param int page_number Le numéro de la page
-* \param int row Le numéro de la ligne de l'imagette commence a 0
-* \param int columm Le numéro de la colonne de l'imagette commence a 0
+* \param int scripter_number Le numÃ©ro du scripter
+* \param int page_number Le numÃ©ro de la page
+* \param int row Le numÃ©ro de la ligne de l'imagette commence a 0
+* \param int columm Le numÃ©ro de la colonne de l'imagette commence a 0
 */
 
 void fileOp::writeTxtFile(string templ, string sourceName, int row, int columm, Mat image, bool verbose){
@@ -29,7 +39,7 @@ void fileOp::writeTxtFile(string templ, string sourceName, int row, int columm, 
 	//enregistrment de l'imagette
 	imwrite(name_img.str(), image);
 
-	//crŽation du fichier .txt
+	//crÅ½ation du fichier .txt
 	ofstream pFile(name.str(), ios::out);
 
 	//remplissage du fichier
@@ -119,7 +129,7 @@ void fileOp::writeARFFFile(){
 
     pFile << endl;
     pFile << "@DATA" << endl;
-    //normalement tous les vector de values of attributes on la même taille
+    //normalement tous les vector de values of attributes on la mÃªme taille
 
         for (int i = 0; i < v_nb_black_pixels.size(); i++){
             pFile <<v_nb_black_pixels[i];
