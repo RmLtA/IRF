@@ -1,10 +1,10 @@
 
 #include "fileOp.h"
 
-void fileOp::writeFile(string nam, Mat img, bool verbose){
+void fileOp::writeNormalized(string nam, Mat img, bool verbose){
 	stringstream name_img,name;
 	name << nam;
-	name_img << dirResImagesName <<name.str()<< ".jpg";
+	name_img << dirResNormalizedName <<name.str()<< ".jpg";
 
 	//if (verbose)cout << "  " << getFilename(name_img.str());
 	//enregistrment de l'imagette

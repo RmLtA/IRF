@@ -9,15 +9,17 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/core/core.hpp>
 #include <ctime>
+
+
 #include "fileOp.h"
-#include "computeImages.h"
+#include "extractImages.hpp"
+#include "normalizeImages.hpp"
+
 #include "feature.h"
 
 
 /* Utility functions*/
 void get_args(int argc, const char * argv[]);
-string niceOutput(string output, bool ok);
-Mat boundingBox2(Mat src);
 /* Process functions*/
 
 void process_part_one();
@@ -27,16 +29,15 @@ void process_part_three();
 
 using namespace std;
 using namespace cv;
-static const int MAXIMAGETTE = 7 ;
 
 
 //debugging on console
-static bool VERBOSE = false;
-static bool RESULT = false;
+static bool VERBOSE = true;
+static bool RESULT = true;
 
 /*unused*/
 //use folder test or default folder
-static  bool TEST = false;
+static  bool TEST = true;
 
 
 
@@ -111,135 +112,23 @@ void get_args(int argc, const char * argv[]){
 
 void process_part_one()
 {
-    fileOp *  op = new fileOp(TEST);
-    clock_t start, end, prog_b, prog_e;
-    double cpuTime;
+    extractImages * e = new extractImages(VERBOSE, RESULT, TEST);
+    e->process();
+    delete e;
     
-    prog_b = clock();
-    
-    //recupere le nom des images sources (feuilles de test)
-    vector<string> sourcesImages = op->getSourcesImages();
-    
-    //recupere le nom des templates
-    vector<string> templatesImages = op->getTemplImages();
-    
-    //boucle de traitement des images sources
-    int totaltotal = 0;
-    string pageCourante;
-    int nErroImg = 0;
-    for(int i=0 ; i < sourcesImages.size() ; i++){
-        Mat img = imread(sourcesImages[i]);
-        computeImages * ll = new computeImages(img, VERBOSE);
-        
-        int imagesCount = 0;
-        
-        
-        try{
-            pageCourante = op->getFilename(sourcesImages[i]);
-            start = clock();
-            if(VERBOSE)cout << "Traitement de la source : "<<sourcesImages[i]  << " ( " << pageCourante << " )" <<endl;
-            if(RESULT && !VERBOSE)cout << pageCourante << " ::";
-            
-            
-            vector<templateArea> foundTemplate;
-            
-            //On recupere en premier lieu les zones matchées par les templates afin de les ordonner
-            for(int j=0 ; j < templatesImages.size() ; j++)
-            {
-                if(imagesCount ==MAXIMAGETTE)break;
-                
-                string templateCourante = op->getFilename(templatesImages[j]);
-                stringstream currentNameStream ; currentNameStream <<pageCourante << "-" << templateCourante << "-" << imagesCount;
-                string s = currentNameStream.str();s.resize(17, ' ');
-                if(VERBOSE)cout << "\t template ( " << s << " ) : ";
-                
-                Mat templ = imread(templatesImages[j]);
-                if(ll->findTemplArea(templ, currentNameStream.str(), false))
-                {
-                    //on enregistre les zones a traiter
-                    templateArea curr;
-                    curr.image = ll->getTemplArea().clone();;
-                    curr.position = ll->getPositionY();
-                    curr.name = templateCourante;
-                    
-                    
-                    foundTemplate.push_back(curr);
-                    imagesCount++;
-                    //on supprime la zone deja matchée...
-                    ll->removeZone();
-                    //if(VERBOSE)ll->showFinalImage(currentNameStream.str());
-                    //on recommence avec le meme template afin de voir s'il existe le meme template à une autre position
-                    j--;
-                    
-                }
-                if(VERBOSE) cout << endl ;
-                
-            }
-            
-            if(VERBOSE){
-                ll->showFinalImage(pageCourante);
-                clock_t middle = clock();
-                cpuTime = (double) ((middle - start) / (double)CLOCKS_PER_SEC);
-                cout << endl << "Time for template matching : " << cpuTime << "s"<<endl;;
-            }
-            
-            int totalImagettes =0;
-            if(foundTemplate.size() >0){
-                if(VERBOSE) cout << "saving... " <<endl;;
-                stringstream ss;
-                // on reordonne les zones matchées
-                sort(foundTemplate.begin(), foundTemplate.end() , compareStruct);
-                // pour chaque zone
-                for(int ligne=0 ; ligne < foundTemplate.size() ; ligne++)
-                {
-                    //if(VERBOSE) cout << "recuperation de ligne potentielles... pour  " << foundTemplate[ligne].name<<endl;;
-                    
-                    //on récupère les lignes étant potentiellement nos imagettes à enregistrer
-                    vector<Vec4i> res =  ll->findLines(foundTemplate[ligne].image);
-                    
-                    //if(VERBOSE) cout << "recuperation des imagettes... " <<endl;;
-                    
-                    //on récupère les imagettes
-                    vector<Mat> result =  ll->findImages(res, foundTemplate[ligne].image);
-                    
-                    //pour chaque image on enregistre le .jpg + txt avec les informations correspondantes
-                    for (int col =0 ; col < result.size(); col++) {
-                        op->writeTxtFile(foundTemplate[ligne].name, pageCourante, ligne, col, result[col], false);
-                        
-                    }
-                    if(RESULT){
-                        stringstream sgs; sgs <<result.size() << "/5";
-                        ss<< "\t "<< ligne+1 <<" : " << niceOutput(sgs.str(), result.size() == 5) ;;
-                    }
-                    totalImagettes += result.size();
-                }
-                if(VERBOSE) cout << endl;
-                
-                if(RESULT){
-                    end = clock();
-                    cpuTime = (double) ((end - start) / (double)CLOCKS_PER_SEC);
-                    stringstream sgs; sgs <<totalImagettes << "/35";
-                    cout << " found :  " << imagesCount << "/7 templates => imagettes : "
-                    << ss.str() << " \t total : " << niceOutput(sgs.str(), totalImagettes == 35) << "\t time : " << cpuTime << " s"  << endl;
-                }
-            }else{
-                
-                if(VERBOSE || RESULT)cout << niceOutput(" Error, image rejected", false) << endl; //sort templ avec position
-                nErroImg++;
-                
-            }
-            totaltotal += totalImagettes;
-            
-        }catch(Exception e){
-            cout << "error with image : " << pageCourante << endl;;
-            cout << " " << e.what()<< endl;;
-        }
-        delete ll;
-    }
-    prog_e = clock();
-    cpuTime = (double) ((prog_e - prog_b) / (double)CLOCKS_PER_SEC);
-    cout << endl << "Total imagettes : " << totaltotal << " / " << 35*(sourcesImages.size()-nErroImg) << "\t" << "| Temps d'exec.: " << cpuTime/60  <<" min" << endl;;
 }
+
+
+
+
+void process_part_three()
+{
+	normalizeImages * n = new normalizeImages(VERBOSE, RESULT, TEST);
+    
+    n->process();
+    delete n;
+}
+
 
 void process_part_two()
 {
@@ -276,16 +165,16 @@ void process_part_two()
             feature* f = new feature(img);
             vector<Mat> v = f->splitImage(16);
             
-        /*
-            op->v_nb_black_pixels.push_back(f->countBlackPixel());
-            op->v_nb_harris_corners.push_back(f->countHarrisCorners());
-            op->v_nb_area.push_back(f->countArea());
-            op->v_nb_lenght.push_back(f->countLengthArea());
-            */
+            /*
+             op->v_nb_black_pixels.push_back(f->countBlackPixel());
+             op->v_nb_harris_corners.push_back(f->countHarrisCorners());
+             op->v_nb_area.push_back(f->countArea());
+             op->v_nb_lenght.push_back(f->countLengthArea());
+             */
             
         }
         
-       // op->writeARFFFile();
+        // op->writeARFFFile();
         
         
         
@@ -298,113 +187,4 @@ void process_part_two()
     delete op;
     
 }
-
-
-
-
- string niceOutput(string output, bool ok){
-    stringstream ss;
-    int  FG_RED      = 31;
-    int FG_GREEN    = 32;
-    ss << "\033[";
-    if(ok){
-        ss << FG_GREEN << "m" << output;
-    }else{
-        ss << FG_RED << "m"  << output;
-    }
-    
-    ss << " \033[0m";
-    return ss.str();
-}
-
-void process_part_three()
-{
-	
-    fileOp *  op = new fileOp(TEST);
-
-        vector<string> result = op->getSourcesImages();
-        cout << "Taille result : "  << result.size() << endl;
-		string current;
-        //read images
-        for (int i = 0; i < result.size(); i++){
-			Mat img = imread(result[i]);
-			Mat res = boundingBox2(img);
-			current = op->getFilename(result[i]);
-			cout << "Process... : " << current<< endl;
-			cout << i << endl;
-			op->writeFile(current,res, VERBOSE);
-		
-		  }       
-  
-	
-    delete op;
-    
-}
-/**
- * \fn Mat boundingBox
- * \brief extrait l'image
- *
- * \param src : image source
- * \return Mat
- */
- Mat boundingBox2(Mat src)
- {
-	 Mat src_gray;
-	 RNG rng(12345);
-	 int thresh = 245;
-	 Mat threshold_output;
-	 vector<vector<Point> > contours;
-	 vector<Vec4i> hierarchy;
-
-	 /// Convert image to gray and blur it
-	 cvtColor(src, src_gray, CV_BGR2GRAY);
-	 blur(src_gray, src_gray, Size(3, 3));
-	 /// Detect edges using Threshold
-	 threshold(src_gray, threshold_output, thresh, 255, THRESH_BINARY);
-	 /// Find contours
-	 findContours(threshold_output, contours, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, Point(0, 0));
-
-	 /// Approximate contours to polygons + get bounding rects and circles
-	 vector<vector<Point> > contours_poly(contours.size());
-	 vector<Rect> boundRect(contours.size());
-	 vector<Point2f>center(contours.size());
-	 vector<float>radius(contours.size());
-
-	 for (int i = 0; i < contours.size(); i++)
-	 {
-		 approxPolyDP(Mat(contours[i]), contours_poly[i], 3, true);
-		 boundRect[i] = boundingRect(Mat(contours_poly[i]));
-		 //minEnclosingCircle((Mat)contours_poly[i], center[i], radius[i]);
-	 }
-
-	 double max = 0; int k = 0;
-	 /// Draw polygonal contour + bonding rects + circles
-	 Mat drawing = Mat::zeros(threshold_output.size(), CV_8UC3);
-	 Mat dst = Mat::zeros(threshold_output.size(), CV_8UC3);
-	 Scalar color = Scalar(rng.uniform(0, 255), rng.uniform(0, 255), rng.uniform(0, 255));
-	 for (int i = 0; i< contours.size(); i++)
-	 {
-
-		 drawContours(drawing, contours_poly, i, color, 1, 8, vector<Vec4i>(), 0, Point());
-		 if (boundRect[i].area() > max && boundRect[i].area()<src.size().area() - 1000){
-			 max = boundRect[i].area();
-			 k = i;
-		 }
-		 rectangle(drawing, boundRect[i].tl(), boundRect[i].br(), color, 2, 8, 0);
-
-		 //circle(drawing, center[i], (int)radius[i], color, 2, 8, 0);
-	 }
-	 rectangle(dst, boundRect[k].tl(), boundRect[k].br(), color, 2, 8, 0);
-	 cout << boundRect[k].area() << endl;
-	 // decouper les images
-
-	 Mat final(src, boundRect[k]);
-
-	 imshow("ROI", final);
-	 /// Show in a window
-	 namedWindow("Contours", CV_WINDOW_AUTOSIZE);
-	 imshow("Contours", drawing);
-	 imshow("bigger", dst);
-	 return final;
- }
 

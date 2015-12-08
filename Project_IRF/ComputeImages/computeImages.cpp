@@ -179,7 +179,7 @@ vector<Vec4i> computeImages::findLines(Mat imgSource){
         //Apply blur to smooth edges and use adapative thresholding
         //Size size(3,3);
         //GaussianBlur(imgSource,img,size,0);
-        cv::cvtColor(imgSource, img, CV_BGR2GRAY);
+        cvtColor(imgSource, img, CV_BGR2GRAY);
         //apply
         adaptiveThreshold(img, img,255,CV_ADAPTIVE_THRESH_MEAN_C, CV_THRESH_BINARY,75,10);
         bitwise_not(img, img);
@@ -299,7 +299,7 @@ vector<Mat> computeImages::findImages(vector<Vec4i> lines, Mat imgSource){
                 continue;
             }
             //removing borders...
-            Rect rr(Point(r.tl().x +  10, r.tl().y +  10) ,Point(r.br().x-10,r.br().y-10));
+            Rect rr(Point(r.tl().x +  15, r.tl().y +  15) ,Point(r.br().x-15,r.br().y-15));
             
             Mat res(imgSource, rr);
             
@@ -349,7 +349,7 @@ vector<Mat> computeImages::findImages(vector<Vec4i> lines, Mat imgSource){
 
 
 
-Point2f computeImages::computeIntersect(cv::Vec4i a, cv::Vec4i b){
+Point2f computeImages::computeIntersect(Vec4i a, Vec4i b){
     int x1 = a[0], y1 = a[1], x2 = a[2], y2 = a[3];
     int x3 = b[0], y3 = b[1], x4 = b[2], y4 = b[3];
     //variable d'intersection
@@ -376,7 +376,7 @@ Point2f computeImages::computeIntersect(cv::Vec4i a, cv::Vec4i b){
 bool computeImages::pointsComparator(Point2f a,Point2f b){
     return a.x<b.x;
 }
-bool computeImages::rectComparator(std::vector<cv::Point2f>& a, std::vector<cv::Point2f>& b){
+bool computeImages::rectComparator(std::vector<Point2f>& a, std::vector<Point2f>& b){
     return  a.at(0).x < b.at(0).x;
 }
 
@@ -388,8 +388,8 @@ bool computeImages::rectComparator(std::vector<cv::Point2f>& a, std::vector<cv::
 * \param center
 * \return success
 */
-bool computeImages::sortCorners(std::vector<cv::Point2f>& corners, cv::Point2f center){
-    std::vector<cv::Point2f> top, bot;
+bool computeImages::sortCorners(std::vector<Point2f>& corners, Point2f center){
+    std::vector<Point2f> top, bot;
     for (int i = 0; i < corners.size(); i++)
     {
         if (corners[i].y <= center.y)

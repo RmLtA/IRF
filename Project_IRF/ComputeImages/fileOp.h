@@ -23,25 +23,46 @@ using namespace cv;
 
 
 class fileOp{
-     string dirSourceName;
-     string dirTemplName;
-     string dirResImagesName;
-     string dirResSquaresName;
+   
+    string dirSourceName;
+    string dirTemplName  ;
+    string dirResImagesName ;
+    string dirResNormalizedName;
+    
+
 
 public:
     fileOp(bool isTest){
-        dirSourceName = "sources/";
-        dirTemplName  = "templates/";
-        dirResImagesName  = "results/images/";
-        dirResSquaresName  = "results/squares/";
+         dirSourceName = "sources/";
+         dirTemplName   = "templates/";
+         dirResImagesName = "results/";
+         dirResNormalizedName = "results/";
         
+        
+        string release = "release/";
+        string test = "test/";
         
         if(isTest){
-            dirSourceName += "test/";
-            dirTemplName += "test/";
-            dirResImagesName += "test/";
+            dirSourceName += test; dirTemplName += test;
+            
+            dirResImagesName += test; dirResNormalizedName += test;
 
+        }else{
+            dirSourceName += release; dirTemplName += release;
+            
+            dirResImagesName +=release; dirResNormalizedName += release;
         }
+        
+        dirResImagesName += "images/";
+        dirResNormalizedName+= "normalized/";
+        
+        
+        cout << dirResNormalizedName <<endl;
+        cout << dirResImagesName << endl;
+        
+        
+   
+        
     };
     string getFilename(string name);
     string getExtName(string name);
@@ -61,7 +82,7 @@ public:
     void writeTxtFile(string templ, string scripter_number, int row, int columm, Mat image, bool verbose = false);
     void writeARFFFile();
     void addclasstov_class_icon(string current);
-    void writeFile(string nam,Mat img,bool verbose);
+    void writeNormalized(string nam,Mat img,bool verbose);
     
 private:
     vector<string> readDir(string dirName);
