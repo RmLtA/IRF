@@ -1,5 +1,6 @@
 #include "feature.h"
 
+
 //Divide the image into x parts/squares;
 vector<Mat>  feature::splitImage(int x){
     if (!this->sourceImg.data)
@@ -158,7 +159,7 @@ double feature::countLengthArea(){
     return max;
 }
 
-
+//Attention les attributs de weka sont des valeurs simples numeric 
 Point2f feature::countMassCenter(){
     Mat src_gray;
     RNG rng(12345);

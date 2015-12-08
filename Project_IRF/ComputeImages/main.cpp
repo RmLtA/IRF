@@ -242,52 +242,41 @@ void process_part_one()
 }
 
 void process_part_two()
-{
+{    
     fileOp *  op = new fileOp(TEST);
     try{
         
-        
-        
-        //A décommenter en cas de test
-        // Test feature for black_pixel
-        vector<string> resultImagesToComputeBlackPixelAttribute = op->getResultImages();
-        cout << "Taille result : "  << resultImagesToComputeBlackPixelAttribute.size() << endl;
-        
-        string current;
-        //add attributes
-        op->v_attributes.push_back("black_pixel");
-        op->v_attributes.push_back("HarrisCorners");
-        op->v_attributes.push_back("Airs");
-        op->v_attributes.push_back("Taille_coutours");
-        op->v_attributes.push_back("class");
-        
-        //add values to vector of attributes
-        for (int i = 0; i < resultImagesToComputeBlackPixelAttribute.size(); i++){
-            Mat img = imread(resultImagesToComputeBlackPixelAttribute[i]);
-            current = op->getFilename(resultImagesToComputeBlackPixelAttribute[i]);
-            cout << "Process... : " << current<< endl;
-            cout << i << endl;
-            
-            
-            //ajout de la classe de l'icon
-            //op->addclasstov_class_icon(current);
-            
-            //ajout des features
-            feature* f = new feature(img);
-            vector<Mat> v = f->splitImage(16);
-            
-        /*
-            op->v_nb_black_pixels.push_back(f->countBlackPixel());
-            op->v_nb_harris_corners.push_back(f->countHarrisCorners());
-            op->v_nb_area.push_back(f->countArea());
-            op->v_nb_lenght.push_back(f->countLengthArea());
-            */
-            
+        //Name of Images used to extract featires
+        vector<string> v_result_images_toextract_features = op->getResultImages();
+
+        //Print features available, ! attention l'ordre ici est important, le même que pour l'enum Features_available si modification
+        //car c'est ce que l'utilisateur va prendre en compte car instructions imprimées à l'écran
+        vector<string> v_features_available = {"Black_Pixel","White_Pixel","Airs","Contours_Size","Harris_Corners", "Length Area"};
+
+        //Features to extract
+        vector<int> v_features_to_extract;
+        cout << "All features available :" << endl;
+        for (int i = 0; i<v_features_available.size();i++){
+            cout << "   -"<<v_features_available[i] << " : Tape "<< i+1<< endl;
         }
+        cout << "To finish : Tape 0" << endl;
+
         
-       // op->writeARFFFile();
-        
-        
+        int features_toextract;
+        cin >> features_toextract;
+        while (features_toextract != 0){
+            v_features_to_extract.push_back(features_toextract);
+            cin >> features_toextract;
+        }
+        //Pour mettre l'attribut class à la fin
+        v_features_to_extract.push_back(INT_MAX);
+
+
+        extractFeature extract_feature;
+        extract_feature.compute_features(v_features_to_extract,v_result_images_toextract_features);
+
+        cout << "computing ... " << endl;
+        op->writeARFFFile(extract_feature);
         
     }catch(Exception e){
         cout << "Error in part two..." << endl;
