@@ -8,11 +8,12 @@
 #include <fstream>
 #include <vector>
 
+
 #include "opencv2/imgproc/imgproc.hpp"
 #include "opencv2/highgui/highgui.hpp"
 #include <opencv2/core/core.hpp>
 #include <dirent.h>
-
+#include "extractFeature.h"
 
 using namespace std;
 using namespace cv;
@@ -71,23 +72,22 @@ public:
     vector<string> getTemplImages();
     vector<string> getResultImages();
     
-    //For features
-    vector<string> v_attributes;
-    vector<int> v_nb_black_pixels;
-    vector<int> v_nb_harris_corners;
-    vector<string> v_class_icon;
-    vector<double>v_nb_area;
-    vector<double>v_nb_lenght;
+ 
     
     void writeTxtFile(string templ, string scripter_number, int row, int columm, Mat image, bool verbose = false);
-    void writeARFFFile();
     void addclasstov_class_icon(string current);
     void writeNormalized(string nam,Mat img,bool verbose);
+    void writeARFFFile(extractFeature& extrfeat);
+
+    //For features ! attention l'ordre ici est important, le même que dans le main pour v_features_available si modification
+    //car c'est ce que l'utilisateur va prendre en compte car instructions imprimées à l'écran
+    //Si ajout de features, ajouter une constante ! il y a un 2e enum dans extractFeature.h
+    enum Features_Available_FileOp { BLACK_PIXEL=1, WHITE_PIXEL, AREA, CONTOURS_SIZE, HARRIS_CORNERS, LENGTHAREA, MASSCENTER, CLASS = INT_MAX };
     
 private:
     vector<string> readDir(string dirName);
     
-   	//vector<string> find_image_name(void);
+    //vector<string> find_image_name(void);
 
 
 

@@ -11,6 +11,7 @@ void fileOp::writeNormalized(string nam, Mat img, bool verbose){
 	imwrite(name_img.str(), img);
 
 }
+
 /**
 * \fn void write_txtfile(string icone, int scripter_number, int page_number, int row, int columm)
 * \brief Fonction de création et de remplissage du fichier ".txt" associé aux imagettes
@@ -24,7 +25,7 @@ void fileOp::writeNormalized(string nam, Mat img, bool verbose){
 
 void fileOp::writeTxtFile(string templ, string sourceName, int row, int columm, Mat image, bool verbose){
 
-	stringstream tmp,name, name_img;
+    stringstream tmp,name, name_img;
     //00102.png
     //scripter = 001
     string scripter =sourceName.substr(3,sourceName.size());
@@ -32,32 +33,32 @@ void fileOp::writeTxtFile(string templ, string sourceName, int row, int columm, 
     string page =sourceName.substr(0,3);
     
     tmp << templ << "_" << scripter << "_" << page << "_" << row << "_" << columm;
-	name <<dirResImagesName << tmp.str() << ".txt";
+    name <<dirResImagesName << tmp.str() << ".txt";
     name_img <<dirResImagesName<<tmp.str() << ".jpg";
-	
-	if(verbose)cout<< "  " << getFilename(name_img.str());
-	//enregistrment de l'imagette
-	imwrite(name_img.str(), image);
+    
+    if(verbose)cout<< "  " << getFilename(name_img.str());
+    //enregistrment de l'imagette
+    imwrite(name_img.str(), image);
 
-	//crŽation du fichier .txt
-	ofstream pFile(name.str(), ios::out);
+    //crŽation du fichier .txt
+    ofstream pFile(name.str(), ios::out);
 
-	//remplissage du fichier
-	pFile << "Label " << templ << endl;
+    //remplissage du fichier
+    pFile << "Label " << templ << endl;
     pFile << "Form " << sourceName << endl;
-	pFile << "Scripteur " <<scripter << endl;
-	pFile << "Page " << page << endl;
-	pFile << "Row " << row << endl;
-	pFile << "Columm " << columm << endl;
+    pFile << "Scripteur " <<scripter << endl;
+    pFile << "Page " << page << endl;
+    pFile << "Row " << row << endl;
+    pFile << "Columm " << columm << endl;
 
-	//fermeture du fichier
-	pFile.close();
+    //fermeture du fichier
+    pFile.close();
 }
 
 ///Retourne les images sources
 vector<string> fileOp::getSourcesImages(){
     vector<string> sourceDir = readDir(dirSourceName);
-	return sourceDir;
+    return sourceDir;
 }
 
 
@@ -70,7 +71,7 @@ vector<string> fileOp::getResultImages(){
 ///Retourne les imagettes templates sources
 vector<string> fileOp::getTemplImages(){
     vector<string> templDir = readDir(dirTemplName);
-	return templDir;
+    return templDir;
 }
 
 ///Fonction utilitaire pour lire dans le dir
@@ -110,9 +111,10 @@ string fileOp::getExtName(string name){
     return "null";
 }
 
-void fileOp::writeARFFFile(){
+void fileOp::writeARFFFile(extractFeature& extrfeat){
     ofstream pFile("IRF.arff", ios::out);
 
+    /*Begin Head File*/
     pFile << "%1. Title : " << endl;
     pFile << "%" << endl;
     pFile << "%2. Sources : " << endl;
@@ -122,54 +124,72 @@ void fileOp::writeARFFFile(){
     pFile << "@RELATION Imagette" << endl;
     pFile << endl;
 
-    for (int i = 0; i < v_attributes.size()-1; i++){
-        pFile << "@ATTRIBUTE " << v_attributes[i]<< " NUMERIC" <<endl;
-    }
-    pFile << "@ATTRIBUTE " << v_attributes[v_attributes.size()-1] << " {accident, bomb, car, casualty, electricity, fire-brigade, fire, flood, gas, injury, paramedics, person police, road-block}" << endl;
+    
+    for (int i = 0; i < (extrfeat).getSizeOfv_attribute_asked(); i++){
+        int attribut = (extrfeat).getVectorAttributesAsked()[i];
+            switch (attribut){
+                case BLACK_PIXEL:
+                        pFile << "@ATTRIBUTE " << " Black_Pixel " << " NUMERIC" << endl;
+                    break;
+                case WHITE_PIXEL:
+                        pFile << "@ATTRIBUTE " << " White_Pixel " << " NUMERIC" << endl;
+                    break;
+                case AREA :
+                    pFile << "@ATTRIBUTE " << " Airs " << " NUMERIC" << endl;
+                    break;
+                case CONTOURS_SIZE:
+                    pFile << "@ATTRIBUTE " << " Contours_size " << " NUMERIC" << endl;
+                    break;
+                case HARRIS_CORNERS:
+                    pFile << "@ATTRIBUTE " << " Harris_Corners " << " NUMERIC" << endl;
+                    break;
+                case LENGTHAREA:
+                    pFile << "@ATTRIBUTE " << " Length_Area " << " NUMERIC" << endl;
+                    break;
+                /*case MASSCENTER:
+                    pFile << "@ATTRIBUTE " << " Mass_Center " << " NUMERIC" << endl;
+                    break;*/
+            }
+            
+        }
+    pFile << "@ATTRIBUTE" << " Class " << " {accident, bomb, car, casualty, electricity, fire-brigade, fire, flood, gas, injury, paramedics, person police, road-block}" << endl;
 
     pFile << endl;
+    /*End Head File*/
+
+
     pFile << "@DATA" << endl;
-    //normalement tous les vector de values of attributes on la même taille
 
-        for (int i = 0; i < v_nb_black_pixels.size(); i++){
-            pFile <<v_nb_black_pixels[i];
-            pFile << ",";
-            pFile << v_nb_harris_corners[i];
-            pFile << ",";
-            pFile << v_nb_area[i];
-            pFile << ",";
-            pFile << v_nb_lenght[i];
-            pFile << ",";
-            pFile << v_class_icon[i];
-            pFile << endl;
-
+    //First compute all numeric attribute
+    int k = 0; //normalement tous les vecteurs ont la même taille
+    int index_class = 0;
+    while (k < (extrfeat).v_all_numeric_v_attributes_values[0].size()){
+        vector<int> v;
+        vector<string> vs;
+        for (int i = 0; i < (extrfeat).v_all_numeric_v_attributes_values.size(); i++){
+            v.push_back((extrfeat).v_all_numeric_v_attributes_values[i][k]);
         }
-    
+        vs.push_back(extrfeat.v_class[k]);
+
+        //Ecriture dans le fichier
+
+            for (int j = 0; j < v.size(); j++){
+                if (j == v.size() - 1){
+                    pFile << v[j] << ","<< vs[index_class]<<endl;
+
+                }
+                else{
+                    pFile << v[j] << ",";
+                }
+            }
+            v.clear();
+            k++;
+
+
+
+    }
     pFile.close();
     
 
-}
-
-void fileOp::addclasstov_class_icon(string current){
-    bool flag = false;
-    if (current.find("accident") != string::npos) v_class_icon.push_back("accident");
-    if (current.find("bomb") != string::npos) v_class_icon.push_back("bomb");
-    if (current.find("car") != string::npos) v_class_icon.push_back("car");
-    if (current.find("casualty") != string::npos) v_class_icon.push_back("casualty");
-    if (current.find("electricity") != string::npos) v_class_icon.push_back("electricity");
-    if (current.find("brigade") != string::npos){
-        flag = true;
-        v_class_icon.push_back("fire-brigade");
-    }
-    if (current.find("fire") != string::npos && flag != true){
-        v_class_icon.push_back("fire");
-    }
-    if (current.find("flood") != string::npos) v_class_icon.push_back("flood");
-    if (current.find("gas") != string::npos) v_class_icon.push_back("gas");
-    if (current.find("injury") != string::npos) v_class_icon.push_back("injury");
-    if (current.find("paramedics") != string::npos) v_class_icon.push_back("paramedics");
-    if (current.find("person") != string::npos) v_class_icon.push_back("person");
-    if (current.find("police") != string::npos) v_class_icon.push_back("police");
-    if (current.find("road-block") != string::npos) v_class_icon.push_back("road-block");
 }
 
