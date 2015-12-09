@@ -83,7 +83,7 @@ vector<int> extractFeature::extract_feature_by_feature(int feature_attribute, ve
 			break;
 	}
 
-	
+    return v_attributes_values;
 }
 
 //No modification on adding features

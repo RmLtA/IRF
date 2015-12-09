@@ -24,7 +24,7 @@ static const double NO_REDUCE = 1;
 static const double NO_R_THRESHOLD_VAL = 0.51;
 
 /*valeur d'ajustement lors de l'intersection entre deux lignes*/
-static const int AVG_INTERSECTION = 39;
+static const int AVG_INTERSECTION = 30;
 
 struct templateArea{
     Mat image;

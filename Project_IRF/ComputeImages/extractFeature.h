@@ -35,11 +35,11 @@ public :
 	}
 	
 	int getSizeVectorClass(){
-		return v_class.size();
+		return  v_class.size();
 	}
 
 	int getSizeOfv_all_numeric(){
-		return v_all_numeric_v_attributes_values.size();
+		return  v_all_numeric_v_attributes_values.size();
 	}
 
 	int getSizeOfv_attribute_asked(){
@@ -47,7 +47,7 @@ public :
 	}
 
 	int getSizeVectorOfOneAttribute(){
-		return v_all_numeric_v_attributes_values.size()/(v_attributes_asked).size();
+		return  v_all_numeric_v_attributes_values.size()/(v_attributes_asked).size();
 	}
 
 	void compute_features(vector<int>& v_of_attributes, vector<string>& v_result_images_toextract_features);

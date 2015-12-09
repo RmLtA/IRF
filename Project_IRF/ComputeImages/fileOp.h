@@ -29,6 +29,7 @@ class fileOp{
     string dirTemplName  ;
     string dirResImagesName ;
     string dirResNormalizedName;
+    string dirResSplitedName;
     
 
 
@@ -38,7 +39,7 @@ public:
          dirTemplName   = "templates/";
          dirResImagesName = "results/";
          dirResNormalizedName = "results/";
-        
+         dirResSplitedName ="results/";
         
         string release = "release/";
         string test = "test/";
@@ -47,22 +48,18 @@ public:
             dirSourceName += test; dirTemplName += test;
             
             dirResImagesName += test; dirResNormalizedName += test;
+            dirResSplitedName +=test;
 
         }else{
             dirSourceName += release; dirTemplName += release;
             
             dirResImagesName +=release; dirResNormalizedName += release;
+             dirResSplitedName +=release;
         }
         
         dirResImagesName += "images/";
         dirResNormalizedName+= "normalized/";
-        
-        
-        cout << dirResNormalizedName <<endl;
-        cout << dirResImagesName << endl;
-        
-        
-   
+        dirResSplitedName +="splited/";
         
     };
     string getFilename(string name);
@@ -76,6 +73,8 @@ public:
     
     void writeTxtFile(string templ, string scripter_number, int row, int columm, Mat image, bool verbose = false);
     void addclasstov_class_icon(string current);
+    
+    void writeSplited(string nam, Mat img, bool verbose);
     void writeNormalized(string nam,Mat img,bool verbose);
     void writeARFFFile(extractFeature& extrfeat);
 

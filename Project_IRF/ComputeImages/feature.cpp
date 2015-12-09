@@ -1,38 +1,6 @@
 #include "feature.h"
 
 
-//Divide the image into x parts/squares;
-vector<Mat>  feature::splitImage(int x){
-    if (!this->sourceImg.data)
-        cerr << "Problem loading image from : splitImage(int x)" << endl;
-
-    
-    int height = this->sourceImg.rows;
-    int width = this->sourceImg.cols;
-    double factor = sqrt(x);
-    
-    
-    Size smallSize ((1/factor)*width,(1/factor)*height); // Size of the squares
-    vector<Mat> smallImages;
-    
-    double smallHeight =(1/factor)*height;
-    double smallWidth =(1/factor)*width ;
-    
-    
-    for  ( double y =  0 ; y < height ; y += smallHeight )
-    {
-        for  ( double x =  0 ; x < width ; x += smallWidth)
-        {
-            Rect rect =  Rect ( x, y, smallWidth , smallHeight );
-            Mat mat =Mat(sourceImg , rect);
-            smallImages.push_back (mat); // constructor Mat (Mat, roi)
-           // cout << "height : " << mat.rows << " width" << mat.cols<<endl;
-        }
-    }
-    
-    //cout << "fin coucou" <<endl;
-    return smallImages;
-}
 
 // Count the number of black pixels
 int feature::countBlackPixel(){

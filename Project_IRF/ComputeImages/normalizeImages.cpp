@@ -10,6 +10,8 @@
 
 void normalizeImages::process(){
     fileOp *  op = new fileOp(TEST);
+    
+    double moy_cols = 0, moy_rows = 0;
 
     vector<string> result = op->getResultImages();
     cout << "Taille result : "  << result.size() << endl;
@@ -18,17 +20,109 @@ void normalizeImages::process(){
     for (int i = 0; i < result.size(); i++){
         Mat img = imread(result[i]);
         current = op->getFilename(result[i]);
-        Mat res = this->boundingBox(img, current);
+        Mat box = this->boundingBox(img, current);
+        
+        if(RESULT){
+            moy_cols +=box.cols;
+            moy_rows +=box.rows;
+        }
+      
+        Mat res = getSquareImage(box,current);
+            
 
-        cout << "Process... : " << current<< endl;
-        cout << i << endl;
+        if(VERBOSE) cout << "Process... : " << current<< endl;
+        //cout << i << endl;
         op->writeNormalized(current,res, VERBOSE);
         
+        
+        vector<Mat> splited = splitImage(SPLIT_FACTOR, res);
+        for(int j = 0 ; j < splited.size(); j++)
+        {
+            stringstream   ss;
+            ss << current << "_" << j;
+            op->writeSplited(ss.str(),splited[j], VERBOSE);
+        }
+        
     }
-
+    if(RESULT){
+        double nb_img = result.size();
+        if(nb_img !=0){
+            moy_rows /=nb_img;
+            moy_cols /=nb_img;
+            cout << "Nb moy cols : " << moy_cols << " \t Nb moy rows : " << moy_rows <<endl;;
+        }
+    }
 
     delete op;
 }
+
+
+
+//Divide the image into x parts/squares;
+vector<Mat>  normalizeImages::splitImage(int x, Mat const & src){
+
+    
+    int height = src.rows;
+    int width =src.cols;
+    double factor = sqrt(x);
+    
+    
+    Size smallSize ((1/factor)*width,(1/factor)*height); // Size of the squares
+    vector<Mat> smallImages;
+    
+    double smallHeight =(1/factor)*height;
+    double smallWidth =(1/factor)*width ;
+    
+    
+    for  ( double y =  0 ; y < height ; y += smallHeight )
+    {
+        for  ( double x =  0 ; x < width ; x += smallWidth)
+        {
+            Rect rect =  Rect ( x, y, smallWidth , smallHeight );
+            Mat mat =Mat(src , rect);
+            smallImages.push_back (mat); // constructor Mat (Mat, roi)
+            // cout << "height : " << mat.rows << " width" << mat.cols<<endl;
+        }
+    }
+    
+    //cout << "fin coucou" <<endl;
+    return smallImages;
+}
+
+
+cv::Mat normalizeImages::getSquareImage( const cv::Mat& img, string imgName )
+{
+    int width = img.cols,
+    height = img.rows;
+    
+    cv::Mat square( MAX_SIZE, MAX_SIZE, img.type() );
+    square.setTo(cv::Scalar(255,255,255));
+    int max_dim = ( width >= height ) ? width : height;
+    float scale = ( ( float ) MAX_SIZE ) / max_dim;
+    cv::Rect roi;
+    if ( width >= height )
+    {
+        roi.width = MAX_SIZE;
+        roi.x = 0;
+        roi.height = height * scale;
+        roi.y = ( MAX_SIZE - roi.height ) / 2;
+    }
+    else
+    {
+        roi.y = 0;
+        roi.height = MAX_SIZE;
+        roi.width = width * scale;
+        roi.x = ( MAX_SIZE - roi.width ) / 2;
+    }
+    
+    cv::resize( img, square( roi ), roi.size() );
+    
+    
+    if(VERBOSE) imshow("Square Image " + imgName, square);
+    return square;
+}
+
+
 
 
 
@@ -40,61 +134,46 @@ void normalizeImages::process(){
  * \param src : image source
  * \return Mat
  */
-Mat normalizeImages::boundingBox(Mat src, string imgName)
+Mat normalizeImages::boundingBox(const cv::Mat& img, string imgName)
 {
     
     try{
-        
-        
-        //removing borders...
-    //Mat cropedImage (src , Rect(10,10,src.cols-10,src.rows-10));
+ 
 
-    Mat src_gray;
-    RNG rng(12345);
-    int thresh = 200;
-    Mat threshold_output;
-    vector<vector<Point> > contours;
-    vector<Vec4i> hierarchy;
-    
-    /// Convert image to gray and blur it
-    cvtColor(src, src_gray, CV_BGR2GRAY);
-    blur(src_gray, src_gray, Size(3, 3));
-        
-//        Size kernalSize (2,2);
-//        Mat element = getStructuringElement (MORPH_RECT, kernalSize, Point(1,1)  );
-//        morphologyEx( src_gray, src_gray, MORPH_BLACKHAT, element );
-//        imshow("morph" + imgName, src_gray);
-    /// Detect edges using Threshold
-    threshold(src_gray, threshold_output, thresh, 255, THRESH_BINARY);
-        
-        
-      
-    /// Find contours
-    findContours(threshold_output, contours, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, Point(1, 1));
-    
-    /// Approximate contours to polygons + get bounding rects and circles
-    vector<vector<Point> > contours_poly(contours.size());
-    vector<Rect> boundRect(contours.size());
-    vector<Point2f>center(contours.size());
-    vector<float>radius(contours.size());
-    vector<Point> allcontours;
-        cout << "for" <<endl;
+        Mat src_gray;
+        RNG rng(12345);
+        Mat threshold_output;
+        vector<vector<Point> > contours;
+        vector<Vec4i> hierarchy;
 
-    for(int i = 0 ;i< contours.size() ; i++){
+        /// Convert image to gray and blur it
+        cvtColor(img, src_gray, CV_BGR2GRAY);
+        blur(src_gray, src_gray, Size(3, 3));
+            
+        threshold(src_gray, threshold_output, THRESH_VALUE, 255, THRESH_BINARY);
         
-        for(int j= 0 ; j< contours[i].size() ; j++){
-            if(contours[i][j].x > 10 && contours[i][j].x < src.cols -10 &&
-               contours[i][j].y > 10 && contours[i][j].y < src.rows -10 ){
-                allcontours.push_back(contours[i][j]);
-                //cout << "push" <<endl;
-                
+        /// Find contours
+        findContours(threshold_output, contours, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, Point(1, 1));
 
+        /// Approximate contours to polygons + get bounding rects and circles
+        vector<vector<Point> > contours_poly(contours.size());
+        vector<Rect> boundRect(contours.size());
+        vector<Point2f>center(contours.size());
+        vector<float>radius(contours.size());
+        vector<Point> allcontours;
+
+        for(int i = 0 ;i< contours.size() ; i++){
+            
+            for(int j= 0 ; j< contours[i].size() ; j++){
+                if(contours[i][j].x > IMG_GAP && contours[i][j].x < img.cols -IMG_GAP &&
+                   contours[i][j].y > IMG_GAP && contours[i][j].y < img.rows -IMG_GAP ){
+                    allcontours.push_back(contours[i][j]);
+                    
+
+                }
             }
         }
-    }
-        
-        cout << "endfor" <<endl;
-        cout << allcontours.size() <<endl;
+            
 
         vector<Point> poly(allcontours.size());
         approxPolyDP(Mat(allcontours), poly, 15, true);
@@ -104,10 +183,10 @@ Mat normalizeImages::boundingBox(Mat src, string imgName)
 
 
         rectangle(drawing, bounRect.tl(), bounRect.br(), color, 2, 8, 0);
-        Mat final(src, bounRect);
+        Mat final(img, bounRect);
 
-        imshow("Contours " + imgName, drawing);
-        imshow("final " + imgName, final);
+       // imshow("Contours " + imgName, drawing);
+       if(VERBOSE) imshow("final " + imgName, final);
 
 
 //

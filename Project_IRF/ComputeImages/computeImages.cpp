@@ -131,14 +131,18 @@ bool computeImages::findTemplArea(Mat templ, string currentName, bool secondPass
         this->currentTemplArea = ligne;
         this->templPos = matchLoc;
         
-         if(verbose)  imshow(currentName, ligne);
+         //if(verbose)  imshow(currentName, ligne);
       
     }else if(maxVal > (myThresholdVal - acceptance ) && secondPass != true){
         if(verbose)
         {   stringstream ss;
             
             cout << " \t\t ~~~~~~";
-            ss<< "  values ::" <<" minLoc : " << minLoc << "  maxLoc : " << maxLoc << " \t minVal : " << minVal << "  maxVal : " << maxVal;
+            ss<< "  values ::" ;
+            //<<" minLoc : " << minLoc <<
+            ss<<"  maxLoc : " << maxLoc << " \t";
+            //minVal : " << minVal <<
+            ss<<"  maxVal : " << maxVal;
             string s = ss.str(); s.resize(100, ' ');
             cout << s << " trying again..." << endl;;
             
@@ -149,9 +153,13 @@ bool computeImages::findTemplArea(Mat templ, string currentName, bool secondPass
     if(verbose)
     {   stringstream ss;
 
-        cout << (secondPass ? " \t\t\t\t\t\t\t ===> " :" \t\t ")
+        cout << (secondPass ? " \t\t\t\t\t\t\t\t ===> " :" \t\t ")
         << (founded ? "//////" : "||||||");
-        ss<< "  values ::" <<" minLoc : " << minLoc << "  maxLoc : " << maxLoc << " \t minVal : " << minVal << "  maxVal : " << maxVal;
+        ss<< "  values ::" ;
+        //<<" minLoc : " << minLoc
+        ss<< "  maxLoc : " << maxLoc << " \t";
+        //minVal : " << minVal
+        ss<< "  maxVal : " << maxVal;
         string s = ss.str(); s.resize(100, ' ');
         cout << s << "" << (founded ? "found " : " not found ");
       
@@ -303,41 +311,38 @@ vector<Mat> computeImages::findImages(vector<Vec4i> lines, Mat imgSource){
             
             Mat res(imgSource, rr);
             
-            
-            if(verbose){
-                stringstream ss;
-                ss << "imagette :: " << " " << templ << " " << i ;
-                
-                imshow(ss.str(), res);
-            }
+//            
+//            if(verbose){
+//                stringstream ss;
+//                ss << "imagette :: " << " " << templ << " " << i ;
+//                
+//                //imshow(ss.str(), res);
+//            }
             returnImages.push_back(res);
         
         }
         
         
-        if(verbose){
-            //affichage lignes trouvées
-            Mat area = imgSource.clone();
-            for(size_t i = 0; i < lines.size(); i++ ) {
-                Vec4i l = lines[i];
-                line(area, Point(l[0], l[1]), Point(l[2], l[3]), Scalar(0,0,255), 3, CV_AA);
-            }
-            
-            Mat imreduite;
-            int reduction =2;
-            Size tailleReduite(area.cols / reduction, area.rows / reduction);
-            imreduite = Mat(tailleReduite, CV_8UC3); //cree une image à 3 canaux de profondeur 8 bits chacuns
-            resize(area, imreduite, tailleReduite);
-            stringstream ss;
-            ss << "image :: " << " " << templ++ ;
-
-            
-            imshow(ss.str(), imreduite);
-            
-            
-            
-            
-        }
+//        if(verbose){
+//            //affichage lignes trouvées
+//            Mat area = imgSource.clone();
+//            for(size_t i = 0; i < lines.size(); i++ ) {
+//                Vec4i l = lines[i];
+//                line(area, Point(l[0], l[1]), Point(l[2], l[3]), Scalar(0,0,255), 3, CV_AA);
+//            }
+//            
+//            Mat imreduite;
+//            int reduction =2;
+//            Size tailleReduite(area.cols / reduction, area.rows / reduction);
+//            imreduite = Mat(tailleReduite, CV_8UC3); //cree une image à 3 canaux de profondeur 8 bits chacuns
+//            resize(area, imreduite, tailleReduite);
+//            stringstream ss;
+//            ss << "image :: " << " " << templ++ ;
+//
+//            
+//            imshow(ss.str(), imreduite);
+//            
+//        }
         return returnImages;
     }catch(Exception e){
         std::cout << "computeImages::findImages" <<endl ;

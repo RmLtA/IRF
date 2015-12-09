@@ -12,6 +12,18 @@ void fileOp::writeNormalized(string nam, Mat img, bool verbose){
 
 }
 
+
+void fileOp::writeSplited(string nam, Mat img, bool verbose){
+    stringstream name_img,name;
+    name << nam;
+    name_img << dirResSplitedName <<name.str()<< ".jpg";
+    
+    if (verbose)cout << "  " << getFilename(name_img.str());
+    //enregistrment de l'imagette
+    imwrite(name_img.str(), img);
+    
+}
+
 /**
 * \fn void write_txtfile(string icone, int scripter_number, int page_number, int row, int columm)
 * \brief Fonction de création et de remplissage du fichier ".txt" associé aux imagettes
@@ -90,7 +102,7 @@ vector<string> fileOp::readDir(string dirName){
         closedir (dir);
     } else {
         cout<< dirName << " not present... "<<endl;
-        closedir (dir);
+        //closedir (dir);
         exit(0);
     }
     return output;

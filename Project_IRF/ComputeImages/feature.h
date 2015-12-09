@@ -30,8 +30,6 @@ public:
 
 	}
 
-	//Divide the image into x parts;
-	vector<Mat> splitImage(int);
 	
 	// Count the number of black pixels
 	int countBlackPixel();

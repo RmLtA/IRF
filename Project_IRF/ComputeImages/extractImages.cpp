@@ -78,7 +78,7 @@ void extractImages::process(){
             }
             
             if(VERBOSE){
-                ll->showFinalImage(pageCourante);
+             //   ll->showFinalImage(pageCourante);
                 clock_t middle = clock();
                 cpuTime = (double) ((middle - start) / (double)CLOCKS_PER_SEC);
                 cout << endl << "Time for template matching : " << cpuTime << "s"<<endl;;

@@ -45,18 +45,21 @@ public :
 
 
 static string niceOutput(string output, bool ok){
-    stringstream ss;
-    int  FG_RED      = 31;
-    int FG_GREEN    = 32;
-    ss << "\033[";
-    if(ok){
-        ss << FG_GREEN << "m" << output;
-    }else{
-        ss << FG_RED << "m"  << output;
+    if(false){
+        stringstream ss;
+        int  FG_RED      = 31;
+        int FG_GREEN    = 32;
+        ss << "\033[";
+        if(ok){
+            ss << FG_GREEN << "m" << output;
+        }else{
+            ss << FG_RED << "m"  << output;
+        }
+        
+        ss << " \033[0m";
+        return ss.str();
     }
-    
-    ss << " \033[0m";
-    return ss.str();
+   return output;
 }
 
 #endif /* extractImages_hpp */

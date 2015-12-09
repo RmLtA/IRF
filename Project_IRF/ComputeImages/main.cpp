@@ -32,7 +32,7 @@ using namespace cv;
 
 
 //debugging on console
-static bool VERBOSE = true;
+static bool VERBOSE = false;
 static bool RESULT = true;
 
 /*unused*/
@@ -41,7 +41,7 @@ static  bool TEST = true;
 
 
 
-static bool PART_1 = false;
+static bool PART_1 = true;
 static bool PART_2 = false;
 static bool PART_3 = true;
 /*
@@ -63,15 +63,15 @@ int main(int argc, const char * argv[]) {
     
     
     if(PART_1){
-        if(VERBOSE)cout << "Part one..." <<endl;
+        if(VERBOSE || RESULT)cout << "\nExtracting images..." <<endl;
         process_part_one();
     }
     if(PART_2){
-        if(VERBOSE)cout << "Part two..." <<endl;
+        if(VERBOSE || RESULT)cout << "\nGetting features..." <<endl;
         process_part_two();
     }
     if (PART_3){
-		if (VERBOSE)cout << "Part three..." << endl;
+		if (VERBOSE || RESULT)cout << "\nNormalizing images..." << endl;
 		process_part_three();
 	}
 	cout << "Finished..." << endl;
@@ -101,9 +101,12 @@ void get_args(int argc, const char * argv[]){
         }
     cout << "VERBOSE : " << VERBOSE;
     cout << " RESULT : " << RESULT;
+    cout << " TEST : " << TEST <<endl;;
     cout << " PART1 : " << PART_1;
     cout << " PART2 : " << PART_2;
-    cout << " TEST : " << TEST;
+    cout << " PART3 : " << PART_3;
+
+  
     cout <<endl;
 
 }
@@ -164,11 +167,13 @@ void process_part_two()
         v_features_to_extract.push_back(INT_MAX);
 
 
-        extractFeature extract_feature;
-        extract_feature.compute_features(v_features_to_extract,v_result_images_toextract_features);
+        extractFeature * extract_feature;
+        extract_feature->compute_features(v_features_to_extract,v_result_images_toextract_features);
 
         cout << "computing ... " << endl;
-        op->writeARFFFile(extract_feature);
+        op->writeARFFFile(*extract_feature);
+        
+        delete extract_feature;
         
     }catch(Exception e){
         cout << "Error in part two..." << endl;
