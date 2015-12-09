@@ -38,7 +38,7 @@ static bool RESULT = true;
 /*unused*/
 //use folder test or default folder
 static  bool TEST = true;
-static bool REMOVE_SOURCE = true;
+static bool REMOVE_SOURCE = false;
 
 
 static bool EXTRACT_IMAGES = true;

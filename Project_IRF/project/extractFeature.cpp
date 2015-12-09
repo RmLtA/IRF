@@ -75,7 +75,7 @@ vector<int> extractFeature::extract_feature_by_feature(int offset , int feature_
 
 //No modification on adding features
 void extractFeature::addclassto_v_class(vector<string>& v_result_images_toextract_features){
-	for (int i = 0; i < v_result_images_toextract_features.size(); i++){
+	for (int i = 0; i < v_result_images_toextract_features.size(); i=i+SPLITED){
 		size_t point0 = v_result_images_toextract_features[i].find_last_of("/");
 		string res = v_result_images_toextract_features[i].substr(point0 + 1, v_result_images_toextract_features[i].size());
 		size_t point = res.find_first_of("_");
