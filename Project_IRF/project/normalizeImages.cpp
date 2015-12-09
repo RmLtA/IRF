@@ -8,13 +8,16 @@
 
 #include "normalizeImages.hpp"
 
-void normalizeImages::process(){
+void normalizeImages::process(bool saveNormalized){
     fileOp *  op = new fileOp(TEST);
+    if(saveNormalized) op->removeAllResNormalizedFiles();
+    op->removeAllResSplittedFiles();
+
     
     double moy_cols = 0, moy_rows = 0;
 
     vector<string> result = op->getResultImages();
-    cout << "Taille result : "  << result.size() << endl;
+    //cout << "Taille result : "  << result.size() << endl;
     string current;
     //read images
     for (int i = 0; i < result.size(); i++){
@@ -32,9 +35,9 @@ void normalizeImages::process(){
 
         if(VERBOSE) cout << "Process... : " << current<< endl;
         //cout << i << endl;
-        op->writeNormalized(current,res, VERBOSE);
+        if(saveNormalized)op->writeNormalized(current,res, VERBOSE);
         
-        
+      
         vector<Mat> splited = splitImage(SPLIT_FACTOR, res);
         for(int j = 0 ; j < splited.size(); j++)
         {
@@ -43,13 +46,17 @@ void normalizeImages::process(){
             op->writeSplited(ss.str(),splited[j], VERBOSE);
         }
         
+       
+ 
+        
     }
     if(RESULT){
         double nb_img = result.size();
         if(nb_img !=0){
             moy_rows /=nb_img;
             moy_cols /=nb_img;
-            cout << "Nb moy cols : " << moy_cols << " \t Nb moy rows : " << moy_rows <<endl;;
+            cout << "Avg size cols : " << moy_cols << " \t Avg size rows : " << moy_rows <<endl;;
+            cout << "Resized image size : " << MAX_SIZE <<"x" << MAX_SIZE<<endl;
         }
     }
 

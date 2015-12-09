@@ -1,6 +1,0 @@
-Label injury
-Form 00006
-Scripteur 06
-Page 000
-Row 4
-Columm 2

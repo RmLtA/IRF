@@ -38,12 +38,12 @@ static bool RESULT = true;
 /*unused*/
 //use folder test or default folder
 static  bool TEST = true;
+static bool REMOVE_SOURCE = true;
 
 
-
-static bool EXTRACT_IMAGES = false;
+static bool EXTRACT_IMAGES = true;
 static bool GET_FEATURES = true;
-static bool NORMALIZE = false;
+static bool NORMALIZE = true;
 /*
  // USAGE ::
  ./projetIRF -v [mode verbose]
@@ -54,16 +54,31 @@ static bool NORMALIZE = false;
  ./projetIRF -a -test [mode resultats + verbose]
  */
 
-
+int SPLIT_FACTOR = 4;
+static bool SAVE_NORMALIZED = false;
 
 
 int main(int argc, const char * argv[]) {
 
     get_args(argc, argv);
+    if(REMOVE_SOURCE){
+        int approve = 0;
+        cout << "Are you sure you wan't to remove all source files from " << (TEST ? "test" : "release") << " [ Yes : 1] "<< endl;
+        cin >> approve;
+        if(approve ==1){
+            fileOp * op = new fileOp(TEST);
+            op->removeAllResImagesFiles();
+            op->removeAllResNormalizedFiles();
+            op->removeAllResSplittedFiles();
+        }
+        cout << "Ending...  "<<endl;
+        return 0;
+    }
     
     
     if(EXTRACT_IMAGES){
         if(VERBOSE || RESULT)cout << "\nExtracting images..." <<endl;
+        
         process_extract();
     }
     if (NORMALIZE){
@@ -98,6 +113,9 @@ void get_args(int argc, const char * argv[]){
         else if(a == "-f" || a =="-features") GET_FEATURES =true;
         else if(a == "-a" || a =="-all") GET_FEATURES = EXTRACT_IMAGES = NORMALIZE= true;
         else if(a == "-test" || a =="-t") TEST =true;
+        else if(a == "-remove"){
+         
+        }
         
     }
     cout << " VERBOSE : " << VERBOSE;
@@ -124,9 +142,23 @@ void process_extract()
 
 void process_normalize()
 {
-	normalizeImages * n = new normalizeImages(VERBOSE, RESULT, TEST);
+    int split_factor = SPLIT_FACTOR;
     
-    n->process();
+    cout << "Normalize images... Split image in ? (1..4..9) :";
+    cin >> split_factor;
+    while(split_factor != 1 && split_factor != 4 && split_factor != 9){
+        cout << "\nOnly 1 or 4 or 9 : ";
+        cin >> split_factor;
+    }
+        
+    if(split_factor != 0) SPLIT_FACTOR = split_factor;
+    cout << "\nOK, Split in : " << SPLIT_FACTOR << endl;
+    
+	normalizeImages * n = new normalizeImages(VERBOSE, RESULT, TEST, split_factor);
+   
+    bool saveNormalized = SAVE_NORMALIZED;
+    cout <<"Save Normalized is set to : " << SAVE_NORMALIZED << endl;;
+    n->process(saveNormalized);
     delete n;
 }
 
@@ -140,8 +172,15 @@ void process_features()
 
         //Name of Images used to extract featires
         //ON UTILISE LES IMAGES NORMALIZEES
-        //TODO VOIR COMMENT FAIRE AVEC LES IMAGES SPLITTED
-        vector<string> v_result_images_toextract_features = op->getNormalizedImages();
+        //VOIR IMAGES SPLITTED
+        vector<string> v_result_images_toextract_features = op->getSplitedImages();
+        
+        if(v_result_images_toextract_features.size() % SPLIT_FACTOR != 0)
+        {
+            cout << "error : Splitted images are not equivalent to SPLIT_FACTOR" << endl;
+            cout << "try again with NORMALIZE (-n -normalize) option to reconstruct images" <<endl;
+            return;
+        }
 
         //Print features available, ! attention l'ordre ici est important, le même que pour l'enum Features_available si modification
         //car c'est ce que l'utilisateur va prendre en compte car instructions imprimées à l'écran
@@ -164,15 +203,25 @@ void process_features()
             cin >> features_toextract;
             
         }
+        
+        cout << "Ok, features are :"<<endl;
+        for (int i = 0; i<v_features_to_extract.size();i++){
+            cout << "\t| "<<v_features_available[v_features_to_extract[i]] ;
+        }
         //Pour mettre l'attribut class à la fin
         v_features_to_extract.push_back(INT_MAX);
-
-
-        extractFeature  extract_feature;
-        extract_feature.compute_features(v_features_to_extract,v_result_images_toextract_features);
-
         cout << "computing ... " << endl;
-        op->writeARFFFile(extract_feature);
+
+
+        extractFeature * extract_feature = new extractFeature(SPLIT_FACTOR);
+        
+        //v_features_to_extract == vector des features
+        //v_result_images_toextract_features = vector des images
+        extract_feature->compute_features(v_features_to_extract,v_result_images_toextract_features);
+
+        op->writeARFFFile(*extract_feature);
+        
+        delete extract_feature;
         
         
     }catch(Exception e){

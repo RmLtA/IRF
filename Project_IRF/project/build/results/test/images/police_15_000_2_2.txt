@@ -1,6 +1,0 @@
-Label police
-Form 00015
-Scripteur 15
-Page 000
-Row 2
-Columm 2

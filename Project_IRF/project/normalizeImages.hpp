@@ -26,27 +26,28 @@ using namespace cv;
 static const int MAX_SIZE = 140;
 static const int THRESH_VALUE = 200; // /254
 static const int IMG_GAP = 10; //Valeur de décalage (limite rectangle noir autours)
-static const int SPLIT_FACTOR = 4;
 
 class normalizeImages{
 public :
     const bool VERBOSE;
     const bool RESULT;;
+    const int SPLIT_FACTOR;
     
     bool TEST;
     
     
-    normalizeImages(bool verbose,bool result, bool test ) : VERBOSE(verbose), RESULT(result) , TEST(test) {}
+    normalizeImages(bool verbose,bool result, bool test, int split ) : VERBOSE(verbose), RESULT(result) , TEST(test), SPLIT_FACTOR(split) {}
     ~normalizeImages(){};
 
-    vector<Mat>  splitImage(int x, Mat const & src);
-
-
-    void process();
+    
+    void process(bool saveNormalized);
 private:
     Mat boundingBox(const cv::Mat& img,string imgName);
     Mat Box( Mat matInput, string imgName);
     Mat getSquareImage(const cv::Mat& img, string imgName);
+    vector<Mat>  splitImage(int x, Mat const & src);
+    
+
 
     
     

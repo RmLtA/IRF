@@ -94,6 +94,38 @@ vector<string> fileOp::getNormalizedImages(){
     return templDir;
 }
 
+
+///Retourne les imagettes splitte
+vector<string> fileOp::getSplitedImages(){
+    vector<string> templDir = readDir(dirResSplitedName);
+    return templDir;
+}
+
+
+void fileOp::removeAllResImagesFiles(){
+    vector<string> files = readDir(dirResImagesName);
+    for(int i=0; i<files.size(); i++){
+        if( remove(files[i].c_str()) != 0 )
+            perror( "Error deleting file" );
+    }
+}
+
+void fileOp::removeAllResNormalizedFiles(){
+    vector<string> files = readDir(dirResNormalizedName);
+    for(int i=0; i<files.size(); i++){
+        if( remove(files[i].c_str()) != 0 )
+            perror( "Error deleting file" );
+    }
+}
+
+void fileOp::removeAllResSplittedFiles(){
+    vector<string> files = readDir(dirResSplitedName);
+    for(int i=0; i<files.size(); i++){
+        if( remove(files[i].c_str()) != 0 )
+            perror( "Error deleting file" );
+    }
+}
+
 ///Fonction utilitaire pour lire dans le dir
 vector<string> fileOp::readDir(string dirName){
     vector<string> output ;
@@ -147,31 +179,35 @@ void fileOp::writeARFFFile(extractFeature& extrfeat){
     
     for (int i = 0; i < (extrfeat).getSizeOfv_attribute_asked(); i++){
         int attribut = (extrfeat).getVectorAttributesAsked()[i];
+        for(int j =0 ; j < extrfeat.SPLITED ; j++){
+            pFile << "@ATTRIBUTE ";
             switch (attribut){
                 case BLACK_PIXEL:
-                        pFile << "@ATTRIBUTE " << " Black_Pixel " << " NUMERIC" << endl;
+                    pFile<< " Black_Pixel_";
                     break;
                 case WHITE_PIXEL:
-                        pFile << "@ATTRIBUTE " << " White_Pixel " << " NUMERIC" << endl;
+                    pFile << " White_Pixel_";
                     break;
                 case AREA :
-                    pFile << "@ATTRIBUTE " << " Airs " << " NUMERIC" << endl;
+                    pFile <<" Airs_";
                     break;
                 case CONTOURS_SIZE:
-                    pFile << "@ATTRIBUTE " << " Contours_size " << " NUMERIC" << endl;
+                    pFile <<" Contours_size_";
                     break;
                 case HARRIS_CORNERS:
-                    pFile << "@ATTRIBUTE " << " Harris_Corners " << " NUMERIC" << endl;
+                    pFile <<" Harris_Corners_";
                     break;
                 case LENGTHAREA:
-                    pFile << "@ATTRIBUTE " << " Length_Area " << " NUMERIC" << endl;
+                    pFile << " Length_Area_";
                     break;
                 /*case MASSCENTER:
                     pFile << "@ATTRIBUTE " << " Mass_Center " << " NUMERIC" << endl;
                     break;*/
             }
-            
+            pFile << j+1 << " NUMERIC" << endl;
         }
+        
+    }
     pFile << "@ATTRIBUTE" << " Class " << " {accident, bomb, car, casualty, electricity, fire-brigade, fire, flood, gas, injury, paramedics, person police, road-block}" << endl;
 
     pFile << endl;

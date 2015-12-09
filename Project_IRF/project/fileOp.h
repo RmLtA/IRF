@@ -7,6 +7,8 @@
 #include <sstream>
 #include <fstream>
 #include <vector>
+#include <stdio.h>
+
 
 
 #include "opencv2/imgproc/imgproc.hpp"
@@ -69,6 +71,12 @@ public:
     vector<string> getTemplImages();
     vector<string> getResultImages();
     vector<string> getNormalizedImages();
+    vector<string> getSplitedImages();
+
+    
+    void removeAllResImagesFiles();
+    void removeAllResNormalizedFiles();
+    void removeAllResSplittedFiles();
  
     
     void writeTxtFile(string templ, string scripter_number, int row, int columm, Mat image, bool verbose = false);

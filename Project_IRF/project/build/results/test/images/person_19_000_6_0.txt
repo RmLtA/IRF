@@ -1,6 +1,0 @@
-Label person
-Form 00019
-Scripteur 19
-Page 000
-Row 6
-Columm 0

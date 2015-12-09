@@ -1,6 +1,0 @@
-Label casualty
-Form 00003
-Scripteur 03
-Page 000
-Row 1
-Columm 4

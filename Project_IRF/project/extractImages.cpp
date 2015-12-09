@@ -13,6 +13,7 @@
 void extractImages::process(){
     
     fileOp *  op = new fileOp(TEST);
+    op->removeAllResImagesFiles();
     clock_t start, end, prog_b, prog_e;
     double cpuTime;
     
