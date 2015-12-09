@@ -76,6 +76,22 @@ int main(int argc, const char * argv[]) {
     }
     
     
+    if(NORMALIZE || GET_FEATURES)
+    {
+        int split_factor = SPLIT_FACTOR;
+        
+        cout << " Split images in ? (1..4..9..16) :";
+        cin >> split_factor;
+        while(split_factor != 1 && split_factor != 4 && split_factor != 9 && split_factor != 16){
+            cout << "\nOnly 1 or 4 or 9 or 16: ";
+            cin >> split_factor;
+        }
+        
+        SPLIT_FACTOR = split_factor;
+        cout << "\nOK, Split in : " << SPLIT_FACTOR << endl;
+    }
+    
+    
     if(EXTRACT_IMAGES){
         if(VERBOSE || RESULT)cout << "\nExtracting images..." <<endl;
         
@@ -142,19 +158,9 @@ void process_extract()
 
 void process_normalize()
 {
-    int split_factor = SPLIT_FACTOR;
+ 
     
-    cout << "Normalize images... Split image in ? (1..4..9) :";
-    cin >> split_factor;
-    while(split_factor != 1 && split_factor != 4 && split_factor != 9){
-        cout << "\nOnly 1 or 4 or 9 : ";
-        cin >> split_factor;
-    }
-        
-    if(split_factor != 0) SPLIT_FACTOR = split_factor;
-    cout << "\nOK, Split in : " << SPLIT_FACTOR << endl;
-    
-	normalizeImages * n = new normalizeImages(VERBOSE, RESULT, TEST, split_factor);
+	normalizeImages * n = new normalizeImages(VERBOSE, RESULT, TEST, SPLIT_FACTOR);
    
     bool saveNormalized = SAVE_NORMALIZED;
     cout <<"Save Normalized is set to : " << SAVE_NORMALIZED << endl;;
@@ -206,11 +212,11 @@ void process_features()
         
         cout << "Ok, features are :"<<endl;
         for (int i = 0; i<v_features_to_extract.size();i++){
-            cout << "\t| "<<v_features_available[v_features_to_extract[i]] ;
+            cout << "\t| "<<v_features_to_extract[i] ;
         }
         //Pour mettre l'attribut class à la fin
         v_features_to_extract.push_back(INT_MAX);
-        cout << "computing ... " << endl;
+        cout << "\ncomputing ... " << endl;
 
 
         extractFeature * extract_feature = new extractFeature(SPLIT_FACTOR);
