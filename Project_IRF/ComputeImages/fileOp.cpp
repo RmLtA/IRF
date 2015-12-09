@@ -86,6 +86,14 @@ vector<string> fileOp::getTemplImages(){
     return templDir;
 }
 
+
+
+///Retourne les imagettes normalisée
+vector<string> fileOp::getNormalizedImages(){
+    vector<string> templDir = readDir(dirResNormalizedName);
+    return templDir;
+}
+
 ///Fonction utilitaire pour lire dans le dir
 vector<string> fileOp::readDir(string dirName){
     vector<string> output ;

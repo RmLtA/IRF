@@ -68,7 +68,7 @@ public:
     vector<string> getSourcesImages();
     vector<string> getTemplImages();
     vector<string> getResultImages();
-    
+    vector<string> getNormalizedImages();
  
     
     void writeTxtFile(string templ, string scripter_number, int row, int columm, Mat image, bool verbose = false);

@@ -17,7 +17,8 @@ void extractFeature::compute_features(vector<int>& v_of_attributes, vector<strin
 	//add values to vector of attributes
 	vector<vector<double>> v_all_v_attributes_values;
 	for (int it = 0; it < (v_attributes_asked).size(); it++){
-			v_all_numeric_v_attributes_values.push_back(extract_feature_by_feature(v_attributes_asked[it], v_result_images_toextract_features));
+        vector<int> values =extract_feature_by_feature(v_attributes_asked[it], v_result_images_toextract_features);
+        v_all_numeric_v_attributes_values.push_back(values);
 	}
 	addclassto_v_class(v_result_images_toextract_features);
 }

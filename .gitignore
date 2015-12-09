@@ -3,3 +3,7 @@
 *.v12.suo
 *.vcxproj
 *.vcxproj.filters
+*.xcodeproj
+Project_IRF/build/*
+Project_IRF/build
+*.jpg

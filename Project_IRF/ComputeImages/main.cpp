@@ -22,9 +22,9 @@
 void get_args(int argc, const char * argv[]);
 /* Process functions*/
 
-void process_part_one();
-void process_part_two();
-void process_part_three();
+void process_extract();
+void process_features();
+void process_normalize();
 
 
 using namespace std;
@@ -41,9 +41,9 @@ static  bool TEST = true;
 
 
 
-static bool PART_1 = true;
-static bool PART_2 = false;
-static bool PART_3 = true;
+static bool EXTRACT_IMAGES = false;
+static bool GET_FEATURES = true;
+static bool NORMALIZE = false;
 /*
  // USAGE ::
  ./projetIRF -v [mode verbose]
@@ -62,18 +62,19 @@ int main(int argc, const char * argv[]) {
     get_args(argc, argv);
     
     
-    if(PART_1){
+    if(EXTRACT_IMAGES){
         if(VERBOSE || RESULT)cout << "\nExtracting images..." <<endl;
-        process_part_one();
+        process_extract();
     }
-    if(PART_2){
+    if (NORMALIZE){
+        if (VERBOSE || RESULT)cout << "\nNormalizing images..." << endl;
+        process_normalize();
+    }
+    if(GET_FEATURES){
         if(VERBOSE || RESULT)cout << "\nGetting features..." <<endl;
-        process_part_two();
+        process_features();
     }
-    if (PART_3){
-		if (VERBOSE || RESULT)cout << "\nNormalizing images..." << endl;
-		process_part_three();
-	}
+   
 	cout << "Finished..." << endl;
 
 
@@ -86,25 +87,25 @@ int main(int argc, const char * argv[]) {
 
 void get_args(int argc, const char * argv[]){
    // cout << argc << endl;;
-        for(int i=1 ; i<argc ; i++){
-            string a = argv[i];
-           // cout <<a << endl;
-            if      (a== "-verbose"  || a=="-v") VERBOSE =true;
-            else if (a=="-result"    || a=="-r") RESULT =true;
-            else if (a=="-none"      || a=="-n") RESULT = VERBOSE =false;
-            else if(a == "-1" || a =="-part1") PART_1 =true;
-            else if(a == "-2" || a =="-part2") PART_2 =true;
-            else if (a == "-3" || a == "-part3") PART_3 = true;
-            else if(a == "-a" || a =="-all") PART_2 = PART_1 = PART_3= true;
-            else if(a == "-test" || a =="-t") TEST =true;
-            
-        }
-    cout << "VERBOSE : " << VERBOSE;
+    for(int i=1 ; i<argc ; i++){
+        string a = argv[i];
+       // cout <<a << endl;
+        if      (a== "-verbose"  || a=="-v") VERBOSE =true;
+        else if (a=="-result"    || a=="-r") RESULT =true;
+        else if (a=="-none"      || a=="-n") RESULT = VERBOSE =false;
+        else if(a == "-e" || a =="-extract") EXTRACT_IMAGES =true;
+        else if (a == "-n" || a == "-normalize") NORMALIZE = true;
+        else if(a == "-f" || a =="-features") GET_FEATURES =true;
+        else if(a == "-a" || a =="-all") GET_FEATURES = EXTRACT_IMAGES = NORMALIZE= true;
+        else if(a == "-test" || a =="-t") TEST =true;
+        
+    }
+    cout << " VERBOSE : " << VERBOSE;
     cout << " RESULT : " << RESULT;
     cout << " TEST : " << TEST <<endl;;
-    cout << " PART1 : " << PART_1;
-    cout << " PART2 : " << PART_2;
-    cout << " PART3 : " << PART_3;
+    cout << " EXTRACT_IMAGES : " << EXTRACT_IMAGES;
+    cout << " NORMALIZE : " << NORMALIZE;
+    cout << " GET_FEATURES : " << GET_FEATURES;
 
   
     cout <<endl;
@@ -113,7 +114,7 @@ void get_args(int argc, const char * argv[]){
 
 
 
-void process_part_one()
+void process_extract()
 {
     extractImages * e = new extractImages(VERBOSE, RESULT, TEST);
     e->process();
@@ -121,10 +122,7 @@ void process_part_one()
     
 }
 
-
-
-
-void process_part_three()
+void process_normalize()
 {
 	normalizeImages * n = new normalizeImages(VERBOSE, RESULT, TEST);
     
@@ -133,7 +131,7 @@ void process_part_three()
 }
 
 
-void process_part_two()
+void process_features()
 {    
     fileOp *  op = new fileOp(TEST);
     try{
@@ -141,7 +139,9 @@ void process_part_two()
   
 
         //Name of Images used to extract featires
-        vector<string> v_result_images_toextract_features = op->getResultImages();
+        //ON UTILISE LES IMAGES NORMALIZEES
+        //TODO VOIR COMMENT FAIRE AVEC LES IMAGES SPLITTED
+        vector<string> v_result_images_toextract_features = op->getNormalizedImages();
 
         //Print features available, ! attention l'ordre ici est important, le même que pour l'enum Features_available si modification
         //car c'est ce que l'utilisateur va prendre en compte car instructions imprimées à l'écran
@@ -162,18 +162,18 @@ void process_part_two()
         while (features_toextract != 0){
             v_features_to_extract.push_back(features_toextract);
             cin >> features_toextract;
+            
         }
         //Pour mettre l'attribut class à la fin
         v_features_to_extract.push_back(INT_MAX);
 
 
-        extractFeature * extract_feature;
-        extract_feature->compute_features(v_features_to_extract,v_result_images_toextract_features);
+        extractFeature  extract_feature;
+        extract_feature.compute_features(v_features_to_extract,v_result_images_toextract_features);
 
         cout << "computing ... " << endl;
-        op->writeARFFFile(*extract_feature);
+        op->writeARFFFile(extract_feature);
         
-        delete extract_feature;
         
     }catch(Exception e){
         cout << "Error in part two..." << endl;
