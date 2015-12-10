@@ -1,6 +1,0 @@
-Label gas
-Form 00018
-Scripteur 18
-Page 000
-Row 4
-Columm 0

@@ -1,6 +1,0 @@
-Label road-block
-Form 00013
-Scripteur 13
-Page 000
-Row 6
-Columm 2

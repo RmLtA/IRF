@@ -1,6 +1,0 @@
-Label person
-Form 00007
-Scripteur 07
-Page 000
-Row 6
-Columm 4

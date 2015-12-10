@@ -40,12 +40,12 @@ static bool RESULT = false;;
 static bool REMOVE_SOURCE = false;
 
 //use folder test or default folder
-static  bool TEST = true;
+static  bool TEST = false;
 
 
-static bool EXTRACT_IMAGES = true;
-static bool GET_FEATURES = true;
-static bool NORMALIZE = true;
+static bool EXTRACT_IMAGES = false;
+static bool GET_FEATURES = false;
+static bool NORMALIZE = false;
 static bool CREATE_VARIOUS = true;
 /*
  // USAGE ::
@@ -58,6 +58,7 @@ static bool CREATE_VARIOUS = true;
  */
 
 int SPLIT_FACTOR = 4;
+int lastFactor =0;
 static bool SAVE_NORMALIZED = false;
 
 int main(int argc, const char * argv[]) {
@@ -126,14 +127,33 @@ void get_args(int argc, const char * argv[]){
        // cout <<a << endl;
         if      (a== "-verbose"  || a=="-v") VERBOSE =true;
         else if (a=="-result"    || a=="-r") RESULT =true;
-        else if (a=="-none"      || a=="-n") RESULT = VERBOSE =false;
+        else if (a=="-none") RESULT = VERBOSE =false;
         else if(a == "-e" || a =="-extract") EXTRACT_IMAGES =true;
         else if (a == "-n" || a == "-normalize") NORMALIZE = true;
         else if(a == "-f" || a =="-features") GET_FEATURES =true;
         else if(a == "-a" || a =="-all") GET_FEATURES = EXTRACT_IMAGES = NORMALIZE= true;
         else if(a == "-test" || a =="-t") TEST =true;
         else if(a == "-remove") REMOVE_SOURCE = true;
-         
+        else if(a == "-help" || "-h")
+        {
+            cout << "Projet IRF " << endl;;
+            cout << "Options : "<<endl;
+            cout << "\t-verbose   | -v : verbose    "<< endl;;
+            cout << "\t-result    | -r : resultats  "<< endl;;
+            cout << "\t-test      | -t : fichier de test  "<< endl;;
+
+            cout << "Usage : "<<endl;
+            cout << "\t-extract   | -e : extraire les images"<< endl;;
+            cout << "\t-normalize | -n : normaliser les images"<< endl;;
+            cout << "\t-features  | -f : extraire les features "<< endl;;
+            
+            cout << "Autres : "<<endl;
+
+            cout << "\t-remove    |    : supprimer les fichiers resultats (a faire avant commit)"<< endl;;
+            cout << "\t-help      | -h : cette page"<< endl;;
+            exit(0);
+        }
+        
         
     }
     cout << " VERBOSE : " << VERBOSE;
@@ -171,13 +191,25 @@ void process_normalize()
     
     SPLIT_FACTOR = split_factor;
     cout << "OK, Split in : " << SPLIT_FACTOR << endl;
-
+    //TODO optimiser
+    fileOp * op = new fileOp(TEST);
+    vector<string> splittedImages = op->getSplitedImages();
+    //PREVENT TO SPLIT IF SAME AGAIN
+    if(lastFactor!= SPLIT_FACTOR)
+    {
+        normalizeImages * n = new normalizeImages(VERBOSE, RESULT, TEST, SPLIT_FACTOR);
+        
+        if(VERBOSE)cout <<"Save Normalized is set to : " << SAVE_NORMALIZED << endl;;
+        n->process(SAVE_NORMALIZED);
+        lastFactor =SPLIT_FACTOR;
+        delete n;
+    }else
+    {
+        cout << "Same as before, no need to reprocess" << endl;
+    }
     
-	normalizeImages * n = new normalizeImages(VERBOSE, RESULT, TEST, SPLIT_FACTOR);
-   
-    if(VERBOSE)cout <<"Save Normalized is set to : " << SAVE_NORMALIZED << endl;;
-    n->process(SAVE_NORMALIZED);
-    delete n;
+    delete op;
+	
 }
 
 

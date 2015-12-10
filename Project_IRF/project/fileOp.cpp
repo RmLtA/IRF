@@ -51,21 +51,23 @@ void fileOp::writeTxtFile(string templ, string sourceName, int row, int columm, 
     if(verbose)cout<< "  " << getFilename(name_img.str());
     //enregistrment de l'imagette
     imwrite(name_img.str(), image);
+    if(verbose){
+        //crŽation du fichier .txt
+        ofstream pFile(name.str(), ios::out);
+        
+        //remplissage du fichier
+        pFile << "Label " << templ << endl;
+        pFile << "Form " << sourceName << endl;
+        pFile << "Scripteur " <<scripter << endl;
+        pFile << "Page " << page << endl;
+        pFile << "Row " << row << endl;
+        pFile << "Columm " << columm << endl;
+        
+        //fermeture du fichier
+        pFile.close();
 
-    //crŽation du fichier .txt
-    ofstream pFile(name.str(), ios::out);
-
-    //remplissage du fichier
-    pFile << "Label " << templ << endl;
-    pFile << "Form " << sourceName << endl;
-    pFile << "Scripteur " <<scripter << endl;
-    pFile << "Page " << page << endl;
-    pFile << "Row " << row << endl;
-    pFile << "Columm " << columm << endl;
-
-    //fermeture du fichier
-    pFile.close();
-}
+    }
+  }
 
 ///Retourne les images sources
 vector<string> fileOp::getSourcesImages(){

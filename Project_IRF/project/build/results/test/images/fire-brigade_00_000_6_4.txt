@@ -1,6 +1,0 @@
-Label fire-brigade
-Form 00000
-Scripteur 00
-Page 000
-Row 6
-Columm 4

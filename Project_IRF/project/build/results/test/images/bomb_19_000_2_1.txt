@@ -1,6 +1,0 @@
-Label bomb
-Form 00019
-Scripteur 19
-Page 000
-Row 2
-Columm 1

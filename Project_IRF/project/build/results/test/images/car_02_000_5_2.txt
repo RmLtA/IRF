@@ -1,6 +1,0 @@
-Label car
-Form 00002
-Scripteur 02
-Page 000
-Row 5
-Columm 2

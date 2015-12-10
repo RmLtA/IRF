@@ -1,6 +1,0 @@
-Label casualty
-Form 00020
-Scripteur 20
-Page 000
-Row 3
-Columm 1
