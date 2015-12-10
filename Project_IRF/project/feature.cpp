@@ -126,41 +126,121 @@ double feature::countLengthArea(){
     }
     return max;
 }
-
+int ww = 0;
 //Attention les attributs de weka sont des valeurs simples numeric 
-Point2f feature::countMassCenter(){
-    Mat src_gray;
-    RNG rng(12345);
-    
-    blur( this->graySourceImg, src_gray, Size(3,3) );
-    Mat canny_output;
-    vector<vector<Point> > contours;
-    vector<Vec4i> hierarchy;
-    
-    /// Detect edges using canny
-    Canny( src_gray, canny_output, thresh, thresh*2, 3 );
-    /// Find contours
-    findContours( canny_output, contours, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, Point(0, 0) );
-    
-    
-    /// Get the moments
-    double maxPos =0;
-    double max = 0;
-    
-    vector<Moments> mu(contours.size() );
-    for( int i = 0; i < contours.size(); i++ )
-    {
-        mu[i] = moments( contours[i], false );
-        if(mu[i].m00 > max){
-            max = mu[i].m00;
-            maxPos =i;
+void feature::countMassCenter(){
+    if(this->massCenter.x == -1 && this->massCenter.y == -1){
+        Mat src_gray;
+        RNG rng(12345);
+        
+        
+        //    blur( this->graySourceImg, src_gray, Size(3,3) );
+        //    Moments mu = moments(src_gray, true);
+        //    Point2f center;
+        //    if(mu.m00 == 0)
+        //        this->massCenter = Point2f(-1,-1);
+        //    else {
+        //
+        //
+        //
+        //        center.x = mu.m10 / mu.m00;
+        //        center.y = mu.m01 / mu.m00;
+        //
+        //        this->massCenter =center;
+        //
+        //
+        //
+        //
+        //    }
+        //
+        
+        blur( this->graySourceImg, src_gray, Size(3,3) );
+        Mat canny_output;
+        vector<vector<Point> > contours;
+        vector<Vec4i> hierarchy;
+        
+        /// Detect edges using canny
+        Canny( src_gray, canny_output, thresh*1.5, thresh*2, 3 );
+        /// Find contours
+        findContours( canny_output, contours, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, Point(0, 0) );
+        
+        vector<Moments> mu(contours.size() );
+        vector<Point2f> mc( contours.size() );
+        for( int i = 0; i < contours.size(); i++ )
+        {
+            mu[i] = moments( contours[i], false );
+            if(mu[i].m00 == 0)
+                mc[i] = Point2f(0,0);
+            else
+                mc[i] = Point2f( mu[i].m10/mu[i].m00 , mu[i].m01/mu[i].m00 );
         }
-    }
-    
-    
-    
-    return Point2f( mu[maxPos].m10/mu[maxPos].m00 , mu[maxPos].m01/mu[maxPos].m00 );
+        
+        double size = contours.size();
+        float distance;
+        float totalX=0.0, totalY=0.0;
+        for(int i=0; i<size; i++) {
+            totalX+=mc[i].x;
+            totalY+=mc[i].y;
+        }
+        
+        Point2f massCenter(totalX/size, totalY/size); // condition: size != 0
+        this->massCenter = massCenter;
+        
+        
+//        Mat3b res;
+//        cvtColor(src_gray, res, CV_GRAY2BGR);
+//        
+//        circle(res, massCenter, 2, Scalar(0,0,255));
+//        
+//        imshow("Result"+ to_string(ww++), res);
+        //
+        
+        
+        //    /// Get the moments
+        //    long maxPos =-1;
+        //    long max = -1;
+        //
+        //    vector<Moments> mu(contours.size() );
+        //    for( int i = 0; i < contours.size(); i++ )
+        //    {
+        //
+        //        if(mu[i].m00 > max){
+        //            max = mu[i].m00;
+        //            maxPos =i;
+        //        }
+        //    }
+        //    if(max != -1)
+        //        this->massCenter = Point2f( mu[maxPos].m10/mu[maxPos].m00 , mu[maxPos].m01/mu[maxPos].m00 );
+        //    else
+        //        this->massCenter = Point2f(-1,-1);
+        //
+        //    if(abs(this->massCenter.x -2147483648 )< 10|| abs(this->massCenter.y -2147483648)<10){
+        //        imshow("srcGray" + to_string(ww++), src_gray);
+        //        imshow("srcGray" + to_string(ww), canny_output);
+        //
+        //    }
 
+    }
+ }
+
+double feature::massCenterX(){
+    if(this->massCenter.x == -1 && this->massCenter.y == -1)
+        feature::countMassCenter();
+    
+    if(!isnan(this->massCenter.x))
+        return this->massCenter.x;
+    else
+        return 0;
 }
 
+
+double feature::massCenterY(){
+    if(this->massCenter.x == -1 && this->massCenter.y == -1)
+        feature::countMassCenter();
+    
+    if(!isnan(this->massCenter.y))
+        return this->massCenter.y;
+    else
+        return 0;
+}
 

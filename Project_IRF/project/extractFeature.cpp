@@ -20,20 +20,23 @@ void extractFeature::compute_features(vector<int>& v_of_attributes, vector<strin
 	//add values to vector of attributes
 	vector<vector<double>> v_all_v_attributes_values;
 	for (int it = 0; it < (v_attributes_asked).size(); it++){
+        cout << v_attributes_asked[it];
         //on extrait les features en fonction de la partie de l'image concerne
         for(int offset=0 ; offset< SPLITED ; offset++){
-            vector<int> values =extract_feature_by_feature(offset, v_attributes_asked[it], v_result_images_toextract_features);
+            cout << "." << flush;
+            vector<double> values =extract_feature_by_feature(offset, v_attributes_asked[it], v_result_images_toextract_features);
             v_all_numeric_v_attributes_values.push_back(values);
         }
        
 	}
+    cout <<endl;
 	addclassto_v_class(v_result_images_toextract_features);
 }
 
 
 //Si ajout de features, Modification ICI, AJOUT D'un case
-vector<int> extractFeature::extract_feature_by_feature(int offset , int feature_attribute, vector<string>& v_result_images_toextract_features){
-	vector<int> v_attributes_values;
+vector<double> extractFeature::extract_feature_by_feature(int offset , int feature_attribute, vector<string>& v_result_images_toextract_features){
+	vector<double> v_attributes_values;
     for (int i = offset; i < v_result_images_toextract_features.size(); i=i+SPLITED)
     {
         string imgName =v_result_images_toextract_features[i];
@@ -60,9 +63,12 @@ vector<int> extractFeature::extract_feature_by_feature(int offset , int feature_
             case LENGTHAREA:
                 v_attributes_values.push_back(f->countLengthArea());
                 break;
-            /*case MASSCENTER:
-                v_attributes_values.push_back(f->countMassCenter());
-                break*/
+            case MASSCENTER_X:
+                v_attributes_values.push_back(f->massCenterX());
+                break;
+            case MASSCENTER_Y:
+                v_attributes_values.push_back(f->massCenterY());
+                break;
             default:
                 cout << "Unknown feature" << endl;
 

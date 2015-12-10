@@ -22,12 +22,12 @@ public:
 	vector<vector<Point> > contours;
     vector<Moments> imMoments;
 
-
+    Point2f massCenter;
 
 	
 	feature(Mat img) : sourceImg(img){
          cvtColor( img, this->graySourceImg, CV_BGR2GRAY);
-
+         massCenter = Point2f(-1,-1);
 	}
 
 	
@@ -42,7 +42,10 @@ public:
    // int findMoments();
     
     
-    Point2f countMassCenter();
+    double massCenterX();
+    double massCenterY();
+
+
     double countLengthArea();
     double countArea();
 
@@ -51,6 +54,7 @@ public:
     
 private:
     void computeBlackPixels();
+    void countMassCenter();
 
 
 };

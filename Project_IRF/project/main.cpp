@@ -33,17 +33,20 @@ using namespace cv;
 
 //debugging on console
 static bool VERBOSE = false;
-static bool RESULT = true;
+static bool RESULT = false;;
 
-/*unused*/
+
+//remove all sources files before commit
+static bool REMOVE_SOURCE = false;
+
 //use folder test or default folder
 static  bool TEST = true;
-static bool REMOVE_SOURCE = false;
 
 
 static bool EXTRACT_IMAGES = true;
 static bool GET_FEATURES = true;
 static bool NORMALIZE = true;
+static bool CREATE_VARIOUS = true;
 /*
  // USAGE ::
  ./projetIRF -v [mode verbose]
@@ -56,7 +59,6 @@ static bool NORMALIZE = true;
 
 int SPLIT_FACTOR = 4;
 static bool SAVE_NORMALIZED = false;
-
 
 int main(int argc, const char * argv[]) {
 
@@ -75,37 +77,37 @@ int main(int argc, const char * argv[]) {
         return 0;
     }
     
-    
-    if(NORMALIZE || GET_FEATURES)
-    {
-        int split_factor = SPLIT_FACTOR;
-        
-        cout << " Split images in ? (1..4..9..16) :";
-        cin >> split_factor;
-        while(split_factor != 1 && split_factor != 4 && split_factor != 9 && split_factor != 16){
-            cout << "\nOnly 1 or 4 or 9 or 16: ";
-            cin >> split_factor;
-        }
-        
-        SPLIT_FACTOR = split_factor;
-        cout << "\nOK, Split in : " << SPLIT_FACTOR << endl;
-    }
-    
-    
     if(EXTRACT_IMAGES){
-        if(VERBOSE || RESULT)cout << "\nExtracting images..." <<endl;
+        cout << "\nExtracting images..." <<endl;
         
         process_extract();
     }
-    if (NORMALIZE){
-        if (VERBOSE || RESULT)cout << "\nNormalizing images..." << endl;
-        process_normalize();
+    
+    int nb =1;
+    if(CREATE_VARIOUS){
+     
+        cout << "How many Arff Files ? " << endl;
+        cin >> nb;
     }
-    if(GET_FEATURES){
-        if(VERBOSE || RESULT)cout << "\nGetting features..." <<endl;
-        process_features();
+    
+    for(int i=0 ; i<nb ; i++){
+        cout << i+1 << " Pass...." << endl;
+        
+        if (NORMALIZE){
+            cout << "\nNormalizing images..." << endl;
+            process_normalize();
+        }
+        if(GET_FEATURES){
+            cout << "\nGetting features..." <<endl;
+            process_features();
+        }
+
+        
+        cout << "End of..." << i+1 << endl;
+
+        
     }
-   
+    
 	cout << "Finished..." << endl;
 
 
@@ -118,7 +120,8 @@ int main(int argc, const char * argv[]) {
 
 void get_args(int argc, const char * argv[]){
    // cout << argc << endl;;
-    for(int i=1 ; i<argc ; i++){
+    for(int i=1 ; i<argc ; i++)
+    {
         string a = argv[i];
        // cout <<a << endl;
         if      (a== "-verbose"  || a=="-v") VERBOSE =true;
@@ -129,9 +132,8 @@ void get_args(int argc, const char * argv[]){
         else if(a == "-f" || a =="-features") GET_FEATURES =true;
         else if(a == "-a" || a =="-all") GET_FEATURES = EXTRACT_IMAGES = NORMALIZE= true;
         else if(a == "-test" || a =="-t") TEST =true;
-        else if(a == "-remove"){
+        else if(a == "-remove") REMOVE_SOURCE = true;
          
-        }
         
     }
     cout << " VERBOSE : " << VERBOSE;
@@ -158,13 +160,23 @@ void process_extract()
 
 void process_normalize()
 {
- 
+    int split_factor = SPLIT_FACTOR;
+    
+    cout << "Split images in ? (1..4..9..16) :";
+    cin >> split_factor;
+    while(split_factor != 1 && split_factor != 4 && split_factor != 9 && split_factor != 16){
+        cout << "\nOnly 1 or 4 or 9 or 16: ";
+        cin >> split_factor;
+    }
+    
+    SPLIT_FACTOR = split_factor;
+    cout << "OK, Split in : " << SPLIT_FACTOR << endl;
+
     
 	normalizeImages * n = new normalizeImages(VERBOSE, RESULT, TEST, SPLIT_FACTOR);
    
-    bool saveNormalized = SAVE_NORMALIZED;
-    cout <<"Save Normalized is set to : " << SAVE_NORMALIZED << endl;;
-    n->process(saveNormalized);
+    if(VERBOSE)cout <<"Save Normalized is set to : " << SAVE_NORMALIZED << endl;;
+    n->process(SAVE_NORMALIZED);
     delete n;
 }
 
@@ -190,7 +202,7 @@ void process_features()
 
         //Print features available, ! attention l'ordre ici est important, le même que pour l'enum Features_available si modification
         //car c'est ce que l'utilisateur va prendre en compte car instructions imprimées à l'écran
-        vector<string> v_features_available = {"Black_Pixel","White_Pixel","Airs","Contours_Size","Harris_Corners", "Length Area"};
+        vector<string> v_features_available = {"Black_Pixel","White_Pixel","Airs","Contours_Size","Harris_Corners", "Length Area", "Mass_center_x" , "Mass_center_y"};
 
         //Features to extract
         vector<int> v_features_to_extract;
@@ -210,13 +222,10 @@ void process_features()
             
         }
         
-        cout << "Ok, features are :"<<endl;
-        for (int i = 0; i<v_features_to_extract.size();i++){
-            cout << "\t| "<<v_features_to_extract[i] ;
-        }
+        cout << "Ok, computing... "<<endl;
+       
         //Pour mettre l'attribut class à la fin
         v_features_to_extract.push_back(INT_MAX);
-        cout << "\ncomputing ... " << endl;
 
 
         extractFeature * extract_feature = new extractFeature(SPLIT_FACTOR);

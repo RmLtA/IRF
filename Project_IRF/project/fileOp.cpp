@@ -164,7 +164,17 @@ string fileOp::getExtName(string name){
 }
 
 void fileOp::writeARFFFile(extractFeature& extrfeat){
-    ofstream pFile("IRF.arff", ios::out);
+    cout <<  "Saving Arff FILE"<<endl;;
+    string name;
+    cout << "Name of Arff file : " << endl;
+    cin >> name;
+    if(name != "" || name != "\0")
+        name +=".arff";
+    else
+        name = "IRF.arff";
+
+    ofstream pFile(name, ios::out);
+
 
     /*Begin Head File*/
     pFile << "%1. Title : " << endl;
@@ -182,27 +192,30 @@ void fileOp::writeARFFFile(extractFeature& extrfeat){
         for(int j =0 ; j < extrfeat.SPLITED ; j++){
             pFile << "@ATTRIBUTE ";
             switch (attribut){
-                case BLACK_PIXEL:
+                case extractFeature::BLACK_PIXEL:
                     pFile<< " Black_Pixel_";
                     break;
-                case WHITE_PIXEL:
+                case extractFeature::WHITE_PIXEL:
                     pFile << " White_Pixel_";
                     break;
-                case AREA :
+                case extractFeature::AREA :
                     pFile <<" Airs_";
                     break;
-                case CONTOURS_SIZE:
+                case extractFeature::CONTOURS_SIZE:
                     pFile <<" Contours_size_";
                     break;
-                case HARRIS_CORNERS:
+                case extractFeature::HARRIS_CORNERS:
                     pFile <<" Harris_Corners_";
                     break;
-                case LENGTHAREA:
+                case extractFeature::LENGTHAREA:
                     pFile << " Length_Area_";
                     break;
-                /*case MASSCENTER:
-                    pFile << "@ATTRIBUTE " << " Mass_Center " << " NUMERIC" << endl;
-                    break;*/
+                case extractFeature::MASSCENTER_X:
+                    pFile << " Mass_Center_X_";
+                    break;
+                case extractFeature::MASSCENTER_Y:
+                    pFile << " Mass_Center_Y_";
+                    break;
             }
             pFile << j+1 << " NUMERIC" << endl;
         }
@@ -220,7 +233,7 @@ void fileOp::writeARFFFile(extractFeature& extrfeat){
     int k = 0; //normalement tous les vecteurs ont la même taille
     int index_class = 0;
     while (k < (extrfeat).v_all_numeric_v_attributes_values[0].size()){
-        vector<int> v;
+        vector<double> v;
         vector<string> vs;
         for (int i = 0; i < (extrfeat).v_all_numeric_v_attributes_values.size(); i++){
             v.push_back((extrfeat).v_all_numeric_v_attributes_values[i][k]);

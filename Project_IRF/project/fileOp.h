@@ -89,7 +89,7 @@ public:
     //For features ! attention l'ordre ici est important, le même que dans le main pour v_features_available si modification
     //car c'est ce que l'utilisateur va prendre en compte car instructions imprimées à l'écran
     //Si ajout de features, ajouter une constante ! il y a un 2e enum dans extractFeature.h
-    enum Features_Available_FileOp { BLACK_PIXEL=1, WHITE_PIXEL, AREA, CONTOURS_SIZE, HARRIS_CORNERS, LENGTHAREA, MASSCENTER, CLASS = INT_MAX };
+//    enum Features_Available_FileOp { BLACK_PIXEL=1, WHITE_PIXEL, AREA, CONTOURS_SIZE, HARRIS_CORNERS, LENGTHAREA, MASSCENTER, CLASS = INT_MAX };
     
 private:
     vector<string> readDir(string dirName);

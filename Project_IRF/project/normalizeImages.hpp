@@ -23,7 +23,7 @@
 using namespace std;
 using namespace cv;
 
-static const int MAX_SIZE = 140;
+static const int MAX_SIZE = 130;
 static const int THRESH_VALUE = 200; // /254
 static const int IMG_GAP = 10; //Valeur de décalage (limite rectangle noir autours)
 
