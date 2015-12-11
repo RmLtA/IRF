@@ -44,10 +44,10 @@ int feature::countWhitePixel(){
 	int white_pixels = (int) ( all_pixels.size() - black_pixels.size());
 	return white_pixels;
 }
-
+int ww=0;
 // Count the number of Harris Corner
 int feature::countHarrisCorners(){
-
+    int thresh = 200;
 	Mat dst, dst_norm, dst_norm_scaled;
 	dst = Mat::zeros(this->sourceImg.size(), CV_32FC1);
 
@@ -72,9 +72,12 @@ int feature::countHarrisCorners(){
 			if ((int)dst_norm.at<float>(j, i) > thresh)
 			{
 				cornerHarris++;
+                circle( dst_norm_scaled, Point( i, j ), 5,  Scalar(0), 2, 8, 0 );
+
 			}
 		}
 	}
+    //imshow("Harris" + to_string(ww++), dst_norm_scaled);
 
 	return cornerHarris;
 }
@@ -84,6 +87,7 @@ int feature::countHarrisCorners(){
 double feature::countArea(){
     Mat src_gray;
     RNG rng(12345);
+    int thresh = 100;
         
   //  cvtColor( src, src_gray, CV_BGR2GRAY );
     blur( this->graySourceImg, src_gray, Size(3,3) );
@@ -126,33 +130,12 @@ double feature::countLengthArea(){
     }
     return max;
 }
-int ww = 0;
-//Attention les attributs de weka sont des valeurs simples numeric 
+
 void feature::countMassCenter(){
     if(this->massCenter.x == -1 && this->massCenter.y == -1){
+        int thresh = 140;
         Mat src_gray;
         RNG rng(12345);
-        
-        
-        //    blur( this->graySourceImg, src_gray, Size(3,3) );
-        //    Moments mu = moments(src_gray, true);
-        //    Point2f center;
-        //    if(mu.m00 == 0)
-        //        this->massCenter = Point2f(-1,-1);
-        //    else {
-        //
-        //
-        //
-        //        center.x = mu.m10 / mu.m00;
-        //        center.y = mu.m01 / mu.m00;
-        //
-        //        this->massCenter =center;
-        //
-        //
-        //
-        //
-        //    }
-        //
         
         blur( this->graySourceImg, src_gray, Size(3,3) );
         Mat canny_output;
@@ -160,7 +143,7 @@ void feature::countMassCenter(){
         vector<Vec4i> hierarchy;
         
         /// Detect edges using canny
-        Canny( src_gray, canny_output, thresh*1.5, thresh*2, 3 );
+        Canny( src_gray, canny_output, thresh, 200, 3 );
         /// Find contours
         findContours( canny_output, contours, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, Point(0, 0) );
         
@@ -176,7 +159,6 @@ void feature::countMassCenter(){
         }
         
         double size = contours.size();
-        float distance;
         float totalX=0.0, totalY=0.0;
         for(int i=0; i<size; i++) {
             totalX+=mc[i].x;
@@ -185,41 +167,6 @@ void feature::countMassCenter(){
         
         Point2f massCenter(totalX/size, totalY/size); // condition: size != 0
         this->massCenter = massCenter;
-        
-        
-//        Mat3b res;
-//        cvtColor(src_gray, res, CV_GRAY2BGR);
-//        
-//        circle(res, massCenter, 2, Scalar(0,0,255));
-//        
-//        imshow("Result"+ to_string(ww++), res);
-        //
-        
-        
-        //    /// Get the moments
-        //    long maxPos =-1;
-        //    long max = -1;
-        //
-        //    vector<Moments> mu(contours.size() );
-        //    for( int i = 0; i < contours.size(); i++ )
-        //    {
-        //
-        //        if(mu[i].m00 > max){
-        //            max = mu[i].m00;
-        //            maxPos =i;
-        //        }
-        //    }
-        //    if(max != -1)
-        //        this->massCenter = Point2f( mu[maxPos].m10/mu[maxPos].m00 , mu[maxPos].m01/mu[maxPos].m00 );
-        //    else
-        //        this->massCenter = Point2f(-1,-1);
-        //
-        //    if(abs(this->massCenter.x -2147483648 )< 10|| abs(this->massCenter.y -2147483648)<10){
-        //        imshow("srcGray" + to_string(ww++), src_gray);
-        //        imshow("srcGray" + to_string(ww), canny_output);
-        //
-        //    }
-
     }
  }
 

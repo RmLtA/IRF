@@ -17,7 +17,7 @@
 #include <ctime>
 #include "fileOp.h"
 #include "computeImages.h"
-
+#include "utils.hpp"
 
 
 using namespace std;
@@ -29,19 +29,17 @@ static const int IMG_GAP = 10; //Valeur de décalage (limite rectangle noir auto
 
 class normalizeImages{
 public :
-    const bool VERBOSE;
-    const bool RESULT;;
-    const int SPLIT_FACTOR;
-    
-    bool TEST;
-    
-    
-    normalizeImages(bool verbose,bool result, bool test, int split ) : VERBOSE(verbose), RESULT(result) , TEST(test), SPLIT_FACTOR(split) {}
+    utils & u = utils::i();;
+
+    normalizeImages(){
+        
+    };
     ~normalizeImages(){};
 
     
     void process(bool saveNormalized);
 private:
+
     Mat boundingBox(const cv::Mat& img,string imgName);
     Mat Box( Mat matInput, string imgName);
     Mat getSquareImage(const cv::Mat& img, string imgName);

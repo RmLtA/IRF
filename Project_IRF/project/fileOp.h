@@ -16,6 +16,7 @@
 #include <opencv2/core/core.hpp>
 #include <dirent.h>
 #include "extractFeature.h"
+#include "utils.hpp"
 
 using namespace std;
 using namespace cv;
@@ -32,21 +33,25 @@ class fileOp{
     string dirResImagesName ;
     string dirResNormalizedName;
     string dirResSplitedName;
+    string dirResArffdName;
     
+    utils & u = utils::i();
 
 
 public:
-    fileOp(bool isTest){
+    fileOp(){
          dirSourceName = "sources/";
          dirTemplName   = "templates/";
          dirResImagesName = "results/";
          dirResNormalizedName = "results/";
          dirResSplitedName ="results/";
+         dirResArffdName ="arff/";
+        
         
         string release = "release/";
         string test = "test/";
         
-        if(isTest){
+        if(u.TEST){
             dirSourceName += test; dirTemplName += test;
             
             dirResImagesName += test; dirResNormalizedName += test;
@@ -79,11 +84,11 @@ public:
     void removeAllResSplittedFiles();
  
     
-    void writeTxtFile(string templ, string scripter_number, int row, int columm, Mat image, bool verbose = false);
+    void writeTxtFile(string templ, string scripter_number, int row, int columm, Mat image);
     void addclasstov_class_icon(string current);
     
-    void writeSplited(string nam, Mat img, bool verbose);
-    void writeNormalized(string nam,Mat img,bool verbose);
+    void writeSplited(string nam, Mat img);
+    void writeNormalized(string nam,Mat img);
     void writeARFFFile(extractFeature& extrfeat);
 
     //For features ! attention l'ordre ici est important, le même que dans le main pour v_features_available si modification

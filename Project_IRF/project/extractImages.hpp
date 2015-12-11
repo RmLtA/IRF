@@ -15,6 +15,7 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/core/core.hpp>
 #include <ctime>
+#import <thread>
 #include "fileOp.h"
 #include "computeImages.h"
 
@@ -22,44 +23,32 @@
 
 using namespace std;
 using namespace cv;
+const int MAXIMAGETTE = 7 ;
 
 class extractImages{
-public :
-    const bool VERBOSE;
-    const bool RESULT;;
-    bool TEST;
-    const int MAXIMAGETTE = 7 ;
+private :
+    utils & u = utils::i();
 
+    int nTotalImg;
+    int nErroImg;
     
-    extractImages(bool verbose,bool result, bool test ) : VERBOSE(verbose), RESULT(result) , TEST(test) {}
+    static void processTask(extractImages &self, string sourceImage,const vector<string>& templatesImages);
+
+public :
+
+    extractImages()
+    {
+        nErroImg = 0;
+        nTotalImg = 0;
+    }
     
     void process();
+
     ~extractImages(){};
 
-
-    
 
 };
 
 
-
-
-static string niceOutput(string output, bool ok){
-    if(false){
-        stringstream ss;
-        int  FG_RED      = 31;
-        int FG_GREEN    = 32;
-        ss << "\033[";
-        if(ok){
-            ss << FG_GREEN << "m" << output;
-        }else{
-            ss << FG_RED << "m"  << output;
-        }
-        
-        ss << " \033[0m";
-        return ss.str();
-    }
-   return output;
-}
 
 #endif /* extractImages_hpp */

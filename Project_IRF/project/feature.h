@@ -1,13 +1,14 @@
 #ifndef FEATURE_H_
 #define FEATURE_H_
 
-#include "opencv2/highgui/highgui.hpp"
-#include "opencv2/imgproc/imgproc.hpp"
+#include <opencv2/highgui/highgui.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
+#include <opencv2/features2d/features2d.hpp>
 #include <iostream>
 using namespace std;
 using namespace cv;
 
-static int thresh = 100;
+static int thresh = 145; //100
 
 class feature{
 

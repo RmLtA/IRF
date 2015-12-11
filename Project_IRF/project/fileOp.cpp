@@ -1,7 +1,7 @@
 
 #include "fileOp.h"
 
-void fileOp::writeNormalized(string nam, Mat img, bool verbose){
+void fileOp::writeNormalized(string nam, Mat img){
 	stringstream name_img,name;
 	name << nam;
 	name_img << dirResNormalizedName <<name.str()<< ".jpg";
@@ -13,12 +13,12 @@ void fileOp::writeNormalized(string nam, Mat img, bool verbose){
 }
 
 
-void fileOp::writeSplited(string nam, Mat img, bool verbose){
+void fileOp::writeSplited(string nam, Mat img){
     stringstream name_img,name;
     name << nam;
     name_img << dirResSplitedName <<name.str()<< ".jpg";
     
-    if (verbose)cout << "  " << getFilename(name_img.str());
+    if (u.VERBOSE)cout << "  " << getFilename(name_img.str());
     //enregistrment de l'imagette
     imwrite(name_img.str(), img);
     
@@ -35,7 +35,7 @@ void fileOp::writeSplited(string nam, Mat img, bool verbose){
 * \param int columm Le numéro de la colonne de l'imagette commence a 0
 */
 
-void fileOp::writeTxtFile(string templ, string sourceName, int row, int columm, Mat image, bool verbose){
+void fileOp::writeTxtFile(string templ, string sourceName, int row, int columm, Mat image){
 
     stringstream tmp,name, name_img;
     //00102.png
@@ -48,10 +48,10 @@ void fileOp::writeTxtFile(string templ, string sourceName, int row, int columm, 
     name <<dirResImagesName << tmp.str() << ".txt";
     name_img <<dirResImagesName<<tmp.str() << ".jpg";
     
-    if(verbose)cout<< "  " << getFilename(name_img.str());
+    if(u.VERBOSE)cout<< "  " << getFilename(name_img.str());
     //enregistrment de l'imagette
     imwrite(name_img.str(), image);
-    if(verbose){
+    if(u.VERBOSE){
         //crŽation du fichier .txt
         ofstream pFile(name.str(), ios::out);
         
@@ -175,7 +175,7 @@ void fileOp::writeARFFFile(extractFeature& extrfeat){
     else
         name = "IRF.arff";
 
-    ofstream pFile(name, ios::out);
+    ofstream pFile(dirResArffdName + name, ios::out);
 
 
     /*Begin Head File*/
@@ -192,34 +192,31 @@ void fileOp::writeARFFFile(extractFeature& extrfeat){
     for (int i = 0; i < (extrfeat).getSizeOfv_attribute_asked(); i++){
         int attribut = (extrfeat).getVectorAttributesAsked()[i];
         for(int j =0 ; j < extrfeat.SPLITED ; j++){
-            pFile << "@ATTRIBUTE ";
             switch (attribut){
                 case extractFeature::BLACK_PIXEL:
-                    pFile<< " Black_Pixel_";
+                    pFile<< "@ATTRIBUTE "<< " Black_Pixel_" <<j << " NUMERIC" << endl;;
                     break;
                 case extractFeature::WHITE_PIXEL:
-                    pFile << " White_Pixel_";
+                    pFile<< "@ATTRIBUTE " << " White_Pixel_" <<j << " NUMERIC" << endl;;
                     break;
                 case extractFeature::AREA :
-                    pFile <<" Airs_";
+                    pFile<< "@ATTRIBUTE " <<" Airs_" <<j << " NUMERIC" << endl;;
                     break;
                 case extractFeature::CONTOURS_SIZE:
-                    pFile <<" Contours_size_";
+                    pFile<< "@ATTRIBUTE " <<" Contours_size_" <<j << " NUMERIC" << endl;;
                     break;
                 case extractFeature::HARRIS_CORNERS:
-                    pFile <<" Harris_Corners_";
+                    pFile<< "@ATTRIBUTE " <<" Harris_Corners_" <<j << " NUMERIC" << endl;;
                     break;
                 case extractFeature::LENGTHAREA:
-                    pFile << " Length_Area_";
+                    pFile<< "@ATTRIBUTE " << " Length_Area_" <<j << " NUMERIC" << endl;;
                     break;
-                case extractFeature::MASSCENTER_X:
-                    pFile << " Mass_Center_X_";
+                case extractFeature::MASSCENTER:
+                    pFile<< "@ATTRIBUTE " << " Mass_Center_X_" <<j << " NUMERIC" << endl;
+                    pFile<< "@ATTRIBUTE " << " Mass_Center_Y_" <<j << " NUMERIC" << endl;
                     break;
-                case extractFeature::MASSCENTER_Y:
-                    pFile << " Mass_Center_Y_";
-                    break;
+               
             }
-            pFile << j+1 << " NUMERIC" << endl;
         }
         
     }
@@ -230,35 +227,43 @@ void fileOp::writeARFFFile(extractFeature& extrfeat){
 
 
     pFile << "@DATA" << endl;
-
-    //First compute all numeric attribute
-    int k = 0; //normalement tous les vecteurs ont la même taille
-    int index_class = 0;
-    while (k < (extrfeat).v_all_numeric_v_attributes_values[0].size()){
-        vector<double> v;
-        vector<string> vs;
-        for (int i = 0; i < (extrfeat).v_all_numeric_v_attributes_values.size(); i++){
-            v.push_back((extrfeat).v_all_numeric_v_attributes_values[i][k]);
+    
+    
+    for(int i = 0 ; i < extrfeat.v_all_numeric_v_attributes_values.size() ; i++){
+        for(int j = 0 ; j < extrfeat.v_all_numeric_v_attributes_values[i].size(); j++){
+            pFile << extrfeat.v_all_numeric_v_attributes_values[i][j] << ",";
         }
-        vs.push_back(extrfeat.v_class[k]);
-
-        //Ecriture dans le fichier
-
-            for (int j = 0; j < v.size(); j++){
-                if (j == v.size() - 1){
-                    pFile << v[j] << ","<< vs[index_class]<<endl;
-
-                }
-                else{
-                    pFile << v[j] << ",";
-                }
-            }
-            v.clear();
-            k++;
-
-
-
+        pFile << extrfeat.v_class[i] << endl;
     }
+//
+//    //First compute all numeric attribute
+//    int k = 0; //normalement tous les vecteurs ont la même taille
+//    int index_class = 0;
+//    while (k < (extrfeat).v_all_numeric_v_attributes_values[0].size()){
+//        vector<double> v;
+//        vector<string> vs;
+//        for (int i = 0; i < (extrfeat).v_all_numeric_v_attributes_values.size(); i++){
+//            v.push_back((extrfeat).v_all_numeric_v_attributes_values[i][k]);
+//        }
+//        vs.push_back(extrfeat.v_class[k]);
+//
+//        //Ecriture dans le fichier
+//
+//            for (int j = 0; j < v.size(); j++){
+//                if (j == v.size() - 1){
+//                    pFile << v[j] << ","<< vs[index_class]<<endl;
+//
+//                }
+//                else{
+//                    pFile << v[j] << ",";
+//                }
+//            }
+//            v.clear();
+//            k++;
+//
+//
+//
+//    }
     pFile.close();
     
 

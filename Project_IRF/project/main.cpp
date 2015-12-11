@@ -31,22 +31,6 @@ using namespace std;
 using namespace cv;
 
 
-//debugging on console
-static bool VERBOSE = false;
-static bool RESULT = false;;
-
-
-//remove all sources files before commit
-static bool REMOVE_SOURCE = false;
-
-//use folder test or default folder
-static  bool TEST = false;
-
-
-static bool EXTRACT_IMAGES = false;
-static bool GET_FEATURES = false;
-static bool NORMALIZE = false;
-static bool CREATE_VARIOUS = true;
 /*
  // USAGE ::
  ./projetIRF -v [mode verbose]
@@ -57,19 +41,19 @@ static bool CREATE_VARIOUS = true;
  ./projetIRF -a -test [mode resultats + verbose]
  */
 
-int SPLIT_FACTOR = 4;
 int lastFactor =0;
 static bool SAVE_NORMALIZED = false;
+utils & u = utils::i();
 
 int main(int argc, const char * argv[]) {
-
     get_args(argc, argv);
-    if(REMOVE_SOURCE){
+    
+    if(u.REMOVE_SOURCE){
         int approve = 0;
-        cout << "Are you sure you wan't to remove all source files from " << (TEST ? "test" : "release") << " [ Yes : 1] "<< endl;
+        cout << "Are you sure you wan't to remove all source files from " << (u.TEST ? "test" : "release") << " [ Yes : 1] "<< endl;
         cin >> approve;
         if(approve ==1){
-            fileOp * op = new fileOp(TEST);
+            fileOp * op = new fileOp();
             op->removeAllResImagesFiles();
             op->removeAllResNormalizedFiles();
             op->removeAllResSplittedFiles();
@@ -78,27 +62,29 @@ int main(int argc, const char * argv[]) {
         return 0;
     }
     
-    if(EXTRACT_IMAGES){
+    if(u.EXTRACT_IMAGES){
         cout << "\nExtracting images..." <<endl;
         
         process_extract();
     }
     
     int nb =1;
-    if(CREATE_VARIOUS){
+    if(u.CREATE_VARIOUS){
      
         cout << "How many Arff Files ? " << endl;
         cin >> nb;
     }
     
+    
+    
     for(int i=0 ; i<nb ; i++){
         cout << i+1 << " Pass...." << endl;
         
-        if (NORMALIZE){
+        if (u.NORMALIZE){
             cout << "\nNormalizing images..." << endl;
             process_normalize();
         }
-        if(GET_FEATURES){
+        if(u.GET_FEATURES){
             cout << "\nGetting features..." <<endl;
             process_features();
         }
@@ -125,22 +111,39 @@ void get_args(int argc, const char * argv[]){
     {
         string a = argv[i];
        // cout <<a << endl;
-        if      (a== "-verbose"  || a=="-v") VERBOSE =true;
-        else if (a=="-result"    || a=="-r") RESULT =true;
-        else if (a=="-none") RESULT = VERBOSE =false;
-        else if(a == "-e" || a =="-extract") EXTRACT_IMAGES =true;
-        else if (a == "-n" || a == "-normalize") NORMALIZE = true;
-        else if(a == "-f" || a =="-features") GET_FEATURES =true;
-        else if(a == "-a" || a =="-all") GET_FEATURES = EXTRACT_IMAGES = NORMALIZE= true;
-        else if(a == "-test" || a =="-t") TEST =true;
-        else if(a == "-remove") REMOVE_SOURCE = true;
-        else if(a == "-help" || "-h")
+        if      (a== "-verbose"  || a=="-v") u.VERBOSE =true;
+        else if (a=="-result"    || a=="-r") u.RESULT =true;
+        else if (a=="-none") u.RESULT = u.VERBOSE =false;
+        else if (a == "-e" || a =="-extract") u.EXTRACT_IMAGES =true;
+        else if (a == "-n" || a == "-normalize") u.NORMALIZE = true;
+        else if (a == "-f" || a =="-features") u.GET_FEATURES =true;
+        else if (a == "-a" || a =="-all") u.GET_FEATURES = u.EXTRACT_IMAGES = u.NORMALIZE= true;
+        else if (a == "-test" || a =="-t") u.TEST =true;
+        else if (a == "-remove") u.REMOVE_SOURCE = true;
+        else if (a == "-split" || a== "-s")
+        {
+            if(i+1 < argc){
+                istringstream ss(argv[++i]);
+                int x;
+                if (!(ss >> x)){
+                    cerr << "Invalid number " << argv[i] <<endl << " Exit." <<endl;;
+                    exit(0);
+                }else{
+                    u.SPLIT_FACTOR = stoi(argv[i]);
+                    cout << "\n Split Factor is now  " << u.SPLIT_FACTOR << endl;
+                }
+            }else{
+                cout << "Error in args -split" << endl;
+            }
+        }
+        else if(a == "-help" || a== "-h")
         {
             cout << "Projet IRF " << endl;;
             cout << "Options : "<<endl;
             cout << "\t-verbose   | -v : verbose    "<< endl;;
             cout << "\t-result    | -r : resultats  "<< endl;;
             cout << "\t-test      | -t : fichier de test  "<< endl;;
+            cout << "\t-split [x] | -s [x] : change split factor to x[int]" <<endl;
 
             cout << "Usage : "<<endl;
             cout << "\t-extract   | -e : extraire les images"<< endl;;
@@ -148,20 +151,19 @@ void get_args(int argc, const char * argv[]){
             cout << "\t-features  | -f : extraire les features "<< endl;;
             
             cout << "Autres : "<<endl;
+            
 
             cout << "\t-remove    |    : supprimer les fichiers resultats (a faire avant commit)"<< endl;;
             cout << "\t-help      | -h : cette page"<< endl;;
             exit(0);
         }
-        
-        
     }
-    cout << " VERBOSE : " << VERBOSE;
-    cout << " RESULT : " << RESULT;
-    cout << " TEST : " << TEST <<endl;;
-    cout << " EXTRACT_IMAGES : " << EXTRACT_IMAGES;
-    cout << " NORMALIZE : " << NORMALIZE;
-    cout << " GET_FEATURES : " << GET_FEATURES;
+    cout << " VERBOSE : " << u.VERBOSE;
+    cout << " RESULT : " << u.RESULT;
+    cout << " TEST : " << u.TEST <<endl;;
+    cout << " EXTRACT_IMAGES : " << u.EXTRACT_IMAGES;
+    cout << " NORMALIZE : " << u.NORMALIZE;
+    cout << " GET_FEATURES : " << u.GET_FEATURES;
 
   
     cout <<endl;
@@ -172,7 +174,7 @@ void get_args(int argc, const char * argv[]){
 
 void process_extract()
 {
-    extractImages * e = new extractImages(VERBOSE, RESULT, TEST);
+    extractImages * e = new extractImages();
     e->process();
     delete e;
     
@@ -180,28 +182,28 @@ void process_extract()
 
 void process_normalize()
 {
-    int split_factor = SPLIT_FACTOR;
+    int split_factor = u.SPLIT_FACTOR;
     
-    cout << "Split images in ? (1..4..9..16) :";
+    cout << "Split images in ? (1..4..9..16..25) :";
     cin >> split_factor;
-    while(split_factor != 1 && split_factor != 4 && split_factor != 9 && split_factor != 16){
-        cout << "\nOnly 1 or 4 or 9 or 16: ";
+    while(split_factor != 1 && split_factor != 4 && split_factor != 9 && split_factor != 16 && split_factor != 25){
+        cout << "\nOnly 1 or 4 or 9 or 16 or 25: ";
         cin >> split_factor;
     }
     
-    SPLIT_FACTOR = split_factor;
-    cout << "OK, Split in : " << SPLIT_FACTOR << endl;
+    u.SPLIT_FACTOR = split_factor;
+    cout << "OK, Split in : " << u.SPLIT_FACTOR << endl;
     //TODO optimiser
-    fileOp * op = new fileOp(TEST);
+    fileOp * op = new fileOp();
     vector<string> splittedImages = op->getSplitedImages();
     //PREVENT TO SPLIT IF SAME AGAIN
-    if(lastFactor!= SPLIT_FACTOR)
+    if(lastFactor!= u.SPLIT_FACTOR)
     {
-        normalizeImages * n = new normalizeImages(VERBOSE, RESULT, TEST, SPLIT_FACTOR);
+        normalizeImages * n = new normalizeImages();
         
-        if(VERBOSE)cout <<"Save Normalized is set to : " << SAVE_NORMALIZED << endl;;
+        if(u.VERBOSE)cout <<"Save Normalized is set to : " << SAVE_NORMALIZED << endl;;
         n->process(SAVE_NORMALIZED);
-        lastFactor =SPLIT_FACTOR;
+        lastFactor =u.SPLIT_FACTOR;
         delete n;
     }else
     {
@@ -215,7 +217,7 @@ void process_normalize()
 
 void process_features()
 {    
-    fileOp *  op = new fileOp(TEST);
+    fileOp *  op = new fileOp();
     try{
         
   
@@ -225,16 +227,16 @@ void process_features()
         //VOIR IMAGES SPLITTED
         vector<string> v_result_images_toextract_features = op->getSplitedImages();
         
-        if(v_result_images_toextract_features.size() % SPLIT_FACTOR != 0)
+        if(v_result_images_toextract_features.size() % u.SPLIT_FACTOR != 0)
         {
             cout << "error : Splitted images are not equivalent to SPLIT_FACTOR" << endl;
-            cout << "try again with NORMALIZE (-n -normalize) option to reconstruct images" <<endl;
+            cout << "try again with NORMALIZE (-normalize) or FEATURES with options [-features -split 9] to reconstruct images" <<endl;
             return;
         }
 
         //Print features available, ! attention l'ordre ici est important, le même que pour l'enum Features_available si modification
         //car c'est ce que l'utilisateur va prendre en compte car instructions imprimées à l'écran
-        vector<string> v_features_available = {"Black_Pixel","White_Pixel","Airs","Contours_Size","Harris_Corners", "Length Area", "Mass_center_x" , "Mass_center_y"};
+        vector<string> v_features_available = {"Black_Pixel","White_Pixel","Airs","Contours_Size","Harris_Corners", "Length Area", "Mass_center"};
 
         //Features to extract
         vector<int> v_features_to_extract;
@@ -260,7 +262,7 @@ void process_features()
         v_features_to_extract.push_back(INT_MAX);
 
 
-        extractFeature * extract_feature = new extractFeature(SPLIT_FACTOR);
+        extractFeature * extract_feature = new extractFeature(u.SPLIT_FACTOR);
         
         //v_features_to_extract == vector des features
         //v_result_images_toextract_features = vector des images

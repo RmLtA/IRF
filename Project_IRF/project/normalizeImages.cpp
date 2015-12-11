@@ -9,7 +9,7 @@
 #include "normalizeImages.hpp"
 
 void normalizeImages::process(bool saveNormalized){
-    fileOp *  op = new fileOp(TEST);
+    fileOp *  op = new fileOp();
     if(saveNormalized) op->removeAllResNormalizedFiles();
     op->removeAllResSplittedFiles();
 
@@ -25,7 +25,7 @@ void normalizeImages::process(bool saveNormalized){
         current = op->getFilename(result[i]);
         Mat box = this->boundingBox(img, current);
         
-        if(RESULT){
+        if(u.RESULT){
             moy_cols +=box.cols;
             moy_rows +=box.rows;
         }
@@ -33,24 +33,24 @@ void normalizeImages::process(bool saveNormalized){
         Mat res = getSquareImage(box,current);
             
 
-        if(VERBOSE) cout << "Process... : " << current<< endl;
+        if(u.VERBOSE) cout << "Process... : " << current<< endl;
         //cout << i << endl;
-        if(saveNormalized)op->writeNormalized(current,res, VERBOSE);
+        if(saveNormalized)op->writeNormalized(current,res);
         
       
-        vector<Mat> splited = splitImage(SPLIT_FACTOR, res);
+        vector<Mat> splited = splitImage(u.SPLIT_FACTOR, res);
         for(int j = 0 ; j < splited.size(); j++)
         {
             stringstream   ss;
             ss << current << "_" << j;
-            op->writeSplited(ss.str(),splited[j], VERBOSE);
+            op->writeSplited(ss.str(),splited[j]);
         }
         
        
  
         
     }
-    if(RESULT){
+    if(u.RESULT){
         double nb_img = result.size();
         if(nb_img !=0){
             moy_rows /=nb_img;
@@ -125,7 +125,7 @@ cv::Mat normalizeImages::getSquareImage( const cv::Mat& img, string imgName )
     cv::resize( img, square( roi ), roi.size() );
     
     
-    if(VERBOSE) imshow("Square Image " + imgName, square);
+    if(u.VERBOSE) imshow("Square Image " + imgName, square);
     return square;
 }
 
@@ -193,7 +193,7 @@ Mat normalizeImages::boundingBox(const cv::Mat& img, string imgName)
         Mat final(img, bounRect);
 
        // imshow("Contours " + imgName, drawing);
-       if(VERBOSE) imshow("final " + imgName, final);
+       if(u.VERBOSE) imshow("final " + imgName, final);
 
 
 //

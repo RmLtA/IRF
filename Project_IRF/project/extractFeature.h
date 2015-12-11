@@ -25,8 +25,8 @@ public :
 	//Respect the order,  attention l'ordre ici est important, le même que dans le main pour v_features_available si modification
 	//car c'est le numéro  que l'utilisateur va prendre en compte car instructions imprimées à l'écran
 	//Si ajout de features, ajouter une constante ! il y a un 2e enum dans fileOp.h
-	enum Features_Available { BLACK_PIXEL = 1, WHITE_PIXEL, AREA, CONTOURS_SIZE, HARRIS_CORNERS, LENGTHAREA, MASSCENTER_X, MASSCENTER_Y, CLASS = INT_MAX };
-
+	enum Features_Available                 { BLACK_PIXEL = 1, WHITE_PIXEL, AREA, CONTOURS_SIZE, HARRIS_CORNERS, LENGTHAREA, MASSCENTER, CLASS = INT_MAX };
+    vector<int> nb_features_by_attributes { 0, 1              ,1           ,1    ,1              ,1             ,1          ,2           ,1};
 	extractFeature(int split){
         SPLITED = split;
 	}
@@ -55,6 +55,9 @@ public :
 	void compute_features(vector<int>& v_of_attributes, vector<string>& v_result_images_toextract_features);
 	vector<double> extract_feature_by_feature(int offset, int feature_attribute, vector<string>& v_result_images_toextract_features);
 	void addclassto_v_class(vector<string>& v_result_images_toextract_features);
+    
+private:
+    void extract_all_features(string imgName, int i, int offset);
 };
 
 #endif /*EXTRACT_FEATURE_H_*/
