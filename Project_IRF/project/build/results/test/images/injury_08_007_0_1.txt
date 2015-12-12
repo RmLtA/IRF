@@ -1,0 +1,6 @@
+Label injury
+Form 00708
+Scripteur 08
+Page 007
+Row 0
+Columm 1

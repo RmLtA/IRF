@@ -9,6 +9,7 @@
 #ifndef utils_hpp
 #define utils_hpp
 
+#include <string.h>
 
 
 class utils
@@ -55,9 +56,16 @@ private:
 
 
 
-static inline string niceOutput(string output, bool ok){
-    if(false){
-        stringstream ss;
+static inline std::string niceOutput(std::string output, bool ok){
+    bool cond = false;
+#if _DEBUG
+    cond = false;
+#else
+    cond = false;
+#endif
+        
+    if(cond){
+        std::stringstream ss;
         int  FG_RED      = 31;
         int FG_GREEN    = 32;
         ss << "\033[";

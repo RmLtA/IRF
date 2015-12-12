@@ -236,7 +236,7 @@ void process_features()
 
         //Print features available, ! attention l'ordre ici est important, le même que pour l'enum Features_available si modification
         //car c'est ce que l'utilisateur va prendre en compte car instructions imprimées à l'écran
-        vector<string> v_features_available = {"Black_Pixel","White_Pixel","Airs","Contours_Size","Harris_Corners", "Length Area", "Mass_center"};
+        vector<string> v_features_available = {"Black_Pixel","White_Pixel","Airs","Contours_Size","Harris_Corners", "Length Area", "Mass_center", "Nb_Lines"};
 
         //Features to extract
         vector<int> v_features_to_extract;

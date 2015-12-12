@@ -4,6 +4,8 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/features2d/features2d.hpp>
+#include "utils.hpp"
+
 #include <iostream>
 using namespace std;
 using namespace cv;
@@ -12,8 +14,12 @@ static int thresh = 145; //100
 
 class feature{
 
+    
 public:
-	Mat sourceImg;
+    //instance
+    utils & u = utils::i();
+    
+    Mat sourceImg;
 	Mat graySourceImg;
     Mat binaryImage;
 
@@ -46,7 +52,7 @@ public:
     double massCenterX();
     double massCenterY();
 
-
+    double HoughLines();
     double countLengthArea();
     double countArea();
 

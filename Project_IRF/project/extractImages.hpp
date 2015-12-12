@@ -28,6 +28,8 @@ const int MAXIMAGETTE = 7 ;
 class extractImages{
 private :
     utils & u = utils::i();
+    unsigned long int leftToProcess;
+    unsigned long int toProcess;
 
     int nTotalImg;
     int nErroImg;

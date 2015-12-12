@@ -1,0 +1,6 @@
+Label injury
+Form 00601
+Scripteur 01
+Page 006
+Row 1
+Columm 1

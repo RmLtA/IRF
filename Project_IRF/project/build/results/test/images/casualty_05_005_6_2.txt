@@ -1,0 +1,6 @@
+Label casualty
+Form 00505
+Scripteur 05
+Page 005
+Row 6
+Columm 2

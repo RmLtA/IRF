@@ -1,0 +1,20 @@
+%1. Title : 
+%
+%2. Sources : 
+%
+%
+%
+@RELATION Imagette
+
+@ATTRIBUTE  Harris_Corners_0 NUMERIC
+@ATTRIBUTE  Hough_Lines_0 NUMERIC
+@ATTRIBUTE Class  {accident, bomb, car, casualty, electricity, fire-brigade, fire, flood, gas, injury, paramedics, person police, road-block}
+
+@DATA
+3,4,accident
+5,0,bomb
+3,3,car
+1,5,casualty
+3,2,electricity
+5,3,fire-brigade
+3,2,fire

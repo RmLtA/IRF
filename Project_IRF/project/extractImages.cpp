@@ -8,10 +8,11 @@
 
 #include "extractImages.hpp"
 #include <time.h>
+#include <mutex>          // std::mutex
+std::mutex mtx;           // mutex for critical section
 
 
 void extractImages::process(){
-    
     fileOp *  op = new fileOp();
     //removing files befores procesing new files
     op->removeAllResImagesFiles();
@@ -27,17 +28,46 @@ void extractImages::process(){
     vector<string> templatesImages = op->getTemplImages();
    
 #ifdef __APPLE__
-    cout <<"Using threads... "<<endl;
     vector<thread> vThreads;
+    int NB_THREADS = thread::hardware_concurrency();
+    if(NB_THREADS ==0)
+        NB_THREADS = 4;
     
+    cout <<"Using up to threads :  "<< NB_THREADS <<endl;
     
-    for(int i=0 ; i < sourcesImages.size() ; i++){
-        //v.emplace_back(f);
+    //init vars
+    leftToProcess=sourcesImages.size();
+    toProcess =sourcesImages.size();
+    unsigned int finishedTask = NB_THREADS;
+    long int temp = leftToProcess;
+
+    //init 4 processes
+    for(int i=0 ; i < NB_THREADS ; i++){
         vThreads.push_back(std::thread(&extractImages::processTask, std::ref(*this), sourcesImages[i], templatesImages));
     }
+
+    this_thread::yield();
     
-    for (auto& th : vThreads){
-      
+    while(leftToProcess)
+    {
+        if(temp != leftToProcess)
+        {
+            mtx.lock();
+            int proceded = (int)temp - (int) leftToProcess;
+            int finished = finishedTask;
+            for(int i = 0 ; i <proceded && finished <toProcess; i++){
+                vThreads.push_back(std::thread(&extractImages::processTask, std::ref(*this), sourcesImages[i+finishedTask], templatesImages));
+                finished++;
+            }
+            finishedTask= finished;
+            temp = leftToProcess;
+            mtx.unlock();
+        }else{
+            this_thread::yield();
+        }
+    }
+    
+    for(auto& th : vThreads){
         th.join();
     }
 
@@ -50,10 +80,10 @@ void extractImages::process(){
 #endif
     
     xt = time(NULL) - xt;
-
     prog_e = clock();
+
     cpuTime = (double) ((prog_e - prog_b) / (double)CLOCKS_PER_SEC);
-    cout << endl << "Total imagettes : " << nTotalImg << " / " << 35*(sourcesImages.size()-nErroImg) << "\t" << "| Temps d'exec.: " << (double)xt/60. <<" min" << endl;;
+    cout << endl << "Total imagettes : " << nTotalImg << " / " << 35*(sourcesImages.size()-nErroImg) << "\t" << "| Temps d'exec.: " << (double)cpuTime/60. <<" min" << endl;;
 
     delete op;
 }
@@ -63,7 +93,6 @@ void extractImages::process(){
 void extractImages::processTask(extractImages& self,string sourceImage,const vector<string>& templatesImages)
 {
     utils & u = utils::i();
-
     double cpuTime;
     clock_t start, end;
     Mat img = imread(sourceImage);
@@ -176,9 +205,13 @@ void extractImages::processTask(extractImages& self,string sourceImage,const vec
     }
     delete ll;
     delete op;
-    
-    
-    if(u.RESULT)cout << "End thread :" << sourceImage <<endl;
+#ifdef __APPLE__
+    mtx.lock();
+    if(u.RESULT)cout << "End : " << sourceImage <<endl;
     if(u.VERBOSE || u.RESULT )cout << output.str()<<endl;
-    cout<< flush << ".";
+    cout<< flush;
+    self.leftToProcess--;
+    mtx.unlock();
+#endif
+
 }

@@ -1,0 +1,6 @@
+Label electricity
+Form 00700
+Scripteur 00
+Page 007
+Row 4
+Columm 4

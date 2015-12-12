@@ -1,0 +1,6 @@
+Label injury
+Form 00020
+Scripteur 20
+Page 000
+Row 2
+Columm 2

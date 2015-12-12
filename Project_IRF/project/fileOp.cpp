@@ -48,10 +48,10 @@ void fileOp::writeTxtFile(string templ, string sourceName, int row, int columm, 
     name <<dirResImagesName << tmp.str() << ".txt";
     name_img <<dirResImagesName<<tmp.str() << ".jpg";
     
-    if(u.VERBOSE)cout<< "  " << getFilename(name_img.str());
+   // if(u.VERBOSE)cout<< "  " << getFilename(name_img.str());
     //enregistrment de l'imagette
     imwrite(name_img.str(), image);
-    if(u.VERBOSE){
+    if(u.RESULT){
         //crŽation du fichier .txt
         ofstream pFile(name.str(), ios::out);
         
@@ -215,6 +215,10 @@ void fileOp::writeARFFFile(extractFeature& extrfeat){
                     pFile<< "@ATTRIBUTE " << " Mass_Center_X_" <<j << " NUMERIC" << endl;
                     pFile<< "@ATTRIBUTE " << " Mass_Center_Y_" <<j << " NUMERIC" << endl;
                     break;
+                case extractFeature::HOUGH_LINES:
+                    pFile<< "@ATTRIBUTE " << " Hough_Lines_" <<j << " NUMERIC" << endl;
+                    break;
+
                
             }
         }

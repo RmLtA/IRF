@@ -47,22 +47,22 @@ int feature::countWhitePixel(){
 int ww=0;
 // Count the number of Harris Corner
 int feature::countHarrisCorners(){
-    int thresh = 200;
+    int thresh = 150;
 	Mat dst, dst_norm, dst_norm_scaled;
 	dst = Mat::zeros(this->sourceImg.size(), CV_32FC1);
 
 	/// Detector parameters
 	int blockSize = 2;
 	int apertureSize = 3;
-	double k = 0.04;
+	double k = 0.03;
 
 	/// Detecting corners
 	cornerHarris(this->graySourceImg, dst, blockSize, apertureSize, k, BORDER_DEFAULT);
 
 	/// Normalizing
 	normalize(dst, dst_norm, 0, 255, NORM_MINMAX, CV_32FC1, Mat());
-	convertScaleAbs(dst_norm, dst_norm_scaled);
-
+	//convertScaleAbs(dst_norm, dst_norm_scaled);
+    Mat display = this->sourceImg.clone();
 	int cornerHarris = 0;
 	/// Drawing a circle around corners
 	for (int j = 0; j < dst_norm.rows; j++)
@@ -72,16 +72,49 @@ int feature::countHarrisCorners(){
 			if ((int)dst_norm.at<float>(j, i) > thresh)
 			{
 				cornerHarris++;
-                circle( dst_norm_scaled, Point( i, j ), 5,  Scalar(0), 2, 8, 0 );
+                circle( display, Point( i, j ), 5,  Scalar(0), 2, 8, 0 );
 
 			}
 		}
 	}
-    //imshow("Harris" + to_string(ww++), dst_norm_scaled);
+    if(u.VERBOSE){
+        imshow("Harris corners " + to_string(ww++), display);
+        cout << "Harris :"<< to_string(ww) << " : "<< cornerHarris << endl;
+        waitKey(1);
+    }
 
 	return cornerHarris;
 }
 
+
+
+double feature::HoughLines(){
+    int resolution = 1;
+    int threshold = 30;
+    int minLinLength =10;
+    int maxLineGap = 10;
+    vector<Vec4i> lines;
+    
+    Mat dst, cdst;
+    Canny(this->sourceImg, dst, 50, 200, 3);
+    cdst = dst.clone();
+    HoughLinesP(dst, lines, resolution, CV_PI/180, threshold,minLinLength , maxLineGap );
+    
+    
+    if(u.VERBOSE){
+        for( size_t i = 0; i < lines.size(); i++ )
+        {
+            Vec4i l = lines[i];
+            line( cdst, Point(l[0], l[1]), Point(l[2], l[3]), Scalar(180,8,255), 3, CV_AA);
+            
+        }
+        
+        imshow("Hough lines" + to_string(ww), cdst);
+        cout << "Hough :" << to_string(ww++) << " : " <<  lines.size()<< endl;
+        waitKey(1);
+    }
+    return lines.size();
+}
 
 
 double feature::countArea(){
@@ -131,6 +164,29 @@ double feature::countLengthArea(){
     return max;
 }
 
+double feature::massCenterX(){
+    if(this->massCenter.x == -1 && this->massCenter.y == -1)
+        feature::countMassCenter();
+    
+    if(!isnan(this->massCenter.x))
+        return this->massCenter.x;
+    else
+        return 0;
+}
+
+
+double feature::massCenterY(){
+    if(this->massCenter.x == -1 && this->massCenter.y == -1)
+        feature::countMassCenter();
+    
+    if(!isnan(this->massCenter.y))
+        return this->massCenter.y;
+    else
+        return 0;
+}
+
+
+//PRIVATE
 void feature::countMassCenter(){
     if(this->massCenter.x == -1 && this->massCenter.y == -1){
         int thresh = 140;
@@ -168,26 +224,6 @@ void feature::countMassCenter(){
         Point2f massCenter(totalX/size, totalY/size); // condition: size != 0
         this->massCenter = massCenter;
     }
- }
-
-double feature::massCenterX(){
-    if(this->massCenter.x == -1 && this->massCenter.y == -1)
-        feature::countMassCenter();
-    
-    if(!isnan(this->massCenter.x))
-        return this->massCenter.x;
-    else
-        return 0;
 }
 
-
-double feature::massCenterY(){
-    if(this->massCenter.x == -1 && this->massCenter.y == -1)
-        feature::countMassCenter();
-    
-    if(!isnan(this->massCenter.y))
-        return this->massCenter.y;
-    else
-        return 0;
-}
 

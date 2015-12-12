@@ -1,0 +1,6 @@
+Label casualty
+Form 00812
+Scripteur 12
+Page 008
+Row 6
+Columm 1

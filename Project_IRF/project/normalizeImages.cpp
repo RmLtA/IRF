@@ -33,7 +33,7 @@ void normalizeImages::process(bool saveNormalized){
         Mat res = getSquareImage(box,current);
             
 
-        if(u.VERBOSE) cout << "Process... : " << current<< endl;
+        if(u.VERBOSE) cout << "\nProcess... : " << current;
         //cout << i << endl;
         if(saveNormalized)op->writeNormalized(current,res);
         
@@ -125,7 +125,7 @@ cv::Mat normalizeImages::getSquareImage( const cv::Mat& img, string imgName )
     cv::resize( img, square( roi ), roi.size() );
     
     
-    if(u.VERBOSE) imshow("Square Image " + imgName, square);
+    //if(u.VERBOSE) imshow("Square Image " + imgName, square);
     return square;
 }
 
@@ -193,7 +193,7 @@ Mat normalizeImages::boundingBox(const cv::Mat& img, string imgName)
         Mat final(img, bounRect);
 
        // imshow("Contours " + imgName, drawing);
-       if(u.VERBOSE) imshow("final " + imgName, final);
+       //if(u.VERBOSE) imshow("final " + imgName, final);
 
 
 //
@@ -283,7 +283,7 @@ Mat normalizeImages::Box( Mat src, string imgName){
             matContour.at<uint8_t>(p) = 255;
         }
     }
-    imshow("ROI "+ imgName, matContour);
+    //imshow("ROI "+ imgName, matContour);
 
     cout << "Done!" << endl;
     return matContour;

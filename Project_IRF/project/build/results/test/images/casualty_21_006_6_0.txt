@@ -1,0 +1,6 @@
+Label casualty
+Form 00621
+Scripteur 21
+Page 006
+Row 6
+Columm 0

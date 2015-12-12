@@ -1,0 +1,6 @@
+Label injury
+Form 00718
+Scripteur 18
+Page 007
+Row 6
+Columm 4

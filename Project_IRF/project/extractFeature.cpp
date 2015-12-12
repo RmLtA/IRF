@@ -90,7 +90,11 @@ void extractFeature::extract_all_features(string imgName, int nextImage, int cur
                 feature_result.push_back(f->massCenterX());
                 feature_result.push_back(f->massCenterY());
                 break;
-                 default:
+            case HOUGH_LINES:
+                feature_result.push_back(f->HoughLines());
+                break;
+
+            default:
                 cout << "Unknown feature" << endl;
                 throw "error";
                 break;
@@ -101,54 +105,54 @@ void extractFeature::extract_all_features(string imgName, int nextImage, int cur
         v_all_numeric_v_attributes_values[nextImage][currentPos+i] = feature_result[i];
 
 }
-
-//Si ajout de features, Modification ICI, AJOUT D'un case
-vector<double> extractFeature::extract_feature_by_feature(int offset , int feature_attribute, vector<string>& v_result_images_toextract_features){
-	vector<double> v_attributes_values;
-    
-    
-    for (int i = offset; i < v_result_images_toextract_features.size(); i=i+SPLITED)
-    {
-        string imgName =v_result_images_toextract_features[i];
-        //cout << imgName << endl;;
-        Mat img = imread(imgName);
-        feature* f = new feature(img);
-
-        switch (feature_attribute){
-            case BLACK_PIXEL:
-                v_attributes_values.push_back(f->countBlackPixel());
-                break;
-            case WHITE_PIXEL:
-                v_attributes_values.push_back(f->countWhitePixel());
-                break;
-            case AREA:
-                v_attributes_values.push_back(f->countArea());
-                break;
-            case CONTOURS_SIZE:
-                v_attributes_values.push_back(f->countLengthArea());
-                break;
-            case HARRIS_CORNERS:
-                v_attributes_values.push_back(f->countHarrisCorners());
-                break;
-            case LENGTHAREA:
-                v_attributes_values.push_back(f->countLengthArea());
-                break;
-            case MASSCENTER:
-                v_attributes_values.push_back(f->massCenterX());
-                break;
-//            case MASSCENTER_Y:
-//                v_attributes_values.push_back(f->massCenterY());
+//
+////Si ajout de features, Modification ICI, AJOUT D'un case
+//vector<double> extractFeature::extract_feature_by_feature(int offset , int feature_attribute, vector<string>& v_result_images_toextract_features){
+//	vector<double> v_attributes_values;
+//    
+//    
+//    for (int i = offset; i < v_result_images_toextract_features.size(); i=i+SPLITED)
+//    {
+//        string imgName =v_result_images_toextract_features[i];
+//        //cout << imgName << endl;;
+//        Mat img = imread(imgName);
+//        feature* f = new feature(img);
+//
+//        switch (feature_attribute){
+//            case BLACK_PIXEL:
+//                v_attributes_values.push_back(f->countBlackPixel());
 //                break;
-            default:
-                cout << "Unknown feature" << endl;
-
-                break;
-        }
-    }
-
-    return v_attributes_values;
-}
-
+//            case WHITE_PIXEL:
+//                v_attributes_values.push_back(f->countWhitePixel());
+//                break;
+//            case AREA:
+//                v_attributes_values.push_back(f->countArea());
+//                break;
+//            case CONTOURS_SIZE:
+//                v_attributes_values.push_back(f->countLengthArea());
+//                break;
+//            case HARRIS_CORNERS:
+//                v_attributes_values.push_back(f->countHarrisCorners());
+//                break;
+//            case LENGTHAREA:
+//                v_attributes_values.push_back(f->countLengthArea());
+//                break;
+//            case MASSCENTER:
+//                v_attributes_values.push_back(f->massCenterX());
+//                break;
+////            case MASSCENTER_Y:
+////                v_attributes_values.push_back(f->massCenterY());
+////                break;
+//            default:
+//                cout << "Unknown feature" << endl;
+//
+//                break;
+//        }
+//    }
+//
+//    return v_attributes_values;
+//}
+//
 //No modification on adding features
 void extractFeature::addclassto_v_class(vector<string>& v_result_images_toextract_features){
 	for (int i = 0; i < v_result_images_toextract_features.size(); i=i+SPLITED){
