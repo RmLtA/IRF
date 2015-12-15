@@ -1,6 +1,0 @@
-Label car
-Form 00117
-Scripteur 17
-Page 001
-Row 4
-Columm 1

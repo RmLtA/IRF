@@ -1,6 +1,0 @@
-Label gas
-Form 00619
-Scripteur 19
-Page 006
-Row 6
-Columm 3

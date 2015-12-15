@@ -1,6 +1,0 @@
-Label paramedics
-Form 00710
-Scripteur 10
-Page 007
-Row 0
-Columm 2

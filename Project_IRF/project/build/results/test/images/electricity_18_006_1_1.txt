@@ -1,6 +1,0 @@
-Label electricity
-Form 00618
-Scripteur 18
-Page 006
-Row 1
-Columm 1

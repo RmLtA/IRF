@@ -1,6 +1,0 @@
-Label fire-brigade
-Form 00102
-Scripteur 02
-Page 001
-Row 4
-Columm 2

@@ -1,6 +1,0 @@
-Label police
-Form 00419
-Scripteur 19
-Page 004
-Row 0
-Columm 2

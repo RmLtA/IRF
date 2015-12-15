@@ -1,6 +1,0 @@
-Label person
-Form 00719
-Scripteur 19
-Page 007
-Row 3
-Columm 1

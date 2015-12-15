@@ -1,6 +1,0 @@
-Label bomb
-Form 00805
-Scripteur 05
-Page 008
-Row 6
-Columm 3

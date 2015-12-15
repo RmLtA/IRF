@@ -1,6 +1,0 @@
-Label car
-Form 00612
-Scripteur 12
-Page 006
-Row 3
-Columm 4

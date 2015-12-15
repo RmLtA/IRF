@@ -1,6 +1,0 @@
-Label paramedics
-Form 00114
-Scripteur 14
-Page 001
-Row 2
-Columm 1

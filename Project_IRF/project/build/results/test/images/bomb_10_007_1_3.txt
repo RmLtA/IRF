@@ -1,6 +1,0 @@
-Label bomb
-Form 00710
-Scripteur 10
-Page 007
-Row 1
-Columm 3

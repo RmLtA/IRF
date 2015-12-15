@@ -1,6 +1,0 @@
-Label police
-Form 00518
-Scripteur 18
-Page 005
-Row 3
-Columm 4

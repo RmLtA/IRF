@@ -1,6 +1,0 @@
-Label gas
-Form 00503
-Scripteur 03
-Page 005
-Row 4
-Columm 1

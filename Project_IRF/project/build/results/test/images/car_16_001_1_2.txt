@@ -1,6 +1,0 @@
-Label car
-Form 00116
-Scripteur 16
-Page 001
-Row 1
-Columm 2

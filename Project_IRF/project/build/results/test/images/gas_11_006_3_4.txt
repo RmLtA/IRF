@@ -1,6 +1,0 @@
-Label gas
-Form 00611
-Scripteur 11
-Page 006
-Row 3
-Columm 4

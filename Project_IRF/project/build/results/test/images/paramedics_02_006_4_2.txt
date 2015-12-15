@@ -1,6 +1,0 @@
-Label paramedics
-Form 00602
-Scripteur 02
-Page 006
-Row 4
-Columm 2

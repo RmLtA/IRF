@@ -1,6 +1,0 @@
-Label paramedics
-Form 00307
-Scripteur 07
-Page 003
-Row 3
-Columm 3

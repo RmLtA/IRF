@@ -1,6 +1,0 @@
-Label paramedics
-Form 00705
-Scripteur 05
-Page 007
-Row 6
-Columm 0

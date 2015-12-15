@@ -1,6 +1,0 @@
-Label person
-Form 00106
-Scripteur 06
-Page 001
-Row 5
-Columm 2

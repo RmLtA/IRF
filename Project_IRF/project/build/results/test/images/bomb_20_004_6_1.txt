@@ -1,6 +1,0 @@
-Label bomb
-Form 00420
-Scripteur 20
-Page 004
-Row 6
-Columm 1

@@ -1,6 +1,0 @@
-Label paramedics
-Form 00106
-Scripteur 06
-Page 001
-Row 2
-Columm 0

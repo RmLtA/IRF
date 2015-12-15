@@ -1,6 +1,0 @@
-Label police
-Form 00002
-Scripteur 02
-Page 000
-Row 0
-Columm 0

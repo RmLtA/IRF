@@ -1,6 +1,0 @@
-Label bomb
-Form 00617
-Scripteur 17
-Page 006
-Row 3
-Columm 2

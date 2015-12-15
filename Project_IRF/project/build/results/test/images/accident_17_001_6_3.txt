@@ -1,6 +1,0 @@
-Label accident
-Form 00117
-Scripteur 17
-Page 001
-Row 6
-Columm 3

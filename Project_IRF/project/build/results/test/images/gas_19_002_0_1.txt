@@ -1,6 +1,0 @@
-Label gas
-Form 00219
-Scripteur 19
-Page 002
-Row 0
-Columm 1

@@ -1,6 +1,0 @@
-Label electricity
-Form 00603
-Scripteur 03
-Page 006
-Row 5
-Columm 2

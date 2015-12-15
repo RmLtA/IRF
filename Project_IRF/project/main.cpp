@@ -42,7 +42,8 @@ using namespace cv;
  */
 
 int lastFactor =0;
-static bool SAVE_NORMALIZED = false;
+static bool SAVE_NORMALIZED = true;
+static bool DO_SQUARE= false;
 utils & u = utils::i();
 
 int main(int argc, const char * argv[]) {
@@ -202,7 +203,8 @@ void process_normalize()
         normalizeImages * n = new normalizeImages();
         
         if(u.VERBOSE)cout <<"Save Normalized is set to : " << SAVE_NORMALIZED << endl;;
-        n->process(SAVE_NORMALIZED);
+        //
+        n->process(SAVE_NORMALIZED, DO_SQUARE);
         lastFactor =u.SPLIT_FACTOR;
         delete n;
     }else
@@ -230,7 +232,7 @@ void process_features()
         if(v_result_images_toextract_features.size() % u.SPLIT_FACTOR != 0)
         {
             cout << "error : Splitted images are not equivalent to SPLIT_FACTOR" << endl;
-            cout << "try again with NORMALIZE (-normalize) or FEATURES with options [-features -split 9] to reconstruct images" <<endl;
+            cout << "try again with NORMALIZE to reconstruct images (-normalize) or FEATURES with options [-features -split 9] to tell last nb of splitted images " <<endl;
             return;
         }
 

@@ -1,6 +1,0 @@
-Label police
-Form 00105
-Scripteur 05
-Page 001
-Row 4
-Columm 1

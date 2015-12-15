@@ -1,6 +1,0 @@
-Label person
-Form 00701
-Scripteur 01
-Page 007
-Row 3
-Columm 1

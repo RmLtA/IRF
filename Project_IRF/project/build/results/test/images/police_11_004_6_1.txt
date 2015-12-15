@@ -1,6 +1,0 @@
-Label police
-Form 00411
-Scripteur 11
-Page 004
-Row 6
-Columm 1

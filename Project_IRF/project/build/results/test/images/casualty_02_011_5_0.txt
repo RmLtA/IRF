@@ -1,6 +1,0 @@
-Label casualty
-Form 01102
-Scripteur 02
-Page 011
-Row 5
-Columm 0

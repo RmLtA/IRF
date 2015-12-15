@@ -1,6 +1,0 @@
-Label person
-Form 00107
-Scripteur 07
-Page 001
-Row 3
-Columm 4

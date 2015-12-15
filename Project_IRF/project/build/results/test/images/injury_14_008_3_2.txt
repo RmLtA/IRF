@@ -1,6 +1,0 @@
-Label injury
-Form 00814
-Scripteur 14
-Page 008
-Row 3
-Columm 2

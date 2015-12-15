@@ -24,7 +24,7 @@ using namespace std;
 using namespace cv;
 
 static const int MAX_SIZE = 130;
-static const int THRESH_VALUE = 200; // /254
+static const int THRESH_VALUE = 230; // /254
 static const int IMG_GAP = 10; //Valeur de décalage (limite rectangle noir autours)
 
 class normalizeImages{
@@ -37,13 +37,13 @@ public :
     ~normalizeImages(){};
 
     
-    void process(bool saveNormalized);
+    void process(bool saveNormalized, bool squareImg);
 private:
 
     Mat boundingBox(const cv::Mat& img,string imgName);
     Mat Box( Mat matInput, string imgName);
-    Mat getSquareImage(const cv::Mat& img, string imgName);
-    vector<Mat>  splitImage(int x, Mat const & src);
+    static Mat getSquareImage(const cv::Mat& img, string imgName);
+    static vector<Mat>  splitImage(int x, Mat const & src);
     
 
 

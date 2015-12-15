@@ -1,6 +1,0 @@
-Label fire-brigade
-Form 00021
-Scripteur 21
-Page 000
-Row 5
-Columm 1

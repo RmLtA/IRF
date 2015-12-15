@@ -1,6 +1,0 @@
-Label fire-brigade
-Form 00315
-Scripteur 15
-Page 003
-Row 5
-Columm 2

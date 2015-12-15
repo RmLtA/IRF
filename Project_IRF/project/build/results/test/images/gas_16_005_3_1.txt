@@ -1,6 +1,0 @@
-Label gas
-Form 00516
-Scripteur 16
-Page 005
-Row 3
-Columm 1

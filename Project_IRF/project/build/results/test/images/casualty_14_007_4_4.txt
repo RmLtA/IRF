@@ -1,6 +1,0 @@
-Label casualty
-Form 00714
-Scripteur 14
-Page 007
-Row 4
-Columm 4

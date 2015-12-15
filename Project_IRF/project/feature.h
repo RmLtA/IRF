@@ -33,8 +33,13 @@ public:
 
 	
 	feature(Mat img) : sourceImg(img){
+        try{
          cvtColor( img, this->graySourceImg, CV_BGR2GRAY);
          massCenter = Point2f(-1,-1);
+        }catch(Exception e){
+            cout << e.msg <<endl;
+            throw e;
+        }
 	}
 
 	

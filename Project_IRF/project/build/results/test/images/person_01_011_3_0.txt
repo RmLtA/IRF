@@ -1,6 +1,0 @@
-Label person
-Form 01101
-Scripteur 01
-Page 011
-Row 3
-Columm 0

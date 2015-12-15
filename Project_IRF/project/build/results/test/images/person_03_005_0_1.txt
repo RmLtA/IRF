@@ -1,6 +1,0 @@
-Label person
-Form 00503
-Scripteur 03
-Page 005
-Row 0
-Columm 1

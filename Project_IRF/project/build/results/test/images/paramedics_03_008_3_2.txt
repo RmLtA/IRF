@@ -1,6 +1,0 @@
-Label paramedics
-Form 00803
-Scripteur 03
-Page 008
-Row 3
-Columm 2

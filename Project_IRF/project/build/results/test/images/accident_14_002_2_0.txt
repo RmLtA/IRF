@@ -1,6 +1,0 @@
-Label accident
-Form 00214
-Scripteur 14
-Page 002
-Row 2
-Columm 0

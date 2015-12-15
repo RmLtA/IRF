@@ -1,6 +1,0 @@
-Label gas
-Form 00312
-Scripteur 12
-Page 003
-Row 1
-Columm 0

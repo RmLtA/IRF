@@ -1,6 +1,0 @@
-Label fire-brigade
-Form 00111
-Scripteur 11
-Page 001
-Row 5
-Columm 4

@@ -1,6 +1,0 @@
-Label accident
-Form 00320
-Scripteur 20
-Page 003
-Row 3
-Columm 2

@@ -1,6 +1,0 @@
-Label road-block
-Form 00408
-Scripteur 08
-Page 004
-Row 6
-Columm 3

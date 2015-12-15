@@ -1,6 +1,0 @@
-Label person
-Form 00814
-Scripteur 14
-Page 008
-Row 1
-Columm 4

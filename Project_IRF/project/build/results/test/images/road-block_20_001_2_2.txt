@@ -1,6 +1,0 @@
-Label road-block
-Form 00120
-Scripteur 20
-Page 001
-Row 2
-Columm 2

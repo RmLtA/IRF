@@ -1,6 +1,0 @@
-Label car
-Form 00314
-Scripteur 14
-Page 003
-Row 5
-Columm 2

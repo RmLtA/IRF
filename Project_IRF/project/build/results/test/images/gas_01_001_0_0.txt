@@ -1,6 +1,0 @@
-Label gas
-Form 00101
-Scripteur 01
-Page 001
-Row 0
-Columm 0

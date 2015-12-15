@@ -1,6 +1,0 @@
-Label police
-Form 00417
-Scripteur 17
-Page 004
-Row 6
-Columm 1

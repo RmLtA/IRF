@@ -1,6 +1,0 @@
-Label car
-Form 00603
-Scripteur 03
-Page 006
-Row 3
-Columm 3

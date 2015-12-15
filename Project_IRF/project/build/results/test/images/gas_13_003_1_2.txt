@@ -1,6 +1,0 @@
-Label gas
-Form 00313
-Scripteur 13
-Page 003
-Row 1
-Columm 2

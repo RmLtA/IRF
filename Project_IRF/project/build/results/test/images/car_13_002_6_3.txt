@@ -1,6 +1,0 @@
-Label car
-Form 00213
-Scripteur 13
-Page 002
-Row 6
-Columm 3

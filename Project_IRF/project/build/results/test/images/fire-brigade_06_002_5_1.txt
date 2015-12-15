@@ -1,6 +1,0 @@
-Label fire-brigade
-Form 00206
-Scripteur 06
-Page 002
-Row 5
-Columm 1

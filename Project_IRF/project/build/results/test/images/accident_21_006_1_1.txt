@@ -1,6 +1,0 @@
-Label accident
-Form 00621
-Scripteur 21
-Page 006
-Row 1
-Columm 1

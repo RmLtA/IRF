@@ -1,6 +1,0 @@
-Label injury
-Form 00401
-Scripteur 01
-Page 004
-Row 1
-Columm 4

@@ -1,6 +1,0 @@
-Label police
-Form 00418
-Scripteur 18
-Page 004
-Row 4
-Columm 3

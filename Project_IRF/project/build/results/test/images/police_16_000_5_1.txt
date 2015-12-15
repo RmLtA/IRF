@@ -1,6 +1,0 @@
-Label police
-Form 00016
-Scripteur 16
-Page 000
-Row 5
-Columm 1

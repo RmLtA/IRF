@@ -1,6 +1,0 @@
-Label injury
-Form 00221
-Scripteur 21
-Page 002
-Row 6
-Columm 1

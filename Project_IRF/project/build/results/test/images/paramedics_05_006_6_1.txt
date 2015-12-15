@@ -1,6 +1,0 @@
-Label paramedics
-Form 00605
-Scripteur 05
-Page 006
-Row 6
-Columm 1

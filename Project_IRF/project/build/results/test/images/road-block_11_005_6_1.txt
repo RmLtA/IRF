@@ -1,6 +1,0 @@
-Label road-block
-Form 00511
-Scripteur 11
-Page 005
-Row 6
-Columm 1

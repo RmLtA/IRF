@@ -1,6 +1,0 @@
-Label injury
-Form 00107
-Scripteur 07
-Page 001
-Row 4
-Columm 0

@@ -1,6 +1,0 @@
-Label car
-Form 00114
-Scripteur 14
-Page 001
-Row 1
-Columm 3

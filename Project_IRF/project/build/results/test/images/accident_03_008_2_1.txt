@@ -1,6 +1,0 @@
-Label accident
-Form 00803
-Scripteur 03
-Page 008
-Row 2
-Columm 1

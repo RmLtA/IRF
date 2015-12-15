@@ -1,6 +1,0 @@
-Label road-block
-Form 00802
-Scripteur 02
-Page 008
-Row 1
-Columm 1

@@ -1,6 +1,0 @@
-Label bomb
-Form 00815
-Scripteur 15
-Page 008
-Row 3
-Columm 3

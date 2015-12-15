@@ -1,6 +1,0 @@
-Label paramedics
-Form 00314
-Scripteur 14
-Page 003
-Row 2
-Columm 3

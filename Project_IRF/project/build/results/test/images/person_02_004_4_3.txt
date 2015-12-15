@@ -1,6 +1,0 @@
-Label person
-Form 00402
-Scripteur 02
-Page 004
-Row 4
-Columm 3

@@ -1,6 +1,0 @@
-Label casualty
-Form 00616
-Scripteur 16
-Page 006
-Row 3
-Columm 3

@@ -1,6 +1,0 @@
-Label fire-brigade
-Form 00720
-Scripteur 20
-Page 007
-Row 6
-Columm 2

@@ -1,6 +1,0 @@
-Label fire-brigade
-Form 00118
-Scripteur 18
-Page 001
-Row 6
-Columm 4

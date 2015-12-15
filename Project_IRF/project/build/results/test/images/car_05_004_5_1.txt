@@ -1,6 +1,0 @@
-Label car
-Form 00405
-Scripteur 05
-Page 004
-Row 5
-Columm 1

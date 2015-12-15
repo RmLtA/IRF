@@ -1,6 +1,0 @@
-Label police
-Form 00706
-Scripteur 06
-Page 007
-Row 0
-Columm 4

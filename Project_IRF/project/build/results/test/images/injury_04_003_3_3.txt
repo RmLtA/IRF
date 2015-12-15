@@ -1,6 +1,0 @@
-Label injury
-Form 00304
-Scripteur 04
-Page 003
-Row 3
-Columm 3

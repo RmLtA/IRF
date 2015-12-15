@@ -60,6 +60,10 @@ void extractFeature::compute_features(vector<int>& v_of_attributes, vector<strin
 
 void extractFeature::extract_all_features(string imgName, int nextImage, int currentPos){
     Mat img = imread(imgName);
+    if(img.rows ==0 || img.cols==0){
+        cout << "Extract Feature:: error with " << imgName << endl;
+        return; 
+    }
     feature* f = new feature(img);
     vector<double> feature_result;
 

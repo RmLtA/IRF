@@ -1,6 +1,0 @@
-Label casualty
-Form 00415
-Scripteur 15
-Page 004
-Row 4
-Columm 0

@@ -1,6 +1,0 @@
-Label paramedics
-Form 00417
-Scripteur 17
-Page 004
-Row 4
-Columm 2

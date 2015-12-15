@@ -1,6 +1,0 @@
-Label paramedics
-Form 00211
-Scripteur 11
-Page 002
-Row 3
-Columm 1

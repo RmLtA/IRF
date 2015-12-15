@@ -1,6 +1,0 @@
-Label gas
-Form 00606
-Scripteur 06
-Page 006
-Row 2
-Columm 0

@@ -1,6 +1,0 @@
-Label gas
-Form 00713
-Scripteur 13
-Page 007
-Row 6
-Columm 2

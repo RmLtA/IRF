@@ -1,6 +1,0 @@
-Label gas
-Form 00205
-Scripteur 05
-Page 002
-Row 2
-Columm 3

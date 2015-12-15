@@ -1,6 +1,0 @@
-Label person
-Form 00015
-Scripteur 15
-Page 000
-Row 6
-Columm 0

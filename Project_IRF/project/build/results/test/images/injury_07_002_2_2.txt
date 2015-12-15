@@ -1,6 +1,0 @@
-Label injury
-Form 00207
-Scripteur 07
-Page 002
-Row 2
-Columm 2

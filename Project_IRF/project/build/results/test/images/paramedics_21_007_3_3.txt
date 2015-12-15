@@ -1,6 +1,0 @@
-Label paramedics
-Form 00721
-Scripteur 21
-Page 007
-Row 3
-Columm 3

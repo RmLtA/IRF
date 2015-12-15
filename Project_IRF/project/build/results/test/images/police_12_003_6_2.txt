@@ -1,6 +1,0 @@
-Label police
-Form 00312
-Scripteur 12
-Page 003
-Row 6
-Columm 2

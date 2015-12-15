@@ -1,6 +1,0 @@
-Label paramedics
-Form 00618
-Scripteur 18
-Page 006
-Row 3
-Columm 2

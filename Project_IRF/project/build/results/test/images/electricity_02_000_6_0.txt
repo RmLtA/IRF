@@ -1,6 +1,0 @@
-Label electricity
-Form 00002
-Scripteur 02
-Page 000
-Row 6
-Columm 0

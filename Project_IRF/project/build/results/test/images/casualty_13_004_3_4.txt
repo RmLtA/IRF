@@ -1,6 +1,0 @@
-Label casualty
-Form 00413
-Scripteur 13
-Page 004
-Row 3
-Columm 4

@@ -1,6 +1,0 @@
-Label electricity
-Form 00305
-Scripteur 05
-Page 003
-Row 1
-Columm 2

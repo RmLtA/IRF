@@ -1,6 +1,0 @@
-Label person
-Form 00512
-Scripteur 12
-Page 005
-Row 6
-Columm 2

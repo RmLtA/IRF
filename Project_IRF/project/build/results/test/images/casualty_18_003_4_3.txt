@@ -1,6 +1,0 @@
-Label casualty
-Form 00318
-Scripteur 18
-Page 003
-Row 4
-Columm 3

@@ -1,6 +1,0 @@
-Label bomb
-Form 00300
-Scripteur 00
-Page 003
-Row 1
-Columm 3

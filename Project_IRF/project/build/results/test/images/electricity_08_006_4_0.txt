@@ -1,6 +1,0 @@
-Label electricity
-Form 00608
-Scripteur 08
-Page 006
-Row 4
-Columm 0

@@ -1,6 +1,0 @@
-Label car
-Form 00618
-Scripteur 18
-Page 006
-Row 5
-Columm 1

@@ -8,7 +8,7 @@
 
 #include "normalizeImages.hpp"
 
-void normalizeImages::process(bool saveNormalized){
+void normalizeImages::process(bool saveNormalized, bool squareImg){
     fileOp *  op = new fileOp();
     if(saveNormalized) op->removeAllResNormalizedFiles();
     op->removeAllResSplittedFiles();
@@ -21,33 +21,45 @@ void normalizeImages::process(bool saveNormalized){
     string current;
     //read images
     for (int i = 0; i < result.size(); i++){
+        cout << "." << flush;
         Mat img = imread(result[i]);
         current = op->getFilename(result[i]);
-        Mat box = this->boundingBox(img, current);
-        
-        if(u.RESULT){
-            moy_cols +=box.cols;
-            moy_rows +=box.rows;
-        }
-      
-        Mat res = getSquareImage(box,current);
+        try{
+            Mat res;
+            Mat box = this->boundingBox(img, current);
+            if(box.rows == 0 || box.cols == 0 )
+            {
+                if(u.RESULT)cout << "Error with image : "<< current <<endl;
+                continue;
+            }
             
+            if(u.RESULT){
+                moy_cols +=box.cols;
+                moy_rows +=box.rows;
+            }
+            if(squareImg)
+                res = getSquareImage(box,current);
+            else
+                res = box;
+                
 
-        if(u.VERBOSE) cout << "\nProcess... : " << current;
-        //cout << i << endl;
-        if(saveNormalized)op->writeNormalized(current,res);
-        
-      
-        vector<Mat> splited = splitImage(u.SPLIT_FACTOR, res);
-        for(int j = 0 ; j < splited.size(); j++)
-        {
-            stringstream   ss;
-            ss << current << "_" << j;
-            op->writeSplited(ss.str(),splited[j]);
-        }
-        
+            if(u.VERBOSE) cout << "\nProcess... : \n" << current;
+            //cout << i << endl;
+            if(saveNormalized)op->writeNormalized(current,res);
+            
+          
+            vector<Mat> splited = splitImage(u.SPLIT_FACTOR, res);
+            for(int j = 0 ; j < splited.size(); j++)
+            {
+                stringstream   ss;
+                ss << current << "_" << j;
+                op->writeSplited(ss.str(),splited[j]);
+            }
+            
        
- 
+        }catch(Exception e){
+            cout << "Error with image : "<< current <<endl;
+        }
         
     }
     if(u.RESULT){
@@ -67,32 +79,33 @@ void normalizeImages::process(bool saveNormalized){
 
 //Divide the image into x parts/squares;
 vector<Mat>  normalizeImages::splitImage(int x, Mat const & src){
-
-    
+    vector<Mat> smallImages;
     int height = src.rows;
     int width =src.cols;
     double factor = sqrt(x);
-    
-    
-    Size smallSize ((1/factor)*width,(1/factor)*height); // Size of the squares
-    vector<Mat> smallImages;
-    
-    double smallHeight =(1/factor)*height;
-    double smallWidth =(1/factor)*width ;
-    
-    
-    for  ( double y =  0 ; y < height ; y += smallHeight )
-    {
-        for  ( double x =  0 ; x < width ; x += smallWidth)
+    try{
+      
+        
+        Size smallSize ((1/factor)*width,(1/factor)*height); // Size of the squares
+        
+        
+        double smallHeight =(1/factor)*height;
+        double smallWidth =(1/factor)*width ;
+        double offsetHeight =smallHeight/2 ;
+        double offsetWidth =smallWidth/2;
+        for  ( double y =  0 ; y < height-offsetHeight; y += smallHeight )
         {
-            Rect rect =  Rect ( x, y, smallWidth , smallHeight );
-            Mat mat =Mat(src , rect);
-            smallImages.push_back (mat); // constructor Mat (Mat, roi)
-            // cout << "height : " << mat.rows << " width" << mat.cols<<endl;
+            for  ( double x =  0 ; x < width-offsetWidth; x += smallWidth)
+            {
+                Rect rect =  Rect ( x, y, smallWidth , smallHeight );
+                Mat mat =Mat(src , rect);
+                smallImages.push_back (mat); // constructor Mat (Mat, roi)
+            }
         }
+    }catch(Exception e){
+        cout << e.msg;
+        throw e;
     }
-    
-    //cout << "fin coucou" <<endl;
     return smallImages;
 }
 
@@ -124,8 +137,6 @@ cv::Mat normalizeImages::getSquareImage( const cv::Mat& img, string imgName )
     
     cv::resize( img, square( roi ), roi.size() );
     
-    
-    //if(u.VERBOSE) imshow("Square Image " + imgName, square);
     return square;
 }
 
@@ -180,20 +191,24 @@ Mat normalizeImages::boundingBox(const cv::Mat& img, string imgName)
                 }
             }
         }
-            
+        
+        if(allcontours.size() == 0)return Mat();
+     
 
         vector<Point> poly(allcontours.size());
         approxPolyDP(Mat(allcontours), poly, 15, true);
         Rect bounRect = boundingRect(Mat(poly));
-        Mat drawing = Mat::zeros(threshold_output.size(), CV_8UC3);
-        Scalar color = Scalar(rng.uniform(0, 255), rng.uniform(0, 255), rng.uniform(0, 255));
+//               Scalar color = Scalar(rng.uniform(0, 255), rng.uniform(0, 255), rng.uniform(0, 255));
 
 
-        rectangle(drawing, bounRect.tl(), bounRect.br(), color, 2, 8, 0);
+//        Mat drawing = Mat::zeros(threshold_output.size(), CV_8UC3);
+
+//        rectangle(drawing, bounRect.tl(), bounRect.br(), color, 2, 8, 0);
         Mat final(img, bounRect);
 
-       // imshow("Contours " + imgName, drawing);
-       //if(u.VERBOSE) imshow("final " + imgName, final);
+//        imshow("Contours " + imgName, drawing);
+//        imshow("final " + imgName, final);
+//        waitKey(1);
 
 
 //
@@ -245,46 +260,4 @@ Mat normalizeImages::boundingBox(const cv::Mat& img, string imgName)
         cout << e.msg <<endl;
         throw e;
     }
-}
-
-
-Mat normalizeImages::Box( Mat src, string imgName){
-    // ---- Preprocessing of depth map. (Optional.) ----
-    /// Convert image to gray and blur it
-    
-    Mat matInput;
-    cvtColor(src, matInput, CV_BGR2GRAY);
-  //  blur(src_gray, src_gray, Size(3, 3));
-    GaussianBlur(matInput, matInput, cv::Size(9, 9), 4.0);
-    
-    // ---- Here, we use cv::threshold instead of cv::Canny as explained above ----
-    
-    Mat matEdge;
-    
-    //Canny(matInput, matEdge, 0.1, 1.0);
-    threshold(matInput, matEdge, 245, 255, THRESH_BINARY);
-
-    
-    // ---- Use findContours to find chains of consecutive edge pixels ----
-    
-    vector<vector<Point> > contours;
-    findContours(matEdge, contours, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_NONE);
-    
-    // ---- Code below is only used for visualizing the result. ----
-    
-    Mat matContour(matEdge.size(), CV_8UC1);
-    
-    for (size_t k = 0; k < contours.size(); ++k)
-    {
-        const vector<Point>& contour = contours[k];
-        for (size_t k2 = 0; k2 < contour.size(); ++k2)
-        {
-            const Point& p = contour[k2];
-            matContour.at<uint8_t>(p) = 255;
-        }
-    }
-    //imshow("ROI "+ imgName, matContour);
-
-    cout << "Done!" << endl;
-    return matContour;
 }

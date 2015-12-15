@@ -1,6 +1,0 @@
-Label electricity
-Form 00417
-Scripteur 17
-Page 004
-Row 5
-Columm 1

@@ -1,6 +1,0 @@
-Label person
-Form 00702
-Scripteur 02
-Page 007
-Row 1
-Columm 2

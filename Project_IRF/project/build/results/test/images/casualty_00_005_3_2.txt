@@ -1,6 +1,0 @@
-Label casualty
-Form 00500
-Scripteur 00
-Page 005
-Row 3
-Columm 2

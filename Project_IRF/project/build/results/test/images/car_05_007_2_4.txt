@@ -1,6 +1,0 @@
-Label car
-Form 00705
-Scripteur 05
-Page 007
-Row 2
-Columm 4

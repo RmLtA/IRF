@@ -1,6 +1,0 @@
-Label casualty
-Form 00805
-Scripteur 05
-Page 008
-Row 4
-Columm 0

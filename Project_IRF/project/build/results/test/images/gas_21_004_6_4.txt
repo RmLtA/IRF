@@ -1,6 +1,0 @@
-Label gas
-Form 00421
-Scripteur 21
-Page 004
-Row 6
-Columm 4

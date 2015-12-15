@@ -1,6 +1,0 @@
-Label electricity
-Form 00506
-Scripteur 06
-Page 005
-Row 5
-Columm 1

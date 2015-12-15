@@ -1,6 +1,0 @@
-Label accident
-Form 00308
-Scripteur 08
-Page 003
-Row 2
-Columm 2

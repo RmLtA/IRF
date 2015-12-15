@@ -1,6 +1,0 @@
-Label paramedics
-Form 00521
-Scripteur 21
-Page 005
-Row 6
-Columm 3

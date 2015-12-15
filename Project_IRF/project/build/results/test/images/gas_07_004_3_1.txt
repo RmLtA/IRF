@@ -1,6 +1,0 @@
-Label gas
-Form 00407
-Scripteur 07
-Page 004
-Row 3
-Columm 1

@@ -1,6 +1,0 @@
-Label electricity
-Form 00810
-Scripteur 10
-Page 008
-Row 1
-Columm 0

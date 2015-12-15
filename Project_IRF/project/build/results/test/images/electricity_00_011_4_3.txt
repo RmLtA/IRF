@@ -1,6 +1,0 @@
-Label electricity
-Form 01100
-Scripteur 00
-Page 011
-Row 4
-Columm 3

@@ -1,6 +1,0 @@
-Label road-block
-Form 00612
-Scripteur 12
-Page 006
-Row 1
-Columm 0

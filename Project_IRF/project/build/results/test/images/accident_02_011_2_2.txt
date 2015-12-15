@@ -1,6 +1,0 @@
-Label accident
-Form 01102
-Scripteur 02
-Page 011
-Row 2
-Columm 2

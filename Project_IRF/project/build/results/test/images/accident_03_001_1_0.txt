@@ -1,6 +1,0 @@
-Label accident
-Form 00103
-Scripteur 03
-Page 001
-Row 1
-Columm 0

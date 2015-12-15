@@ -1,6 +1,0 @@
-Label accident
-Form 00702
-Scripteur 02
-Page 007
-Row 4
-Columm 4

@@ -1,6 +1,0 @@
-Label casualty
-Form 00808
-Scripteur 08
-Page 008
-Row 1
-Columm 4

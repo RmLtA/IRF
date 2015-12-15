@@ -1,6 +1,0 @@
-Label casualty
-Form 00114
-Scripteur 14
-Page 001
-Row 5
-Columm 2

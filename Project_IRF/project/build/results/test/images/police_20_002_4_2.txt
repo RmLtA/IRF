@@ -1,6 +1,0 @@
-Label police
-Form 00220
-Scripteur 20
-Page 002
-Row 4
-Columm 2

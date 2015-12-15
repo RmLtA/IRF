@@ -1,6 +1,0 @@
-Label gas
-Form 00310
-Scripteur 10
-Page 003
-Row 2
-Columm 4

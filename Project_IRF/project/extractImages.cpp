@@ -8,6 +8,7 @@
 
 #include "extractImages.hpp"
 #include <time.h>
+#include <iomanip>
 #include <mutex>          // std::mutex
 std::mutex mtx;           // mutex for critical section
 
@@ -56,6 +57,7 @@ void extractImages::process(){
             int proceded = (int)temp - (int) leftToProcess;
             int finished = finishedTask;
             for(int i = 0 ; i <proceded && finished <toProcess; i++){
+                cout << "." << flush;
                 vThreads.push_back(std::thread(&extractImages::processTask, std::ref(*this), sourcesImages[i+finishedTask], templatesImages));
                 finished++;
             }
@@ -63,7 +65,8 @@ void extractImages::process(){
             temp = leftToProcess;
             mtx.unlock();
         }else{
-            this_thread::yield();
+            //this_thread::yield();
+            sleep(1);
         }
     }
     
@@ -83,7 +86,7 @@ void extractImages::process(){
     prog_e = clock();
 
     cpuTime = (double) ((prog_e - prog_b) / (double)CLOCKS_PER_SEC);
-    cout << endl << "Total imagettes : " << nTotalImg << " / " << 35*(sourcesImages.size()-nErroImg) << "\t" << "| Temps d'exec.: " << (double)cpuTime/60. <<" min" << endl;;
+    cout << setprecision(3) << "Total imagettes : " << nTotalImg << " / " << 35*(sourcesImages.size()-nErroImg) << "\t" << "| Temps d'exec.: " << (double)xt/60. <<" min | Cpu time : "<< (double)cpuTime/60. << endl;;
 
     delete op;
 }
@@ -93,8 +96,6 @@ void extractImages::process(){
 void extractImages::processTask(extractImages& self,string sourceImage,const vector<string>& templatesImages)
 {
     utils & u = utils::i();
-    double cpuTime;
-    clock_t start, end;
     Mat img = imread(sourceImage);
     fileOp *  op = new fileOp();
     computeImages * ll = new computeImages(img, u.VERBOSE);
@@ -105,7 +106,6 @@ void extractImages::processTask(extractImages& self,string sourceImage,const vec
     
     try{
         pageCourante = op->getFilename(sourceImage);
-        start = clock();
         if(u.VERBOSE)output << "Traitement de la source : "<<sourceImage  << " ( " << pageCourante << " )" <<endl;
         if(u.RESULT && !u.VERBOSE)output << pageCourante << " ::";
         
@@ -145,12 +145,7 @@ void extractImages::processTask(extractImages& self,string sourceImage,const vec
             
         }
         
-        if(u.VERBOSE){
-            //   ll->showFinalImage(pageCourante);
-            clock_t middle = clock();
-            cpuTime = (double) ((middle - start) / (double)CLOCKS_PER_SEC);
-            output << endl << "Time for template matching : " << cpuTime << "s"<<endl;;
-        }
+      
         
         int totalImagettes =0;
         if(foundTemplate.size() >0){
@@ -185,11 +180,9 @@ void extractImages::processTask(extractImages& self,string sourceImage,const vec
             if(u.VERBOSE) output << endl;
             
             if(u.RESULT){
-                end = clock();
-                cpuTime = (double) ((end - start) / (double)CLOCKS_PER_SEC);
                 stringstream sgs; sgs <<totalImagettes << "/35";
                 output << " found :  " << imagesCount << "/7 templates => imagettes : "
-                << ss.str() << " \t total : " << niceOutput(sgs.str(), totalImagettes == 35) << "\t time : " << cpuTime << " s"  << endl;
+                << ss.str() << " \t total : " << niceOutput(sgs.str(), totalImagettes == 35)  << endl;
             }
         }else{
             
