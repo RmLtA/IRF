@@ -201,13 +201,10 @@ void fileOp::writeARFFFile(extractFeature& extrfeat){
                     case extractFeature::AREA :
                         pFile<< "@ATTRIBUTE " <<" Airs_" <<j << " NUMERIC" << endl;;
                         break;
-                    case extractFeature::CONTOURS_SIZE:
-                        pFile<< "@ATTRIBUTE " <<" Contours_size_" <<j << " NUMERIC" << endl;;
-                        break;
                     case extractFeature::HARRIS_CORNERS:
                         pFile<< "@ATTRIBUTE " <<" Harris_Corners_" <<j << " NUMERIC" << endl;;
                         break;
-                    case extractFeature::LENGTHAREA:
+                    case extractFeature::LENGTH_AREA:
                         pFile<< "@ATTRIBUTE " << " Length_Area_" <<j << " NUMERIC" << endl;;
                         break;
                     case extractFeature::MASSCENTER:
@@ -238,35 +235,7 @@ void fileOp::writeARFFFile(extractFeature& extrfeat){
         }
         pFile << extrfeat.v_class[i] << endl;
     }
-//
-//    //First compute all numeric attribute
-//    int k = 0; //normalement tous les vecteurs ont la même taille
-//    int index_class = 0;
-//    while (k < (extrfeat).v_all_numeric_v_attributes_values[0].size()){
-//        vector<double> v;
-//        vector<string> vs;
-//        for (int i = 0; i < (extrfeat).v_all_numeric_v_attributes_values.size(); i++){
-//            v.push_back((extrfeat).v_all_numeric_v_attributes_values[i][k]);
-//        }
-//        vs.push_back(extrfeat.v_class[k]);
-//
-//        //Ecriture dans le fichier
-//
-//            for (int j = 0; j < v.size(); j++){
-//                if (j == v.size() - 1){
-//                    pFile << v[j] << ","<< vs[index_class]<<endl;
-//
-//                }
-//                else{
-//                    pFile << v[j] << ",";
-//                }
-//            }
-//            v.clear();
-//            k++;
-//
-//
-//
-//    }
+
     pFile.close();
     
 

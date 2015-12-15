@@ -18,7 +18,7 @@ double feature::countBlackPixel(){
 void feature::computeBlackPixels(){
    // Mat bw;
     // Transform it to binary and invert it. White on black is needed.
-    threshold(this->graySourceImg, this->binaryImage, 60, 255, CV_THRESH_BINARY_INV | CV_THRESH_OTSU);
+    threshold(this->graySourceImg, this->binaryImage, 80, 255, CV_THRESH_BINARY_INV | CV_THRESH_OTSU);
     
     // output, locations of non-zero pixels
     cv::findNonZero(this->binaryImage, black_pixels);
@@ -119,26 +119,42 @@ double feature::HoughLines(){
 
 double feature::countArea(){
     Mat src_gray;
-    RNG rng(12345);
-    int thresh = 100;
-        
+    //RNG rng(12345);
+//    int thresh = 100;
+    //int IMG_GAP = 1;
   //  cvtColor( src, src_gray, CV_BGR2GRAY );
-    blur( this->graySourceImg, src_gray, Size(3,3) );
-    Mat canny_output;
+    blur( this->graySourceImg, src_gray, Size(1,1) );
+    Mat img;
     vector<vector<Point> > contours;
     vector<Vec4i> hierarchy;
     
     /// Detect edges using canny
-    Canny( src_gray, canny_output, thresh, thresh*2, 3 );
+    Canny( src_gray, img, 0, 300, 3 );
     /// Find contours
-    findContours( canny_output, contours, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, Point(0, 0) );
+    findContours( img, contours, hierarchy, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_NONE);
  
-    double max = 0;
-    for(int i=0; i<contours.size() ; i++){
-        double tmp = contourArea(contours[i]);
-        if(tmp > max) max = tmp;
+    vector<Point> allcontours;
+    
+    for(int i = 0 ;i< contours.size() ; i++){
+        
+        for(int j= 0 ; j< contours[i].size() ; j++){
+//            if(contours[i][j].x > IMG_GAP && contours[i][j].x < img.cols -IMG_GAP &&
+//               contours[i][j].y > IMG_GAP && contours[i][j].y < img.rows -IMG_GAP ){
+                allcontours.push_back(contours[i][j]);
+                
+                
+//            }
+        }
     }
-    return max;
+    vector<Point> approx;
+
+    if(allcontours.size() >0){
+        approxPolyDP(allcontours, approx, 1, true);
+        return (double) contourArea(approx) / (double)(this->graySourceImg.rows * this->graySourceImg.cols);
+
+    }
+    else
+        return 0;
 }
 
 
@@ -152,16 +168,30 @@ double feature::countLengthArea(){
     vector<Vec4i> hierarchy;
     
     /// Detect edges using canny
-    Canny( src_gray, canny_output, thresh, thresh*2, 3 );
+    Canny( src_gray, canny_output, 0, 300, 3 );
     /// Find contours
-    findContours( canny_output, contours, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, Point(0, 0) );
+    findContours( canny_output, contours, hierarchy, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_NONE, Point(0, 0) );
     
-    double max = 0;
-    for(int i=0; i<contours.size() ; i++){
-        double tmp = arcLength( contours[i], true );
-        if(tmp > max) max = tmp;
+    
+    vector<Point> allcontours;
+    
+    for(int i = 0 ;i< contours.size() ; i++){
+        
+        for(int j= 0 ; j< contours[i].size() ; j++){
+            //            if(contours[i][j].x > IMG_GAP && contours[i][j].x < img.cols -IMG_GAP &&
+            //               contours[i][j].y > IMG_GAP && contours[i][j].y < img.rows -IMG_GAP ){
+            allcontours.push_back(contours[i][j]);
+            
+            
+            //            }
+        }
     }
-    return max;
+    if(allcontours.size() >0){
+        return (double) arcLength(allcontours, false) / (double)(this->graySourceImg.rows * this->graySourceImg.cols);
+        
+    }
+    else
+        return 0;
 }
 
 double feature::massCenterX(){
@@ -201,7 +231,7 @@ void feature::countMassCenter(){
         /// Detect edges using canny
         Canny( src_gray, canny_output, thresh, 200, 3 );
         /// Find contours
-        findContours( canny_output, contours, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, Point(0, 0) );
+        findContours( canny_output, contours, hierarchy, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE, Point(0, 0) );
         
         vector<Moments> mu(contours.size() );
         vector<Point2f> mc( contours.size() );

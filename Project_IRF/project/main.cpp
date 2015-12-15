@@ -238,13 +238,21 @@ void process_features()
 
         //Print features available, ! attention l'ordre ici est important, le même que pour l'enum Features_available si modification
         //car c'est ce que l'utilisateur va prendre en compte car instructions imprimées à l'écran
-        vector<string> v_features_available = {"Black_Pixel","White_Pixel","Airs","Contours_Size","Harris_Corners", "Length Area", "Mass_center", "Nb_Lines"};
+        vector<string> v_features_available = {
+            "Black_Pixel    ~ OK  ",
+            "White_Pixel          ",
+            "Area           ~ OK  ",
+            "Harris_Corners       ",
+            "Perimètre      ~ OK  ",
+            "Mass_center    ~ OK  ",
+            "Nb_Lines             "
+        };
 
         //Features to extract
         vector<int> v_features_to_extract;
         cout << "All features available :" << endl;
         for (int i = 0; i<v_features_available.size();i++){
-            cout << "   -"<<v_features_available[i] << " : Tape "<< i+1<< endl;
+            cout << "   -"<<v_features_available[i] << "\t\t\t : Tape "<< i+1<< endl;
         }
         cout << "To finish : Tape 0" << endl;
 

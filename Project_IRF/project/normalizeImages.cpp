@@ -7,12 +7,13 @@
 //
 
 #include "normalizeImages.hpp"
+#include <iomanip>
 
 void normalizeImages::process(bool saveNormalized, bool squareImg){
     fileOp *  op = new fileOp();
+    cout << "cleaning result images.." << endl;
     if(saveNormalized) op->removeAllResNormalizedFiles();
     op->removeAllResSplittedFiles();
-
     
     double moy_cols = 0, moy_rows = 0;
 
@@ -20,8 +21,12 @@ void normalizeImages::process(bool saveNormalized, bool squareImg){
     //cout << "Taille result : "  << result.size() << endl;
     string current;
     //read images
+    cout<<"Computing.. : "<<endl;
     for (int i = 0; i < result.size(); i++){
-        cout << "." << flush;
+       
+        double pr=((double)i/(double)result.size())*100;
+        cout<<setprecision(2)<< pr<<"%   \r"<< flush ;
+        
         Mat img = imread(result[i]);
         current = op->getFilename(result[i]);
         try{

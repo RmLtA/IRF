@@ -57,15 +57,19 @@ void extractImages::process(){
             int proceded = (int)temp - (int) leftToProcess;
             int finished = finishedTask;
             for(int i = 0 ; i <proceded && finished <toProcess; i++){
-                cout << "." << flush;
                 vThreads.push_back(std::thread(&extractImages::processTask, std::ref(*this), sourcesImages[i+finishedTask], templatesImages));
                 finished++;
             }
             finishedTask= finished;
             temp = leftToProcess;
+           
+            double pr=((double)finished/(double)toProcess)*100;
+            cout<<setprecision(2)<< pr<<"%   \r"<< flush ;
+            
             mtx.unlock();
+            
         }else{
-            //this_thread::yield();
+            this_thread::yield();
             //sleep(1);
         }
     }
