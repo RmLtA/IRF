@@ -28,7 +28,7 @@ void extractImages::process(){
     //recupere le nom des templates
     vector<string> templatesImages = op->getTemplImages();
    
-#ifdef __APPLE__
+//#ifdef __APPLE__
     vector<thread> vThreads;
     int NB_THREADS = thread::hardware_concurrency();
     if(NB_THREADS ==0)
@@ -75,13 +75,13 @@ void extractImages::process(){
     }
     
 
-#else
-    
-      for(int i=0 ; i < sourcesImages.size() ; i++){
-          processTask(*this,sourcesImages[i],templatesImages);
-      }
-    
-#endif
+//#else
+//    
+//      for(int i=0 ; i < sourcesImages.size() ; i++){
+//          processTask(*this,sourcesImages[i],templatesImages);
+//      }
+//    
+//#endif
     
     xt = time(NULL) - xt;
     prog_e = clock();
@@ -199,13 +199,13 @@ void extractImages::processTask(extractImages& self,string sourceImage,const vec
     }
     delete ll;
     delete op;
-#ifdef __APPLE__
+//#ifdef __APPLE__
     mtx.lock();
     if(u.RESULT)cout << "End : " << sourceImage <<endl;
     if(u.VERBOSE || u.RESULT )cout << output.str()<<endl;
     cout<< flush;
     self.leftToProcess--;
     mtx.unlock();
-#endif
+//#endif
 
 }
