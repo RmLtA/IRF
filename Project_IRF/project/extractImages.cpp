@@ -66,13 +66,14 @@ void extractImages::process(){
             mtx.unlock();
         }else{
             //this_thread::yield();
-            sleep(1);
+            //sleep(1);
         }
     }
     
     for(auto& th : vThreads){
         th.join();
     }
+    
 
 #else
     
@@ -86,7 +87,7 @@ void extractImages::process(){
     prog_e = clock();
 
     cpuTime = (double) ((prog_e - prog_b) / (double)CLOCKS_PER_SEC);
-    cout << setprecision(3) << "Total imagettes : " << nTotalImg << " / " << 35*(sourcesImages.size()-nErroImg) << "\t" << "| Temps d'exec.: " << (double)xt/60. <<" min | Cpu time : "<< (double)cpuTime/60. << endl;;
+    cout << endl << setprecision(3) << "Total imagettes : " << nTotalImg << " / " << 35*(sourcesImages.size()-nErroImg) << "\t" << "| Temps d'exec.: " << (double)xt/60. <<" min | Cpu time : "<< (double)cpuTime/60. << endl;;
 
     delete op;
 }

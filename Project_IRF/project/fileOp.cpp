@@ -188,40 +188,39 @@ void fileOp::writeARFFFile(extractFeature& extrfeat){
     pFile << "@RELATION Imagette" << endl;
     pFile << endl;
 
-    
-    for (int i = 0; i < (extrfeat).getSizeOfv_attribute_asked(); i++){
-        int attribut = (extrfeat).getVectorAttributesAsked()[i];
-        for(int j =0 ; j < extrfeat.SPLITED ; j++){
-            switch (attribut){
-                case extractFeature::BLACK_PIXEL:
-                    pFile<< "@ATTRIBUTE "<< " Black_Pixel_" <<j << " NUMERIC" << endl;;
-                    break;
-                case extractFeature::WHITE_PIXEL:
-                    pFile<< "@ATTRIBUTE " << " White_Pixel_" <<j << " NUMERIC" << endl;;
-                    break;
-                case extractFeature::AREA :
-                    pFile<< "@ATTRIBUTE " <<" Airs_" <<j << " NUMERIC" << endl;;
-                    break;
-                case extractFeature::CONTOURS_SIZE:
-                    pFile<< "@ATTRIBUTE " <<" Contours_size_" <<j << " NUMERIC" << endl;;
-                    break;
-                case extractFeature::HARRIS_CORNERS:
-                    pFile<< "@ATTRIBUTE " <<" Harris_Corners_" <<j << " NUMERIC" << endl;;
-                    break;
-                case extractFeature::LENGTHAREA:
-                    pFile<< "@ATTRIBUTE " << " Length_Area_" <<j << " NUMERIC" << endl;;
-                    break;
-                case extractFeature::MASSCENTER:
-                    pFile<< "@ATTRIBUTE " << " Mass_Center_X_" <<j << " NUMERIC" << endl;
-                    pFile<< "@ATTRIBUTE " << " Mass_Center_Y_" <<j << " NUMERIC" << endl;
-                    break;
-                case extractFeature::HOUGH_LINES:
-                    pFile<< "@ATTRIBUTE " << " Hough_Lines_" <<j << " NUMERIC" << endl;
-                    break;
+    for(int j =0 ; j < extrfeat.SPLITED ; j++){
+        for (int i = 0; i < (extrfeat).getSizeOfv_attribute_asked(); i++){
+            int attribut = (extrfeat).getVectorAttributesAsked()[i];
+                switch (attribut){
+                    case extractFeature::BLACK_PIXEL:
+                        pFile<< "@ATTRIBUTE "<< " Black_Pixel_" <<j << " NUMERIC" << endl;;
+                        break;
+                    case extractFeature::WHITE_PIXEL:
+                        pFile<< "@ATTRIBUTE " << " White_Pixel_" <<j << " NUMERIC" << endl;;
+                        break;
+                    case extractFeature::AREA :
+                        pFile<< "@ATTRIBUTE " <<" Airs_" <<j << " NUMERIC" << endl;;
+                        break;
+                    case extractFeature::CONTOURS_SIZE:
+                        pFile<< "@ATTRIBUTE " <<" Contours_size_" <<j << " NUMERIC" << endl;;
+                        break;
+                    case extractFeature::HARRIS_CORNERS:
+                        pFile<< "@ATTRIBUTE " <<" Harris_Corners_" <<j << " NUMERIC" << endl;;
+                        break;
+                    case extractFeature::LENGTHAREA:
+                        pFile<< "@ATTRIBUTE " << " Length_Area_" <<j << " NUMERIC" << endl;;
+                        break;
+                    case extractFeature::MASSCENTER:
+                        pFile<< "@ATTRIBUTE " << " Mass_Center_X_" <<j << " NUMERIC" << endl;
+                        pFile<< "@ATTRIBUTE " << " Mass_Center_Y_" <<j << " NUMERIC" << endl;
+                        break;
+                    case extractFeature::HOUGH_LINES:
+                        pFile<< "@ATTRIBUTE " << " Hough_Lines_" <<j << " NUMERIC" << endl;
+                        break;
 
-               
+                   
+                }
             }
-        }
         
     }
     pFile << "@ATTRIBUTE" << " Class " << " {accident, bomb, car, casualty, electricity, fire-brigade, fire, flood, gas, injury, paramedics, person police, road-block}" << endl;

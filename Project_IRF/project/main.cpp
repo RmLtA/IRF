@@ -42,7 +42,7 @@ using namespace cv;
  */
 
 int lastFactor =0;
-static bool SAVE_NORMALIZED = true;
+static bool SAVE_NORMALIZED = false;
 static bool DO_SQUARE= false;
 utils & u = utils::i();
 
@@ -188,7 +188,7 @@ void process_normalize()
     cout << "Split images in ? (1..4..9..16..25) :";
     cin >> split_factor;
     while(split_factor != 1 && split_factor != 4 && split_factor != 9 && split_factor != 16 && split_factor != 25){
-        cout << "\nOnly 1 or 4 or 9 or 16 or 25: ";
+        cout << "\nOnly 1 or 4 or 9 or 16 or 25: " << flush;
         cin >> split_factor;
     }
     
@@ -252,7 +252,7 @@ void process_features()
 
         int features_toextract;
         cin >> features_toextract;
-        while (features_toextract != 0){
+        while (features_toextract != 0 || v_features_to_extract.size() ==0) {
             v_features_to_extract.push_back(features_toextract);
             cin >> features_toextract;
             

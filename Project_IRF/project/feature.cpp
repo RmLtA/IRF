@@ -3,12 +3,12 @@
 
 
 // Count the number of black pixels
-int feature::countBlackPixel(){
+double feature::countBlackPixel(){
 	if (!this->sourceImg.data)
 		cerr << "Problem loading image from : countBlackPixel()" << endl;
 
     computeBlackPixels(); //TODO if already done
-	return (int) black_pixels.size();
+	return  (double) black_pixels.size()/ (double)(sourceImg.cols*sourceImg.rows);
 }
 
 
@@ -18,7 +18,7 @@ int feature::countBlackPixel(){
 void feature::computeBlackPixels(){
    // Mat bw;
     // Transform it to binary and invert it. White on black is needed.
-    threshold(this->graySourceImg, this->binaryImage, 40, 255, CV_THRESH_BINARY_INV | CV_THRESH_OTSU);
+    threshold(this->graySourceImg, this->binaryImage, 60, 255, CV_THRESH_BINARY_INV | CV_THRESH_OTSU);
     
     // output, locations of non-zero pixels
     cv::findNonZero(this->binaryImage, black_pixels);
@@ -28,7 +28,7 @@ void feature::computeBlackPixels(){
 
 
 
-int feature::countWhitePixel(){
+double feature::countWhitePixel(){
     if (!this->sourceImg.data)
         cerr << "Problem loading image from : countWhitePixel()" << endl;
     
@@ -169,7 +169,7 @@ double feature::massCenterX(){
         feature::countMassCenter();
     
     if(!isnan(this->massCenter.x))
-        return this->massCenter.x;
+        return this->massCenter.x / this->sourceImg.cols;
     else
         return 0;
 }
@@ -180,7 +180,7 @@ double feature::massCenterY(){
         feature::countMassCenter();
     
     if(!isnan(this->massCenter.y))
-        return this->massCenter.y;
+        return this->massCenter.y / this->sourceImg.rows;
     else
         return 0;
 }

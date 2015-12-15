@@ -44,10 +44,10 @@ public:
 
 	
 	// Count the number of black pixels
-	int countBlackPixel();
+	double countBlackPixel();
 
 	//Count the number of white pixels;
-	int countWhitePixel();
+	double countWhitePixel();
 
 	// Count the number of Harris Corner
 	int countHarrisCorners();

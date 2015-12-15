@@ -15,7 +15,7 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/core/core.hpp>
 #include <ctime>
-#import <thread>
+#include <thread>
 #include "fileOp.h"
 #include "computeImages.h"
 
