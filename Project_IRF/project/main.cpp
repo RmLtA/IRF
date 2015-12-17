@@ -271,8 +271,8 @@ void process_features()
         int features_toextract;
         cin >> features_toextract;
         while (features_toextract != 0 || v_features_to_extract_splited.size() ==0) {
-            
-            v_features_to_extract_splited.push_back(features_toextract);
+            if(features_toextract <= v_features_available_splited.size())
+                v_features_to_extract_splited.push_back(features_toextract);
             cin >> features_toextract;
             
         }
@@ -287,7 +287,9 @@ void process_features()
             "Harris_Corners       ",
             "Perimètre            ",
             "Mass_center          ",
-            "Nb_Lines             "
+            "Nb_Lines             ",
+            "Rows or Cols Longer  "
+
         };
         
         //Features to extract
@@ -300,8 +302,9 @@ void process_features()
         cout << "To finish : Tape 0" << endl;
         
         cin >> features_toextract;
-        while (features_toextract != 0 || v_features_to_extract_global.size() ==0) {
-            v_features_to_extract_global.push_back(features_toextract);
+        while (features_toextract != 0 || v_features_to_extract_global.size() == 0) {
+            if(features_toextract <= v_features_available_global.size())
+                v_features_to_extract_global.push_back(features_toextract);
             cin >> features_toextract;
             
         }

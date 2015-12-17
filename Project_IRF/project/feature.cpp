@@ -27,24 +27,6 @@ void feature::computeBlackPixels(){
 }
 
 
-
-//
-//double feature::countWhitePixel(){
-//    if (!this->sourceImg.data)
-//        cerr << "Problem loading image from : countWhitePixel()" << endl;
-//    
-//    
-//    computeBlackPixels();//TODO if already done
-//	// extract only the external blob
-//	findContours(this->binaryImage, contours, hierarchy, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE, Point(0, 0));
-//
-//	Mat mask = Mat::zeros(this->binaryImage.size(), CV_8UC1);
-//	vector<Point> all_pixels;   // output, locations of non-zero pixels
-//	cv::findNonZero(mask, all_pixels);
-//
-//	int white_pixels = (int) ( all_pixels.size() - black_pixels.size());
-//	return white_pixels;
-//}
 int ww=0;
 // Count the number of Harris Corner
 int feature::countHarrisCorners(){
@@ -96,6 +78,42 @@ int feature::countHarrisCorners(){
 }
 
 
+//global feature
+//if rows are bigger then 1
+//else 0
+int feature::isLongerRowsOrCols(){
+    int rows = this->sourceImg.rows;
+    int cols = this->sourceImg.cols;
+    if(  rows == cols ){
+        //this means image has beene normalized in equals squares
+        //so we need to check the one that has more white pixels
+        int countRows = 0 , countCols = 0;
+     
+        for( int i = 0; i < rows; i++ ) {
+                if ( this->graySourceImg.at<uchar>(i,0) != 255  &&
+                    this->graySourceImg.at<uchar>(i,1) == 255)
+                    countRows++;
+            
+        }
+        for( int i = 0; i < cols; i++ ) {
+            if ( this->graySourceImg.at<uchar>(0,i) == 255 &&
+                this->graySourceImg.at<uchar>(1,i) == 255)
+                    countCols++;
+            
+        }
+        if(countRows == countCols)
+            return -1;
+        if(countRows > countCols)
+            return 1;
+        else
+            return 0;
+    
+    }else if(rows>cols){
+        return 1;
+    }else{
+        return 0;
+    }
+}
 
 double feature::HoughLines(){
     

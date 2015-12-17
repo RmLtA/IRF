@@ -43,26 +43,10 @@ public :
         LENGTH_AREA_GLOBAL,
         MASSCENTER_GLOBAL,
         HOUGH_LINES_GLOBAL,
+        ROWS_OR_COLS_GLOBAL
     };
 
-//
-//    struct Features {
-//            Features_Available name;
-//            int value;
-//            bool split;
-//    };
-//   
-//    constexpr static const Features FeaturesAvailable[]  ={
-//        {BLACK_PIXEL, 1, true},
-//        {AREA, 1, true},
-//        {HARRIS_CORNERS, 1, true},
-//        {LENGTH_AREA, 1, true},
-//        {MASSCENTER, 2, true},
-//        {HOUGH_LINES, 1, true},
-//        {BLACK_PIXEL_GLOBAL, 1, false},
-//        
-//        
-//    };
+
 
     vector<int> nb_features_by_attributes_splited;
     vector<int> nb_features_by_attributes_global;
@@ -70,7 +54,7 @@ public :
         SPLITED = split;
         //nombre de features differentes par features (voir mass center par exemple (2)
         nb_features_by_attributes_splited = { 0 ,1 ,1 ,1 ,1 ,2 ,1};
-        nb_features_by_attributes_global =  { 0 ,1 ,1 ,1 ,1 ,2 ,1};
+        nb_features_by_attributes_global =  { 0 ,1 ,1 ,1 ,1 ,2 ,1, 1};
         
 	}
     

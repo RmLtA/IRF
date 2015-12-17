@@ -212,6 +212,9 @@ void fileOp::writeARFFFile(extractFeature& extrfeat){
             case extractFeature::HOUGH_LINES_GLOBAL:
                 pFile<< "@ATTRIBUTE " << " Hough_Lines_Global"<< " NUMERIC" << endl;
                 break;
+            case extractFeature::ROWS_OR_COLS_GLOBAL:
+                pFile<< "@ATTRIBUTE " << " Rows_Or_Cols_Global"<< " NUMERIC" << endl;
+                break;
                 
                 
         }

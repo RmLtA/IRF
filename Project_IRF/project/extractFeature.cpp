@@ -153,6 +153,9 @@ void extractFeature::extract_all_features_global(string imgName, unsigned int cu
             case HOUGH_LINES_GLOBAL:
                 feature_result.push_back(f->HoughLines());
                 break;
+            case ROWS_OR_COLS_GLOBAL:
+                feature_result.push_back(f->isLongerRowsOrCols());
+                break;
                 
             default:
                 cout << "Unknown feature" << endl;

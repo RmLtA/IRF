@@ -62,7 +62,9 @@ public:
     double HoughLines();
     double countLengthArea();
     double countArea();
-
+    
+    //1 if rows are bigger than cols else 0;
+    int isLongerRowsOrCols();
 
 
     
