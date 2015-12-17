@@ -18,6 +18,7 @@ class feature{
 public:
     //instance
     utils & u = utils::i();
+    bool isGlobal;
     
     Mat sourceImg;
 	Mat graySourceImg;
@@ -32,7 +33,7 @@ public:
     Point2f massCenter;
 
 	
-	feature(Mat img) : sourceImg(img){
+	feature(Mat img, bool _isGlobal) : sourceImg(img), isGlobal(_isGlobal){
         try{
          cvtColor( img, this->graySourceImg, CV_BGR2GRAY);
          massCenter = Point2f(-1,-1);
@@ -46,8 +47,9 @@ public:
 	// Count the number of black pixels
 	double countBlackPixel();
 
-	//Count the number of white pixels;
-	double countWhitePixel();
+//unused
+//	//Count the number of white pixels;
+//	double countWhitePixel();
 
 	// Count the number of Harris Corner
 	int countHarrisCorners();

@@ -42,7 +42,7 @@ using namespace cv;
  */
 
 int lastFactor =0;
-static bool SAVE_NORMALIZED = false;
+static bool SAVE_NORMALIZED = true;
 static bool DO_SQUARE= false;
 utils & u = utils::i();
 
@@ -70,7 +70,7 @@ int main(int argc, const char * argv[]) {
     }
     
     int nb =1;
-    if(u.CREATE_VARIOUS){
+    if(u.CREATE_VARIOUS && u.GET_FEATURES){
      
         cout << "How many Arff Files ? " << endl;
         cin >> nb;
@@ -79,7 +79,7 @@ int main(int argc, const char * argv[]) {
     
     
     for(int i=0 ; i<nb ; i++){
-        cout << i+1 << " Pass...." << endl;
+        cout << "Creating Arff : "<<i+1<<  endl;
         
         if (u.NORMALIZE){
             cout << "\nNormalizing images..." << endl;
@@ -91,8 +91,8 @@ int main(int argc, const char * argv[]) {
         }
 
         
-        cout << "End of..." << i+1 << endl;
-
+        cout << "End of " << i+1 << endl;
+        cout <<"~~~~~~~~~~~~~~~~"<<endl;
         
     }
     
@@ -200,12 +200,12 @@ void process_normalize()
     //PREVENT TO SPLIT IF SAME AGAIN
     if(lastFactor!= u.SPLIT_FACTOR)
     {
-        normalizeImages * n = new normalizeImages();
         
         if(u.VERBOSE)cout <<"Save Normalized is set to : " << SAVE_NORMALIZED << endl;;
-        //
-        n->process(SAVE_NORMALIZED, DO_SQUARE);
+        normalizeImages * n = new normalizeImages(SAVE_NORMALIZED, DO_SQUARE);
         lastFactor =u.SPLIT_FACTOR;
+
+        n->process();
         delete n;
     }else
     {
@@ -227,56 +227,93 @@ void process_features()
         //Name of Images used to extract featires
         //ON UTILISE LES IMAGES NORMALIZEES
         //VOIR IMAGES SPLITTED
-        vector<string> v_result_images_toextract_features = op->getSplitedImages();
+        vector<string> v_result_images_toextract_features_splited = op->getSplitedImages();
+        vector<string> v_result_images_toextract_features_global = op->getNormalizedImages();
+
         
-        if(v_result_images_toextract_features.size() % u.SPLIT_FACTOR != 0)
+        if(v_result_images_toextract_features_splited.size() % u.SPLIT_FACTOR != 0)
         {
             cout << "error : Splitted images are not equivalent to SPLIT_FACTOR" << endl;
             cout << "try again with NORMALIZE to reconstruct images (-normalize) or FEATURES with options [-features -split 9] to tell last nb of splitted images " <<endl;
             return;
         }
+        
+        if(v_result_images_toextract_features_global.size()== 0)
+        {
+            cout << "error : Your are not saving normalized images" << endl;
+            cout << "change save normalized to true  " <<endl;
+            return;
+        }
+        
+        
 
         //Print features available, ! attention l'ordre ici est important, le même que pour l'enum Features_available si modification
         //car c'est ce que l'utilisateur va prendre en compte car instructions imprimées à l'écran
-        vector<string> v_features_available = {
-            "Black_Pixel    ~ OK  ",
-            "White_Pixel          ",
-            "Area           ~ OK  ",
+        //ici features pour les images splited
+        vector<string> v_features_available_splited = {
+            "Black_Pixel          ",
+            "Area                 ",
             "Harris_Corners       ",
-            "Perimètre      ~ OK  ",
-            "Mass_center    ~ OK  ",
+            "Perimètre            ",
+            "Mass_center          ",
             "Nb_Lines             "
         };
 
         //Features to extract
-        vector<int> v_features_to_extract;
-        cout << "All features available :" << endl;
-        for (int i = 0; i<v_features_available.size();i++){
-            cout << "   -"<<v_features_available[i] << "\t\t\t : Tape "<< i+1<< endl;
+        vector<int> v_features_to_extract_splited;
+        cout <<endl<< "SPLITED FEATURES" <<endl;
+        cout << "All features available for splited image :" << endl;
+        for (int i = 0; i<v_features_available_splited.size();i++){
+            cout << "   -"<<v_features_available_splited[i] << "\t\t\t : Tape "<< i+1<< endl;
         }
         cout << "To finish : Tape 0" << endl;
 
-        
-
         int features_toextract;
         cin >> features_toextract;
-        while (features_toextract != 0 || v_features_to_extract.size() ==0) {
-            v_features_to_extract.push_back(features_toextract);
+        while (features_toextract != 0 || v_features_to_extract_splited.size() ==0) {
+            
+            v_features_to_extract_splited.push_back(features_toextract);
             cin >> features_toextract;
             
         }
         
+        //ici features pour les images globales
+        //peuvent etre différentes ==
+        //idée ajouter longueur ou largeur image est plus grande ? (1 ou 0 ) (différentie deja quelques images...)
+        //et implementer...
+        vector<string> v_features_available_global= {
+            "Black_Pixel          ",
+            "Area                 ",
+            "Harris_Corners       ",
+            "Perimètre            ",
+            "Mass_center          ",
+            "Nb_Lines             "
+        };
+        
+        //Features to extract
+        vector<int> v_features_to_extract_global;
+        cout <<endl<< "GLOBAL FEATURES" <<endl;
+        cout << "All features available for the global image :" << endl;
+        for (int i = 0; i<v_features_available_global.size();i++){
+            cout << "   -"<<v_features_available_global[i] << "\t\t\t : Tape "<< i+1<< endl;
+        }
+        cout << "To finish : Tape 0" << endl;
+        
+        cin >> features_toextract;
+        while (features_toextract != 0 || v_features_to_extract_global.size() ==0) {
+            v_features_to_extract_global.push_back(features_toextract);
+            cin >> features_toextract;
+            
+        }
+
+        
         cout << "Ok, computing... "<<endl;
        
-        //Pour mettre l'attribut class à la fin
-        v_features_to_extract.push_back(INT_MAX);
-
-
         extractFeature * extract_feature = new extractFeature(u.SPLIT_FACTOR);
         
-        //v_features_to_extract == vector des features
-        //v_result_images_toextract_features = vector des images
-        extract_feature->compute_features(v_features_to_extract,v_result_images_toextract_features);
+        
+        extract_feature->compute_features(v_features_to_extract_splited,v_result_images_toextract_features_splited,
+                                          v_features_to_extract_global, v_result_images_toextract_features_global);
 
         op->writeARFFFile(*extract_feature);
         

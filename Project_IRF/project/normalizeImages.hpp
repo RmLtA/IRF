@@ -15,6 +15,10 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/core/core.hpp>
 #include <ctime>
+#include <iomanip>
+#include <thread>
+#include <mutex>
+#include <iostream>
 #include "fileOp.h"
 #include "computeImages.h"
 #include "utils.hpp"
@@ -30,17 +34,27 @@ static const int IMG_GAP = 10; //Valeur de décalage (limite rectangle noir auto
 class normalizeImages{
 public :
     utils & u = utils::i();;
+    const bool saveNormalized;
+    const bool squareImg;
+    double moy_cols, moy_rows;
 
-    normalizeImages(){
-        
+    unsigned long int leftToProcess;
+    unsigned long int currentToProcess;
+    int nErroImg;
+
+    normalizeImages(bool snormalized, bool simg) : saveNormalized(snormalized), squareImg(simg){
+        moy_cols = 0, moy_rows = 0; nErroImg = 0;
     };
+    
+    
     ~normalizeImages(){};
 
     
-    void process(bool saveNormalized, bool squareImg);
+    void process();
 private:
+    static void processTask(normalizeImages& self,vector<string> resultImages);
 
-    Mat boundingBox(const cv::Mat& img,string imgName);
+    static Mat boundingBox(const cv::Mat& img,string imgName);
     Mat Box( Mat matInput, string imgName);
     static Mat getSquareImage(const cv::Mat& img, string imgName);
     static vector<Mat>  splitImage(int x, Mat const & src);

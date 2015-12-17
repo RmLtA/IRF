@@ -7,76 +7,140 @@
 //
 
 #include "normalizeImages.hpp"
-#include <iomanip>
 
-void normalizeImages::process(bool saveNormalized, bool squareImg){
+std::mutex NormalizeMtx;           // mutex for critical section
+std::mutex OutputMtx;           // mutex for critical section
+
+void normalizeImages::process(){
     fileOp *  op = new fileOp();
-    cout << "cleaning result images.." << endl;
     if(saveNormalized) op->removeAllResNormalizedFiles();
     op->removeAllResSplittedFiles();
     
-    double moy_cols = 0, moy_rows = 0;
+    clock_t prog_b, prog_e;
+    double cpuTime;
+    prog_b = clock();
+    time_t xt = time(NULL);
+    
 
-    vector<string> result = op->getResultImages();
-    //cout << "Taille result : "  << result.size() << endl;
-    string current;
-    //read images
-    cout<<"Computing.. : "<<endl;
-    for (int i = 0; i < result.size(); i++){
-       
-        double pr=((double)i/(double)result.size())*100;
-        cout<<setprecision(2)<< pr<<"%   \r"<< flush ;
+    vector<string> resultImages = op->getResultImages();
+    unsigned long int nbImages =resultImages.size();
+
+    cout << "Images to process : "  << nbImages * u.SPLIT_FACTOR << endl;
+    
+    vector<thread> vThreads;
+    int NB_THREADS = thread::hardware_concurrency();
+    if(NB_THREADS ==0)NB_THREADS = 1;
+    
+    cout <<"Using up to threads :  "<< NB_THREADS <<endl;
+    
+    //init vars
+    leftToProcess=resultImages.size();
+    currentToProcess = 0 ;
+    
+    //init x processes
+    for(int i=0 ; i < NB_THREADS ; i++){
+        vThreads.push_back(std::thread(&normalizeImages::processTask, std::ref(*this), resultImages));
+    }
+    
+    this_thread::yield();
+
+    while(leftToProcess)
+    {
+        OutputMtx.lock();
+        double pr=((double)currentToProcess/(double)nbImages)*100;
+        cout<<"\t"<<setprecision(2)<<std::fixed<< pr<<"%   \r"<< flush ;
+        OutputMtx.unlock();
+        sleep(1); //pour windows a faire
+        // http://stackoverflow.com/questions/10918206/cross-platform-sleep-function-for-c
+    }
+    //join all processes to be sure everyone has finished
+    for(auto& th : vThreads){
+        th.join();
+    }
+    double pr=((double)currentToProcess/(double)nbImages)*100;
+    cout<<"\t"<<setprecision(2)<<std::fixed<< pr<<"%   \r"<< flush ;
+
+    
+    if(u.RESULT){
+        if(nbImages !=0){ //prevent div 0 
+            moy_rows /=nbImages;
+            moy_cols /=nbImages;
+            cout << "Avg size cols : " << moy_cols << " \t Avg size rows : " << moy_rows <<endl;;
+            cout << "Resized image size : " << MAX_SIZE <<"x" << MAX_SIZE<<endl;
+        }
+    }
+    
+    //output time results
+    xt = time(NULL) - xt;
+    prog_e = clock();
+    //output operations results
+    cpuTime = (double) ((prog_e - prog_b) / (double)CLOCKS_PER_SEC);
+    cout << endl << setprecision(3)
+    << "Total : " << (currentToProcess-nErroImg)*u.SPLIT_FACTOR << " / " << nbImages*u.SPLIT_FACTOR << "\t"
+    << "| Temps d'exec.: " << setprecision(2)<< (double)xt/60. <<" min";;
+
+
+    delete op;
+}
+
+
+
+void normalizeImages::processTask(normalizeImages& self,vector<string> resultImages)
+{
+    utils & u = utils::i();
+    fileOp * op = new fileOp();
+    
+    
+    while(self.leftToProcess)
+    {
+        NormalizeMtx.lock();
+        if(self.leftToProcess==0) break;
+        self.leftToProcess--;
+        string sourceImage = resultImages[self.currentToProcess++];
+        NormalizeMtx.unlock();
+
         
-        Mat img = imread(result[i]);
-        current = op->getFilename(result[i]);
+        Mat img = imread(sourceImage);
+        string current = op->getFilename(sourceImage);
         try{
             Mat res;
-            Mat box = this->boundingBox(img, current);
+            Mat box = normalizeImages::boundingBox(img, current);
             if(box.rows == 0 || box.cols == 0 )
             {
                 if(u.RESULT)cout << "Error with image : "<< current <<endl;
+                self.nErroImg++;
                 continue;
             }
             
             if(u.RESULT){
-                moy_cols +=box.cols;
-                moy_rows +=box.rows;
+                self.moy_cols +=box.cols;
+                self.moy_rows +=box.rows;
             }
-            if(squareImg)
-                res = getSquareImage(box,current);
+            
+            if(self.squareImg)
+                res = normalizeImages::getSquareImage(box,current);
             else
                 res = box;
-                
-
+            
+            
             if(u.VERBOSE) cout << "\nProcess... : \n" << current;
             //cout << i << endl;
-            if(saveNormalized)op->writeNormalized(current,res);
+            if(self.saveNormalized)op->writeNormalized(current,res);
             
-          
-            vector<Mat> splited = splitImage(u.SPLIT_FACTOR, res);
+            
+            vector<Mat> splited = normalizeImages::splitImage(u.SPLIT_FACTOR, res);
             for(int j = 0 ; j < splited.size(); j++)
             {
                 stringstream   ss;
                 ss << current << "_" << j;
                 op->writeSplited(ss.str(),splited[j]);
             }
-            
-       
+                        
         }catch(Exception e){
             cout << "Error with image : "<< current <<endl;
         }
-        
     }
-    if(u.RESULT){
-        double nb_img = result.size();
-        if(nb_img !=0){
-            moy_rows /=nb_img;
-            moy_cols /=nb_img;
-            cout << "Avg size cols : " << moy_cols << " \t Avg size rows : " << moy_rows <<endl;;
-            cout << "Resized image size : " << MAX_SIZE <<"x" << MAX_SIZE<<endl;
-        }
-    }
-
+    
     delete op;
 }
 
@@ -89,10 +153,7 @@ vector<Mat>  normalizeImages::splitImage(int x, Mat const & src){
     int width =src.cols;
     double factor = sqrt(x);
     try{
-      
-        
         Size smallSize ((1/factor)*width,(1/factor)*height); // Size of the squares
-        
         
         double smallHeight =(1/factor)*height;
         double smallWidth =(1/factor)*width ;

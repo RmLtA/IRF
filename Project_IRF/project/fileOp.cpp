@@ -188,15 +188,41 @@ void fileOp::writeARFFFile(extractFeature& extrfeat){
     pFile << "@RELATION Imagette" << endl;
     pFile << endl;
 
+    
+    pFile << "% Global features from the images :" << endl;
+    for (int i = 0; i < extrfeat.v_attributes_asked_global.size(); i++){
+        int attribut = extrfeat.v_attributes_asked_global[i];
+        switch (attribut){
+            case extractFeature::BLACK_PIXEL_GLOBAL:
+                pFile<< "@ATTRIBUTE "<< " Black_Pixel_Global" << " NUMERIC" << endl;;
+                break;
+            case extractFeature::AREA_GLOBAL :
+                pFile<< "@ATTRIBUTE " <<" Airs_Global"<< " NUMERIC" << endl;;
+                break;
+            case extractFeature::HARRIS_CORNERS_GLOBAL:
+                pFile<< "@ATTRIBUTE " <<" Harris_Corners_Global"<< " NUMERIC" << endl;;
+                break;
+            case extractFeature::LENGTH_AREA_GLOBAL:
+                pFile<< "@ATTRIBUTE " << " Length_Area_Global"<< " NUMERIC" << endl;;
+                break;
+            case extractFeature::MASSCENTER_GLOBAL:
+                pFile<< "@ATTRIBUTE " << " Mass_Center_X_Global" << " NUMERIC" << endl;
+                pFile<< "@ATTRIBUTE " << " Mass_Center_Y_Global" << " NUMERIC" << endl;
+                break;
+            case extractFeature::HOUGH_LINES_GLOBAL:
+                pFile<< "@ATTRIBUTE " << " Hough_Lines_Global"<< " NUMERIC" << endl;
+                break;
+                
+                
+        }
+    }
+    pFile << "% Features from the images splited in " <<extrfeat.SPLITED << " : " << endl;
     for(int j =0 ; j < extrfeat.SPLITED ; j++){
-        for (int i = 0; i < (extrfeat).getSizeOfv_attribute_asked(); i++){
-            int attribut = (extrfeat).getVectorAttributesAsked()[i];
+        for (int i = 0; i < extrfeat.v_attributes_asked_splited.size(); i++){
+            int attribut = extrfeat.v_attributes_asked_splited[i];
                 switch (attribut){
                     case extractFeature::BLACK_PIXEL:
                         pFile<< "@ATTRIBUTE "<< " Black_Pixel_" <<j << " NUMERIC" << endl;;
-                        break;
-                    case extractFeature::WHITE_PIXEL:
-                        pFile<< "@ATTRIBUTE " << " White_Pixel_" <<j << " NUMERIC" << endl;;
                         break;
                     case extractFeature::AREA :
                         pFile<< "@ATTRIBUTE " <<" Airs_" <<j << " NUMERIC" << endl;;
@@ -218,9 +244,8 @@ void fileOp::writeARFFFile(extractFeature& extrfeat){
                    
                 }
             }
-        
     }
-    pFile << "@ATTRIBUTE" << " Class " << " {accident, bomb, car, casualty, electricity, fire-brigade, fire, flood, gas, injury, paramedics, person police, road-block}" << endl;
+    pFile << "@ATTRIBUTE" << " Class " << " {accident, bomb, car, casualty, electricity, fire-brigade, fire, flood, gas, injury, paramedics, person, police, road-block}" << endl;
 
     pFile << endl;
     /*End Head File*/

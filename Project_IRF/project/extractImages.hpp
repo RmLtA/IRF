@@ -15,7 +15,11 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/core/core.hpp>
 #include <ctime>
+#include <iostream>
 #include <thread>
+#include <time.h>
+#include <iomanip>
+#include <mutex>
 #include "fileOp.h"
 #include "computeImages.h"
 
@@ -29,12 +33,14 @@ class extractImages{
 private :
     utils & u = utils::i();
     unsigned long int leftToProcess;
+    unsigned long int currentToProcess;
+
     unsigned long int toProcess;
 
     int nTotalImg;
     int nErroImg;
     
-    static void processTask(extractImages &self, string sourceImage,const vector<string>& templatesImages);
+    static void processTask(extractImages& self,const vector<string>&  sourcesImages,const vector<string>& templatesImages);
 
 public :
 

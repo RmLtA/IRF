@@ -24,8 +24,6 @@ using namespace cv;
 
 
 
-
-
 class fileOp{
    
     string dirSourceName;

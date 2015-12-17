@@ -1,6 +1,7 @@
 #include "feature.h"
 
-
+//TODO : SI feature est de l'image globale ou si c'est d'une image splited
+// voir extractfeatures
 
 // Count the number of black pixels
 double feature::countBlackPixel(){
@@ -27,26 +28,34 @@ void feature::computeBlackPixels(){
 
 
 
-
-double feature::countWhitePixel(){
-    if (!this->sourceImg.data)
-        cerr << "Problem loading image from : countWhitePixel()" << endl;
-    
-    
-    computeBlackPixels();//TODO if already done
-	// extract only the external blob
-	findContours(this->binaryImage, contours, hierarchy, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE, Point(0, 0));
-
-	Mat mask = Mat::zeros(this->binaryImage.size(), CV_8UC1);
-	vector<Point> all_pixels;   // output, locations of non-zero pixels
-	cv::findNonZero(mask, all_pixels);
-
-	int white_pixels = (int) ( all_pixels.size() - black_pixels.size());
-	return white_pixels;
-}
+//
+//double feature::countWhitePixel(){
+//    if (!this->sourceImg.data)
+//        cerr << "Problem loading image from : countWhitePixel()" << endl;
+//    
+//    
+//    computeBlackPixels();//TODO if already done
+//	// extract only the external blob
+//	findContours(this->binaryImage, contours, hierarchy, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE, Point(0, 0));
+//
+//	Mat mask = Mat::zeros(this->binaryImage.size(), CV_8UC1);
+//	vector<Point> all_pixels;   // output, locations of non-zero pixels
+//	cv::findNonZero(mask, all_pixels);
+//
+//	int white_pixels = (int) ( all_pixels.size() - black_pixels.size());
+//	return white_pixels;
+//}
 int ww=0;
 // Count the number of Harris Corner
 int feature::countHarrisCorners(){
+//    //TODO
+//    //
+//    if(isGlobal){
+//        //params
+//    }else{
+//        //params
+//    }
+    
     int thresh = 150;
 	Mat dst, dst_norm, dst_norm_scaled;
 	dst = Mat::zeros(this->sourceImg.size(), CV_32FC1);
@@ -89,6 +98,14 @@ int feature::countHarrisCorners(){
 
 
 double feature::HoughLines(){
+    
+    //    //TODO
+    //    //
+    //    if(isGlobal){
+    //        //params
+    //    }else{
+    //        //params
+    //    }
     int resolution = 1;
     int threshold = 30;
     int minLinLength =10;
@@ -118,6 +135,14 @@ double feature::HoughLines(){
 
 
 double feature::countArea(){
+    
+    //    //TODO
+    //    //
+    //    if(isGlobal){
+    //        //params
+    //    }else{
+    //        //params
+    //    }
     Mat src_gray;
     //RNG rng(12345);
 //    int thresh = 100;
@@ -159,6 +184,14 @@ double feature::countArea(){
 
 
 double feature::countLengthArea(){
+    
+    //    //TODO
+    //    //
+    //    if(isGlobal){
+    //        //params
+    //    }else{
+    //        //params
+    //    }
     Mat src_gray;
     RNG rng(12345);
     
@@ -195,6 +228,7 @@ double feature::countLengthArea(){
 }
 
 double feature::massCenterX(){
+    
     if(this->massCenter.x == -1 && this->massCenter.y == -1)
         feature::countMassCenter();
     
@@ -218,6 +252,13 @@ double feature::massCenterY(){
 
 //PRIVATE
 void feature::countMassCenter(){
+    //    //TODO
+    //    //
+    //    if(isGlobal){
+    //        //params
+    //    }else{
+    //        //params
+    //    }
     if(this->massCenter.x == -1 && this->massCenter.y == -1){
         int thresh = 140;
         Mat src_gray;
