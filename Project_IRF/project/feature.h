@@ -32,6 +32,7 @@ public:
 
     Point2f massCenter;
     Point2f cornerHarrisPoint;
+    double houghLines [4];
 
 	
 	feature(Mat img, bool _isGlobal, string _imgName) : sourceImg(img), isGlobal(_isGlobal), imgName(_imgName){
@@ -39,6 +40,7 @@ public:
          cvtColor( img, this->graySourceImg, CV_BGR2GRAY);
             massCenter = Point2f(-1,-1);
             cornerHarrisPoint = Point2f(-1,-1);
+            houghLines[0] = -1;
         }catch(Exception e){
             cout << e.msg <<endl;
             throw e;
@@ -65,18 +67,25 @@ public:
     
     
 
-    double HoughLines();
     double countLengthArea();
     double countArea();
     
     //1 if rows are bigger than cols else 0;
     int isLongerRowsOrCols();
+    
+    
+    
+    double houghLinesHorizontals();
+    double houghLinesVerticals();
+    double houghLinesDiagonalPos();
+    double houghLinesDiagonalNegs();
 
 
     
 private:
     void countMassCenter();
     void countHarrisCorners();
+    void HoughLines();
 
 
 };

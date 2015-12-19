@@ -212,7 +212,10 @@ void fileOp::writeARFFFile(extractFeature& extrfeat){
                 pFile<< "@ATTRIBUTE " << " Mass_Center_Y_Global" << " NUMERIC" << endl;
                 break;
             case extractFeature::HOUGH_LINES_GLOBAL:
-                pFile<< "@ATTRIBUTE " << " Hough_Lines_Global"<< " NUMERIC" << endl;
+                pFile<< "@ATTRIBUTE " << " Hough_Lines_Vertical_Global"<< " NUMERIC" << endl;
+                pFile<< "@ATTRIBUTE " << " Hough_Lines_Horizontal_Global"<< " NUMERIC" << endl;
+                pFile<< "@ATTRIBUTE " << " Hough_Lines_DiagonalPos_Global"<< " NUMERIC" << endl;
+                pFile<< "@ATTRIBUTE " << " Hough_Lines_DiagonalNeg_Global"<< " NUMERIC" << endl;
                 break;
             case extractFeature::ROWS_OR_COLS_GLOBAL:
                 pFile<< "@ATTRIBUTE " << " Rows_Or_Cols_Global"<< " NUMERIC" << endl;
@@ -244,7 +247,10 @@ void fileOp::writeARFFFile(extractFeature& extrfeat){
                         pFile<< "@ATTRIBUTE " << " Mass_Center_Y_" <<j << " NUMERIC" << endl;
                         break;
                     case extractFeature::HOUGH_LINES:
-                        pFile<< "@ATTRIBUTE " << " Hough_Lines_" <<j << " NUMERIC" << endl;
+                        pFile<< "@ATTRIBUTE " << " Hough_Lines_Vertical_" <<j << " NUMERIC" << endl;
+                        pFile<< "@ATTRIBUTE " << " Hough_Lines_Horizontal_" <<j << " NUMERIC" << endl;
+                        pFile<< "@ATTRIBUTE " << " Hough_Lines_DiagonalPos_" <<j << " NUMERIC" << endl;
+                        pFile<< "@ATTRIBUTE " << " Hough_Lines_DiagonalNeg_" <<j << " NUMERIC" << endl;
                         break;
 
                    

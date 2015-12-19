@@ -142,7 +142,7 @@ int feature::isLongerRowsOrCols(){
     }
 }
 
-double feature::HoughLines(){
+void feature::HoughLines(){
     int resolution;
     int threshold ;
     int minLinLength;
@@ -150,20 +150,19 @@ double feature::HoughLines(){
     int AVG;
 
     //    //TODO check better params
-        //
-        if(isGlobal){
-            resolution = 1;
-            threshold = 50;
-            minLinLength =10;
-            maxLineGap = 10;
-            AVG= 10;
-        }else{
-            resolution = 1;
-            threshold = 30;
-            minLinLength =5;
-            maxLineGap = 5;
-            AVG = 10;
-        }
+    if(isGlobal){
+        resolution = 1;
+        threshold = 50;
+        minLinLength =10;
+        maxLineGap = 10;
+        AVG= 10;
+    }else{
+        resolution = 1;
+        threshold = 30;
+        minLinLength =5;
+        maxLineGap = 5;
+        AVG = 10;
+    }
     
     vector<Vec4i> lines;
     
@@ -184,17 +183,28 @@ double feature::HoughLines(){
             //check if line is -
             else if(abs(l[1] - l[3]) < AVG)
                 horizontal++;
-            //check if line is \
-            
-            else if(l[1] < l[3])
+            else if(l[1] < l[3])                 /*check if line is \ */
                 diagonalNeg++;
-            else if(l[1] > l[3])
+            else if(l[1] > l[3])                /*check if line is / */
                 diagonalPos++;
-            //check if line is /
+          
             
         
             
         }
+    
+    if(lines.size()){
+        houghLines[0] = (vertical / lines.size()) * 100;
+        houghLines[1] = (horizontal / lines.size()) * 100;
+        houghLines[2] = (diagonalNeg / lines.size()) * 100;
+        houghLines[3] = (diagonalPos / lines.size()) * 100;
+    }else{
+        houghLines[0] = 0;
+        houghLines[1] = 0;
+        houghLines[2] = 0;
+        houghLines[3] = 0;
+        
+    }
     if(u.VERBOSE){
         imshow("Hough lines", cdst);
         waitKey(1);
@@ -206,9 +216,33 @@ double feature::HoughLines(){
     //see same as cornerHarris implementation
     
     //should return in others functions horizontal, vertical, diagonalPos and diagonalNeg
-    return lines.size();
+    //return lines.size();
 }
 
+double feature::houghLinesVerticals(){
+    if(houghLines[0] == -1)
+        HoughLines();
+    
+    return houghLines[0];
+}
+double feature::houghLinesHorizontals(){
+    if(houghLines[0] == -1)
+        HoughLines();
+    
+    return houghLines[1];
+}
+double feature::houghLinesDiagonalNegs(){
+    if(houghLines[0] == -1)
+        HoughLines();
+    
+    return houghLines[2];
+}
+double feature::houghLinesDiagonalPos(){
+    if(houghLines[0] == -1)
+        HoughLines();
+    
+    return houghLines[3];
+}
 
 double feature::countArea(){
     

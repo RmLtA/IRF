@@ -103,7 +103,11 @@ void extractFeature::extract_all_features_splited(string imgName, int nextImage,
                 feature_result.push_back(f->massCenterY());
                 break;
             case HOUGH_LINES:
-                feature_result.push_back(f->HoughLines());
+                feature_result.push_back(f->houghLinesVerticals());
+                feature_result.push_back(f->houghLinesHorizontals());
+                feature_result.push_back(f->houghLinesDiagonalPos());
+                feature_result.push_back(f->houghLinesDiagonalNegs());
+
                 break;
 
             default:
@@ -153,7 +157,11 @@ void extractFeature::extract_all_features_global(string imgName, unsigned int cu
                 feature_result.push_back(f->massCenterY());
                 break;
             case HOUGH_LINES_GLOBAL:
-                feature_result.push_back(f->HoughLines());
+                feature_result.push_back(f->houghLinesVerticals());
+                feature_result.push_back(f->houghLinesHorizontals());
+                feature_result.push_back(f->houghLinesDiagonalPos());
+                feature_result.push_back(f->houghLinesDiagonalNegs());
+
                 break;
             case ROWS_OR_COLS_GLOBAL:
                 feature_result.push_back(f->isLongerRowsOrCols());
