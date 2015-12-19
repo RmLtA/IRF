@@ -131,6 +131,7 @@ void get_args(int argc, const char * argv[]){
                     exit(0);
                 }else{
                     u.SPLIT_FACTOR = stoi(argv[i]);
+                    lastFactor = u.SPLIT_FACTOR;
                     cout << "\n Split Factor is now  " << u.SPLIT_FACTOR << endl;
                 }
             }else{
@@ -270,7 +271,7 @@ void process_features()
 
         int features_toextract;
         cin >> features_toextract;
-        while (features_toextract != 0 || v_features_to_extract_splited.size() ==0) {
+        while (features_toextract != 0) {
             if(features_toextract <= v_features_available_splited.size())
                 v_features_to_extract_splited.push_back(features_toextract);
             cin >> features_toextract;
@@ -302,7 +303,7 @@ void process_features()
         cout << "To finish : Tape 0" << endl;
         
         cin >> features_toextract;
-        while (features_toextract != 0 || v_features_to_extract_global.size() == 0) {
+        while (features_toextract != 0) {
             if(features_toextract <= v_features_available_global.size())
                 v_features_to_extract_global.push_back(features_toextract);
             cin >> features_toextract;

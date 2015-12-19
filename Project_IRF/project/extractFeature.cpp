@@ -77,7 +77,7 @@ void extractFeature::extract_all_features_splited(string imgName, int nextImage,
         return; 
     }
     //feature :: is global ? = false
-    feature* f = new feature(img, false);
+    feature* f = new feature(img, false, imgName);
     vector<double> feature_result;
 
     for(int j = 0 ; j < v_attributes_asked_splited.size() ; j++)
@@ -92,7 +92,8 @@ void extractFeature::extract_all_features_splited(string imgName, int nextImage,
                 feature_result.push_back(f->countArea());
                 break;
             case HARRIS_CORNERS:
-                feature_result.push_back(f->countHarrisCorners());
+                feature_result.push_back(f->harrisCornerX());
+                feature_result.push_back(f->harrisCornerY());
                 break;
             case LENGTH_AREA:
                 feature_result.push_back(f->countLengthArea());
@@ -126,7 +127,7 @@ void extractFeature::extract_all_features_global(string imgName, unsigned int cu
         return;
     }
     //feature :: is global = true
-    feature* f = new feature(img, true);
+    feature* f = new feature(img, true, imgName);
     vector<double> feature_result;
     
     for(int j = 0 ; j < v_attributes_asked_global.size() ; j++)
@@ -141,7 +142,8 @@ void extractFeature::extract_all_features_global(string imgName, unsigned int cu
                 feature_result.push_back(f->countArea());
                 break;
             case HARRIS_CORNERS_GLOBAL:
-                feature_result.push_back(f->countHarrisCorners());
+                feature_result.push_back(f->harrisCornerX());
+                feature_result.push_back(f->harrisCornerY());
                 break;
             case LENGTH_AREA_GLOBAL:
                 feature_result.push_back(f->countLengthArea());

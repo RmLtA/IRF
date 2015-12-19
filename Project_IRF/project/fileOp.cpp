@@ -200,7 +200,9 @@ void fileOp::writeARFFFile(extractFeature& extrfeat){
                 pFile<< "@ATTRIBUTE " <<" Airs_Global"<< " NUMERIC" << endl;;
                 break;
             case extractFeature::HARRIS_CORNERS_GLOBAL:
-                pFile<< "@ATTRIBUTE " <<" Harris_Corners_Global"<< " NUMERIC" << endl;;
+                pFile<< "@ATTRIBUTE " <<" Harris_Corners_X_Global"<< " NUMERIC" << endl;;
+                pFile<< "@ATTRIBUTE " <<" Harris_Corners_Y_Global"<< " NUMERIC" << endl;;
+
                 break;
             case extractFeature::LENGTH_AREA_GLOBAL:
                 pFile<< "@ATTRIBUTE " << " Length_Area_Global"<< " NUMERIC" << endl;;
@@ -231,7 +233,8 @@ void fileOp::writeARFFFile(extractFeature& extrfeat){
                         pFile<< "@ATTRIBUTE " <<" Airs_" <<j << " NUMERIC" << endl;;
                         break;
                     case extractFeature::HARRIS_CORNERS:
-                        pFile<< "@ATTRIBUTE " <<" Harris_Corners_" <<j << " NUMERIC" << endl;;
+                        pFile<< "@ATTRIBUTE " <<" Harris_Corners_X_" <<j << " NUMERIC" << endl;;
+                        pFile<< "@ATTRIBUTE " <<" Harris_Corners_Y_" <<j << " NUMERIC" << endl;;
                         break;
                     case extractFeature::LENGTH_AREA:
                         pFile<< "@ATTRIBUTE " << " Length_Area_" <<j << " NUMERIC" << endl;;

@@ -5,57 +5,61 @@
 
 // Count the number of black pixels
 double feature::countBlackPixel(){
-	if (!this->sourceImg.data)
-		cerr << "Problem loading image from : countBlackPixel()" << endl;
-
-    computeBlackPixels(); //TODO if already done
-	return  (double) black_pixels.size()/ (double)(sourceImg.cols*sourceImg.rows);
-}
-
-
-
-
-//PRIVATE
-void feature::computeBlackPixels(){
-   // Mat bw;
-    // Transform it to binary and invert it. White on black is needed.
-    threshold(this->graySourceImg, this->binaryImage, 80, 255, CV_THRESH_BINARY_INV | CV_THRESH_OTSU);
+	
+    vector<Point> black_pixels;
+    //invert image
+    threshold(this->graySourceImg, this->binaryImage, 1, 255, CV_THRESH_BINARY_INV | CV_THRESH_OTSU);
     
     // output, locations of non-zero pixels
     cv::findNonZero(this->binaryImage, black_pixels);
-  //  return bw;
+    
+    double res = (double) black_pixels.size()/ (double)(sourceImg.cols*sourceImg.rows) * 100;
+    if(u.VERBOSE){
+        
+        imshow("Black pixels " + imgName, this->binaryImage);
+        cout << "Black pixels  :"<< imgName << " : "<< res << endl;
+        waitKey(1);
+    }
+    
+    return res;
 }
 
 
-int ww=0;
-// Count the number of Harris Corner
-int feature::countHarrisCorners(){
-//    //TODO
-//    //
-//    if(isGlobal){
-//        //params
-//    }else{
-//        //params
-//    }
+// Count the number of Harris Corner and get the mass center of all the points
+//PRIVATE
+void feature::countHarrisCorners(){
+    //TODO check the params
+    //try to get values that are the same for the same type...
+    //check for splited images and global...
+    int thresh;
+    int blockSize;
+    int apertureSize;
+    double k = 0.03;
     
-    int thresh = 150;
-	Mat dst, dst_norm, dst_norm_scaled;
+    if(isGlobal){
+        thresh = 180;
+        blockSize = 25;
+        apertureSize = 3;
+    }else{
+        thresh = 230;
+        blockSize = 4;
+        apertureSize = 3;
+        //params
+    }
+    
+	Mat dst, dst_norm;
 	dst = Mat::zeros(this->sourceImg.size(), CV_32FC1);
-
-	/// Detector parameters
-	int blockSize = 2;
-	int apertureSize = 3;
-	double k = 0.03;
+	
 
 	/// Detecting corners
 	cornerHarris(this->graySourceImg, dst, blockSize, apertureSize, k, BORDER_DEFAULT);
-
-	/// Normalizing
+	/// Normalizing from 0 to 255
 	normalize(dst, dst_norm, 0, 255, NORM_MINMAX, CV_32FC1, Mat());
-	//convertScaleAbs(dst_norm, dst_norm_scaled);
     Mat display = this->sourceImg.clone();
 	int cornerHarris = 0;
 	/// Drawing a circle around corners
+    double moyX=0;
+    double moyY=0;
 	for (int j = 0; j < dst_norm.rows; j++)
 	{
 		for (int i = 0; i < dst_norm.cols; i++)
@@ -63,18 +67,40 @@ int feature::countHarrisCorners(){
 			if ((int)dst_norm.at<float>(j, i) > thresh)
 			{
 				cornerHarris++;
-                circle( display, Point( i, j ), 5,  Scalar(0), 2, 8, 0 );
+                moyX += i;
+                moyY +=j;
+                if(u.VERBOSE)circle( display, Point( i, j ), 5,  Scalar(0), 2, 8, 0 );
 
 			}
 		}
 	}
+    
+    moyX = moyX/cornerHarris;
+    moyY = moyY/cornerHarris;
+    if(u.VERBOSE)circle( display, Point( moyX, moyY ), 5,  Scalar(3), 2, 8, 0 );
+    moyX = moyX /  dst_norm.cols * 100;
+    moyY = moyY / dst_norm.rows * 100;
+    cornerHarrisPoint = Point2f(moyX, moyX);
     if(u.VERBOSE){
-        imshow("Harris corners " + to_string(ww++), display);
-        cout << "Harris :"<< to_string(ww) << " : "<< cornerHarris << endl;
+        imshow("Harris corners ", display);
+        cout << "Harris :"<< imgName << " : "<< cornerHarris << endl;
+        cout << " X " << moyX << " Y " << moyY << endl;
         waitKey(1);
     }
 
-	return cornerHarris;
+}
+
+
+double feature::harrisCornerX(){
+    if(cornerHarrisPoint.x ==-1 && cornerHarrisPoint.y ==-1)
+        countHarrisCorners();
+    return cornerHarrisPoint.x;
+}
+double feature::harrisCornerY(){
+    if(cornerHarrisPoint.x ==-1 && cornerHarrisPoint.y ==-1)
+        countHarrisCorners();
+
+    return cornerHarrisPoint.y;
 }
 
 
@@ -88,7 +114,8 @@ int feature::isLongerRowsOrCols(){
         //this means image has beene normalized in equals squares
         //so we need to check the one that has more white pixels
         int countRows = 0 , countCols = 0;
-     
+        //TODO :: dont really works...
+        //chekc better implementation
         for( int i = 0; i < rows; i++ ) {
                 if ( this->graySourceImg.at<uchar>(i,0) != 255  &&
                     this->graySourceImg.at<uchar>(i,1) == 255)
@@ -116,38 +143,69 @@ int feature::isLongerRowsOrCols(){
 }
 
 double feature::HoughLines(){
+    int resolution;
+    int threshold ;
+    int minLinLength;
+    int maxLineGap;
+    int AVG;
+
+    //    //TODO check better params
+        //
+        if(isGlobal){
+            resolution = 1;
+            threshold = 50;
+            minLinLength =10;
+            maxLineGap = 10;
+            AVG= 10;
+        }else{
+            resolution = 1;
+            threshold = 30;
+            minLinLength =5;
+            maxLineGap = 5;
+            AVG = 10;
+        }
     
-    //    //TODO
-    //    //
-    //    if(isGlobal){
-    //        //params
-    //    }else{
-    //        //params
-    //    }
-    int resolution = 1;
-    int threshold = 30;
-    int minLinLength =10;
-    int maxLineGap = 10;
     vector<Vec4i> lines;
     
     Mat dst, cdst;
+    //check canny params also...
     Canny(this->sourceImg, dst, 50, 200, 3);
     cdst = dst.clone();
     HoughLinesP(dst, lines, resolution, CV_PI/180, threshold,minLinLength , maxLineGap );
     
-    
-    if(u.VERBOSE){
+    int horizontal=0, vertical=0, diagonalPos=0, diagonalNeg=0;
         for( size_t i = 0; i < lines.size(); i++ )
         {
             Vec4i l = lines[i];
             line( cdst, Point(l[0], l[1]), Point(l[2], l[3]), Scalar(180,8,255), 3, CV_AA);
+            //check if line is |
+            if(abs(l[0] - l[2]) < AVG)
+                vertical++;
+            //check if line is -
+            else if(abs(l[1] - l[3]) < AVG)
+                horizontal++;
+            //check if line is \
+            
+            else if(l[1] < l[3])
+                diagonalNeg++;
+            else if(l[1] > l[3])
+                diagonalPos++;
+            //check if line is /
+            
+        
             
         }
-        
-        imshow("Hough lines" + to_string(ww), cdst);
-        cout << "Hough :" << to_string(ww++) << " : " <<  lines.size()<< endl;
+    if(u.VERBOSE){
+        imshow("Hough lines", cdst);
         waitKey(1);
+       // imshow("Canny ", dst);
+
+        cout << "Hough :" << imgName << " : " <<  lines.size()<< endl;
     }
+    //should normalize the result.. 2/10 of horizontal, 1/10 vertical etc instead of just numbers of results.
+    //see same as cornerHarris implementation
+    
+    //should return in others functions horizontal, vertical, diagonalPos and diagonalNeg
     return lines.size();
 }
 

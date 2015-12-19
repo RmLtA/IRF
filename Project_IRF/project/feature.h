@@ -19,24 +19,26 @@ public:
     //instance
     utils & u = utils::i();
     bool isGlobal;
+    string imgName;
     
     Mat sourceImg;
 	Mat graySourceImg;
     Mat binaryImage;
 
     //TODO see if this is useful
-    vector<Point> black_pixels;
 	vector<Vec4i> hierarchy;
 	vector<vector<Point> > contours;
     vector<Moments> imMoments;
 
     Point2f massCenter;
+    Point2f cornerHarrisPoint;
 
 	
-	feature(Mat img, bool _isGlobal) : sourceImg(img), isGlobal(_isGlobal){
+	feature(Mat img, bool _isGlobal, string _imgName) : sourceImg(img), isGlobal(_isGlobal), imgName(_imgName){
         try{
          cvtColor( img, this->graySourceImg, CV_BGR2GRAY);
-         massCenter = Point2f(-1,-1);
+            massCenter = Point2f(-1,-1);
+            cornerHarrisPoint = Point2f(-1,-1);
         }catch(Exception e){
             cout << e.msg <<endl;
             throw e;
@@ -45,19 +47,23 @@ public:
 
 	
 	// Count the number of black pixels
+    //return % of black points
 	double countBlackPixel();
 
-//unused
-//	//Count the number of white pixels;
-//	double countWhitePixel();
 
-	// Count the number of Harris Corner
-	int countHarrisCorners();
-   // int findMoments();
-    
-    
+	// Get the mass center of all the Harris Corners
+    //return % of X pos
+    double harrisCornerX();
+    //return % of Y pos
+    double harrisCornerY();
+
+    //Get the mass center of the drawn image
+    //return % of X pos
     double massCenterX();
+    //return % of Y pos
     double massCenterY();
+    
+    
 
     double HoughLines();
     double countLengthArea();
@@ -69,8 +75,8 @@ public:
 
     
 private:
-    void computeBlackPixels();
     void countMassCenter();
+    void countHarrisCorners();
 
 
 };
