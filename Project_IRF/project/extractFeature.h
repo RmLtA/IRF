@@ -53,8 +53,8 @@ public :
 	extractFeature(int split){
         SPLITED = split;
         //nombre de features differentes par features (voir mass center par exemple (2)
-        nb_features_by_attributes_splited = { 0 ,1 ,2 ,1 ,1 ,2 ,4};
-        nb_features_by_attributes_global =  { 0 ,1 ,2 ,1 ,1 ,2 ,4, 1};
+        nb_features_by_attributes_splited = { 0 ,1 ,1 ,2 ,1 ,2 ,4};
+        nb_features_by_attributes_global =  { 0 ,1 ,1 ,2 ,1 ,2 ,4, 1};
         
 	}
     

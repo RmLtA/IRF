@@ -74,12 +74,18 @@ void feature::countHarrisCorners(){
 			}
 		}
 	}
-    
-    moyX = moyX/cornerHarris;
-    moyY = moyY/cornerHarris;
-    if(u.VERBOSE)circle( display, Point( moyX, moyY ), 5,  Scalar(3), 2, 8, 0 );
-    moyX = moyX /  dst_norm.cols * 100;
-    moyY = moyY / dst_norm.rows * 100;
+    if(cornerHarris){
+        moyX = moyX/cornerHarris;
+        moyY = moyY/cornerHarris;
+        moyX = moyX /  dst_norm.cols * 100;
+        moyY = moyY / dst_norm.rows * 100;
+
+    }else{
+        moyX =0;
+        moyY =0;
+    }
+   // if(u.VERBOSE)circle( display, Point( moyX, moyY ), 5,  Scalar(3), 2, 8, 0 );
+   
     cornerHarrisPoint = Point2f(moyX, moyX);
     if(u.VERBOSE){
         imshow("Harris corners ", display);
@@ -94,6 +100,7 @@ void feature::countHarrisCorners(){
 double feature::harrisCornerX(){
     if(cornerHarrisPoint.x ==-1 && cornerHarrisPoint.y ==-1)
         countHarrisCorners();
+    
     return cornerHarrisPoint.x;
 }
 double feature::harrisCornerY(){
@@ -157,10 +164,11 @@ void feature::HoughLines(){
         maxLineGap = 10;
         AVG= 10;
     }else{
+        //faire en fonction du splitted params
         resolution = 1;
         threshold = 30;
-        minLinLength =5;
-        maxLineGap = 5;
+        minLinLength =2;
+        maxLineGap = 2;
         AVG = 10;
     }
     
@@ -172,16 +180,15 @@ void feature::HoughLines(){
     cdst = dst.clone();
     HoughLinesP(dst, lines, resolution, CV_PI/180, threshold,minLinLength , maxLineGap );
     
-    int horizontal=0, vertical=0, diagonalPos=0, diagonalNeg=0;
+    double horizontal=0, vertical=0, diagonalPos=0, diagonalNeg=0;
         for( size_t i = 0; i < lines.size(); i++ )
         {
             Vec4i l = lines[i];
-            line( cdst, Point(l[0], l[1]), Point(l[2], l[3]), Scalar(180,8,255), 3, CV_AA);
-            //check if line is |
-            if(abs(l[0] - l[2]) < AVG)
+            if(u.VERBOSE)line( cdst, Point(l[0], l[1]), Point(l[2], l[3]), Scalar(180,8,255), 3, CV_AA);
+          
+            if(abs(l[0] - l[2]) < AVG)             /*check if line is | */
                 vertical++;
-            //check if line is -
-            else if(abs(l[1] - l[3]) < AVG)
+            else if(abs(l[1] - l[3]) < AVG)             /*check if line is -*/
                 horizontal++;
             else if(l[1] < l[3])                 /*check if line is \ */
                 diagonalNeg++;
@@ -193,11 +200,11 @@ void feature::HoughLines(){
             
         }
     
-    if(lines.size()){
-        houghLines[0] = (vertical / lines.size()) * 100;
-        houghLines[1] = (horizontal / lines.size()) * 100;
-        houghLines[2] = (diagonalNeg / lines.size()) * 100;
-        houghLines[3] = (diagonalPos / lines.size()) * 100;
+    if(lines.size() > 0){
+        houghLines[0] = (vertical / (double) lines.size()) * 100;
+        houghLines[1] = (horizontal / (double) lines.size()) * 100;
+        houghLines[2] = (diagonalNeg / (double) lines.size()) * 100;
+        houghLines[3] = (diagonalPos / (double) lines.size()) * 100;
     }else{
         houghLines[0] = 0;
         houghLines[1] = 0;
@@ -212,12 +219,7 @@ void feature::HoughLines(){
 
         cout << "Hough :" << imgName << " : " <<  lines.size()<< endl;
     }
-    //should normalize the result.. 2/10 of horizontal, 1/10 vertical etc instead of just numbers of results.
-    //see same as cornerHarris implementation
-    
-    //should return in others functions horizontal, vertical, diagonalPos and diagonalNeg
-    //return lines.size();
-}
+ }
 
 double feature::houghLinesVerticals(){
     if(houghLines[0] == -1)
