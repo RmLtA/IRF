@@ -159,17 +159,17 @@ void feature::HoughLines(){
     //    //TODO check better params
     if(isGlobal){
         resolution = 1;
-        threshold = 50;
-        minLinLength =10;
-        maxLineGap = 10;
+        threshold = 30;
+        minLinLength =3;
+        maxLineGap = 3;
         AVG= 10;
     }else{
         //faire en fonction du splitted params
         resolution = 1;
-        threshold = 30;
-        minLinLength =2;
-        maxLineGap = 2;
-        AVG = 10;
+        threshold = 10;
+        minLinLength =3;
+        maxLineGap = 5;
+        AVG = 5;
     }
     
     vector<Vec4i> lines;

@@ -257,7 +257,7 @@ void process_features()
             "Harris_Corners       ",
             "Perimètre            ",
             "Mass_center          ",
-            "Nb_Lines             "
+            "Hough_Lines          "
         };
 
         //Features to extract
@@ -288,7 +288,7 @@ void process_features()
             "Harris_Corners       ",
             "Perimètre            ",
             "Mass_center          ",
-            "Nb_Lines             ",
+            "Hough_Lines          ",
             "Rows or Cols Longer  "
 
         };
