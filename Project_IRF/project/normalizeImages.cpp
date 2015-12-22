@@ -31,7 +31,7 @@ void normalizeImages::process(){
     int NB_THREADS = thread::hardware_concurrency();
     if(NB_THREADS ==0)NB_THREADS = 1;
     
-    cout <<"Using up to threads :  "<< NB_THREADS <<endl;
+    cout <<"Using " << NB_THREADS << " threads  "<<endl;
     
     //init vars
     leftToProcess=resultImages.size();
@@ -52,6 +52,7 @@ void normalizeImages::process(){
         OutputMtx.unlock();
         sleep(1); //pour windows a faire
         // http://stackoverflow.com/questions/10918206/cross-platform-sleep-function-for-c
+        //ou yield si marche pas
     }
     //join all processes to be sure everyone has finished
     for(auto& th : vThreads){

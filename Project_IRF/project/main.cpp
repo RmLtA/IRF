@@ -255,9 +255,10 @@ void process_features()
             "Black_Pixel          ",
             "Area                 ",
             "Harris_Corners       ",
-            "Perimètre            ",
             "Mass_center          ",
-            "Hough_Lines          "
+            "Hough_Lines          ",
+            "Hough_Circles        "
+
         };
 
         //Features to extract
@@ -286,9 +287,9 @@ void process_features()
             "Black_Pixel          ",
             "Area                 ",
             "Harris_Corners       ",
-            "Perimètre            ",
             "Mass_center          ",
             "Hough_Lines          ",
+            "Hough_Circles        ",
             "Rows or Cols Longer  "
 
         };
@@ -313,7 +314,7 @@ void process_features()
         
         cout << "Ok, computing... "<<endl;
        
-        extractFeature * extract_feature = new extractFeature(u.SPLIT_FACTOR);
+        extractFeature * extract_feature = new extractFeature();
         
         
         extract_feature->compute_features(v_features_to_extract_splited,v_result_images_toextract_features_splited,

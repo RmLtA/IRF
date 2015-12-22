@@ -166,6 +166,7 @@ string fileOp::getExtName(string name){
 }
 
 void fileOp::writeARFFFile(extractFeature& extrfeat){
+    utils & u = utils::i();
     cout <<  "Saving Arff FILE"<<endl;;
     string name;
     cout << "Name of Arff file : " << endl;
@@ -197,14 +198,26 @@ void fileOp::writeARFFFile(extractFeature& extrfeat){
                 pFile<< "@ATTRIBUTE "<< " Black_Pixel_Global" << " NUMERIC" << endl;;
                 break;
             case extractFeature::AREA_GLOBAL :
-                pFile<< "@ATTRIBUTE " <<" Airs_Global"<< " NUMERIC" << endl;;
+                pFile<< "@ATTRIBUTE " <<" Airs_Center_X_GLOBAL" << " NUMERIC" << endl;;
+                
+                pFile<< "@ATTRIBUTE " <<" Airs_Center_Y_GLOBAL" << " NUMERIC" << endl;;
+                pFile<< "@ATTRIBUTE " <<" Airs_Radius_GLOBAL"   <<" NUMERIC" << endl;;
+                
+                pFile<< "@ATTRIBUTE " <<" Airs_Triangle_1_X_GLOBAL" << " NUMERIC" << endl;;
+                pFile<< "@ATTRIBUTE " <<" Airs_Triangle_1_Y_GLOBAL" << " NUMERIC" << endl;;
+                
+                pFile<< "@ATTRIBUTE " <<" Airs_Triangle_2_X_GLOBAL" << " NUMERIC" << endl;;
+                pFile<< "@ATTRIBUTE " <<" Airs_Triangle_2_Y_GLOBAL" << " NUMERIC" << endl;;
+                
+                pFile<< "@ATTRIBUTE " <<" Airs_Triangle_3_X_GLOBAL" << " NUMERIC" << endl;;
+                pFile<< "@ATTRIBUTE " <<" Airs_Triangle_3_Y_GLOBAL" << " NUMERIC" << endl;;
+                
+                pFile<< "@ATTRIBUTE " <<" Airs_Contours_GLOBAL" << " NUMERIC" << endl;;
+                pFile<< "@ATTRIBUTE " <<" Airs_Length_Contours_GLOBAL" << " NUMERIC" << endl;;
                 break;
             case extractFeature::HARRIS_CORNERS_GLOBAL:
-                pFile<< "@ATTRIBUTE " <<" Harris_Corners_X_Global"<< " NUMERIC" << endl;;
-                pFile<< "@ATTRIBUTE " <<" Harris_Corners_Y_Global"<< " NUMERIC" << endl;;
-                break;
-            case extractFeature::LENGTH_AREA_GLOBAL:
-                pFile<< "@ATTRIBUTE " << " Length_Area_Global"<< " NUMERIC" << endl;;
+                pFile<< "@ATTRIBUTE " <<" Harris_Corners_X_GLOBAL" << " NUMERIC" << endl;;
+                pFile<< "@ATTRIBUTE " <<" Harris_Corners_Y_GLOBAL" << " NUMERIC" << endl;;
                 break;
             case extractFeature::MASSCENTER_GLOBAL:
                 pFile<< "@ATTRIBUTE " << " Mass_Center_X_Global" << " NUMERIC" << endl;
@@ -215,6 +228,14 @@ void fileOp::writeARFFFile(extractFeature& extrfeat){
                 pFile<< "@ATTRIBUTE " << " Hough_Lines_Horizontal_Global"<< " NUMERIC" << endl;
                 pFile<< "@ATTRIBUTE " << " Hough_Lines_DiagonalPos_Global"<< " NUMERIC" << endl;
                 pFile<< "@ATTRIBUTE " << " Hough_Lines_DiagonalNeg_Global"<< " NUMERIC" << endl;
+                pFile<< "@ATTRIBUTE " << " Hough_Lines_Nb_Global"<< " NUMERIC" << endl;
+
+                break;
+            case extractFeature::HOUGH_CIRCLES_GLOBAL:
+                pFile<< "@ATTRIBUTE " << " Hough_Circles_X_Global" << " NUMERIC" << endl;
+                pFile<< "@ATTRIBUTE " << " Hough_Circles_Y_Global" << " NUMERIC" << endl;
+                pFile<< "@ATTRIBUTE " << " Hough_Circles_Radius_Global" << " NUMERIC" << endl;
+                pFile<< "@ATTRIBUTE " << " Hough_Circles_Nb_Global" << " NUMERIC" << endl;
                 break;
             case extractFeature::ROWS_OR_COLS_GLOBAL:
                 pFile<< "@ATTRIBUTE " << " Rows_Or_Cols_Global"<< " NUMERIC" << endl;
@@ -223,8 +244,8 @@ void fileOp::writeARFFFile(extractFeature& extrfeat){
                 
         }
     }
-    pFile << "% Features from the images splited in " <<extrfeat.SPLITED << " : " << endl;
-    for(int j =0 ; j < extrfeat.SPLITED ; j++){
+    pFile << "% Features from the images splited in " <<u.SPLIT_FACTOR << " : " << endl;
+    for(int j =0 ; j < u.SPLIT_FACTOR ; j++){
         for (int i = 0; i < extrfeat.v_attributes_asked_splited.size(); i++){
             int attribut = extrfeat.v_attributes_asked_splited[i];
                 switch (attribut){
@@ -232,15 +253,24 @@ void fileOp::writeARFFFile(extractFeature& extrfeat){
                         pFile<< "@ATTRIBUTE "<< " Black_Pixel_" <<j << " NUMERIC" << endl;;
                         break;
                     case extractFeature::AREA :
-                        pFile<< "@ATTRIBUTE " <<" Airs_" <<j << " NUMERIC" << endl;;
+                        pFile<< "@ATTRIBUTE " <<" Airs_Center_X_" <<j << " NUMERIC" << endl;;
+                        pFile<< "@ATTRIBUTE " <<" Airs_Center_Y_" <<j << " NUMERIC" << endl;;
+                        pFile<< "@ATTRIBUTE " <<" Airs_Radius_" <<j << " NUMERIC" << endl;;
+                        pFile<< "@ATTRIBUTE " <<" Airs_Triangle_1_X_" <<j << " NUMERIC" << endl;;
+                        pFile<< "@ATTRIBUTE " <<" Airs_Triangle_1_Y_" <<j << " NUMERIC" << endl;;
+                        pFile<< "@ATTRIBUTE " <<" Airs_Triangle_2_X_" <<j << " NUMERIC" << endl;;
+                        pFile<< "@ATTRIBUTE " <<" Airs_Triangle_2_Y_" <<j << " NUMERIC" << endl;;
+                        pFile<< "@ATTRIBUTE " <<" Airs_Triangle_3_X_" <<j << " NUMERIC" << endl;;
+                        pFile<< "@ATTRIBUTE " <<" Airs_Triangle_3_Y_" <<j << " NUMERIC" << endl;;
+                        pFile<< "@ATTRIBUTE " <<" Airs_Contours_"     <<j<< " NUMERIC" << endl;;
+                        pFile<< "@ATTRIBUTE " <<" Airs_Length_Contours_"<<j << " NUMERIC" << endl;;
+
                         break;
                     case extractFeature::HARRIS_CORNERS:
                         pFile<< "@ATTRIBUTE " <<" Harris_Corners_X_" <<j << " NUMERIC" << endl;;
                         pFile<< "@ATTRIBUTE " <<" Harris_Corners_Y_" <<j << " NUMERIC" << endl;;
                         break;
-                    case extractFeature::LENGTH_AREA:
-                        pFile<< "@ATTRIBUTE " << " Length_Area_" <<j << " NUMERIC" << endl;;
-                        break;
+               
                     case extractFeature::MASSCENTER:
                         pFile<< "@ATTRIBUTE " << " Mass_Center_X_" <<j << " NUMERIC" << endl;
                         pFile<< "@ATTRIBUTE " << " Mass_Center_Y_" <<j << " NUMERIC" << endl;
@@ -250,8 +280,14 @@ void fileOp::writeARFFFile(extractFeature& extrfeat){
                         pFile<< "@ATTRIBUTE " << " Hough_Lines_Horizontal_" <<j << " NUMERIC" << endl;
                         pFile<< "@ATTRIBUTE " << " Hough_Lines_DiagonalPos_" <<j << " NUMERIC" << endl;
                         pFile<< "@ATTRIBUTE " << " Hough_Lines_DiagonalNeg_" <<j << " NUMERIC" << endl;
+                        pFile<< "@ATTRIBUTE " << " Hough_Lines_Nb_" <<j << " NUMERIC" << endl;
                         break;
-
+                    case extractFeature::HOUGH_CIRCLES:
+                        pFile<< "@ATTRIBUTE " << " Hough_Circles_X_" <<j<< " NUMERIC" << endl;
+                        pFile<< "@ATTRIBUTE " << " Hough_Circles_Y_" <<j<< " NUMERIC" << endl;
+                        pFile<< "@ATTRIBUTE " << " Hough_Circles_Radius_"<<j << " NUMERIC" << endl;
+                        pFile<< "@ATTRIBUTE " << " Hough_Circles_Nb_" <<j << " NUMERIC" << endl;
+                        break;
                    
                 }
             }

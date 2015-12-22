@@ -1,5 +1,7 @@
 #include "extractFeature.h"
-#include <iomanip>
+
+std::mutex ExtractFMtx;           // mutex for critical section
+std::mutex OutMtx;           // mutex for critical section
 
 //Si ajout de features, pas besion de modification
 
@@ -8,6 +10,8 @@
 void extractFeature::compute_features(vector<int>& v_of_attributes_splited, vector<string>& v_result_images_toextract_features_splited,
                                       vector<int>& v_of_attributes_global, vector<string>& v_result_images_toextract_features_global){
 
+    
+    utils & u = utils::i();
 	//delete duplicates in v_of_attributes 
 	sort(v_of_attributes_splited.begin(), v_of_attributes_splited.end());
 	v_of_attributes_splited.erase(unique(v_of_attributes_splited.begin(), v_of_attributes_splited.end()), v_of_attributes_splited.end());
@@ -19,13 +23,13 @@ void extractFeature::compute_features(vector<int>& v_of_attributes_splited, vect
     
     
     //nombre d'attributs par feature splited.
-    int nbSplitedFeatures =0;
+    nbSplitedFeatures =0;
 	for (int  i = 0; i < v_of_attributes_splited.size(); i++){
 		v_attributes_asked_splited.push_back(v_of_attributes_splited[i]);
         nbSplitedFeatures += nb_features_by_attributes_splited[v_of_attributes_splited[i]];
 	}
     //nombre d'attributs par feature global.
-    int nbGlobalFeatures =0;
+     nbGlobalFeatures =0;
     for (int  i = 0; i < v_of_attributes_global.size(); i++){
         v_attributes_asked_global.push_back(v_of_attributes_global[i]);
         nbGlobalFeatures += nb_features_by_attributes_global[v_of_attributes_global[i]];
@@ -35,38 +39,82 @@ void extractFeature::compute_features(vector<int>& v_of_attributes_splited, vect
     
     
     //creation du tableau ˆ la bonne dimension
-    //+1 is class
-    v_all_numeric_v_attributes_values = vector<vector<double>>(nbImgTotal, vector<double>(nbSplitedFeatures*SPLITED+nbGlobalFeatures));
+    v_all_numeric_v_attributes_values = vector<vector<double>>(nbImgTotal, vector<double>(nbSplitedFeatures*u.SPLIT_FACTOR+nbGlobalFeatures));
 
 	
 
     
     //pour toutes les images
-    for (unsigned int i = 0; i < nbImgTotal; i++)
-    {
-        //on extrait les features globales en premier lieu
-        string imgGlobalName = v_result_images_toextract_features_global[i];
-        extract_all_features_global(imgGlobalName, i);
-        //puis les features splited
-        for(int offset=0 ; offset< SPLITED ; offset++){
-             //pour chaque petite image de l'image
-            
-             string imgName =v_result_images_toextract_features_splited[i*SPLITED+offset];
-             //on extrait toutes les features
-             extract_all_features_splited(imgName, i , offset*nbSplitedFeatures+nbGlobalFeatures);
-         }
-        
-        
-        //affichage
-        double pr=((double)i/(double)nbImgTotal)*100;
-        cout<<setprecision(2)<< pr<<"%   \r"<< flush ;
-    }
+    vector<thread> vThreads;
+    int NB_THREADS = thread::hardware_concurrency();
+    if(NB_THREADS ==0)NB_THREADS = 1;
     
+    cout <<"Using " << NB_THREADS << " threads  "<<endl;
+    
+    //init vars
+    leftToProcess=nbImgTotal;
+    currentToProcess= 0;
+    
+    //init processes
+    for(int i=0 ; i < NB_THREADS ; i++){
+        vThreads.push_back(std::thread(&extractFeature::processTask, std::ref(*this), v_result_images_toextract_features_splited, v_result_images_toextract_features_global));
+    }
+    //give hand to process first time
+    this_thread::yield();
+    
+    while(leftToProcess)
+    {
+        OutMtx.lock();
+        //output current %
+        double pr=((double)currentToProcess/(double)nbImgTotal)*100;
+        cout<<"\t"<<setprecision(2)<<std::fixed<< pr<<"%   \r"<< flush ;
+        OutMtx.unlock();
+        //sleep to let others threads procced
+        sleep(1.5); //pour windows a faire
+        //pour windows : http://stackoverflow.com/questions/10918206/cross-platform-sleep-function-for-c
+        //ou yield si marche pas
+
+    }
+    //wait for last threads & join
+    for(auto& th : vThreads){
+        th.join();
+    }
+
     
 
     cout <<endl;
     //on ajoute la classe
 	addclassto_v_class(v_result_images_toextract_features_global);
+}
+
+
+
+void extractFeature::processTask(extractFeature& self, vector<string> v_result_images_toextract_features_splited, vector<string> v_result_images_toextract_features_global){
+    unsigned long i;
+    utils & u = utils::i();
+
+    while(self.leftToProcess)
+    {
+        ExtractFMtx.lock();
+        if(self.leftToProcess==0) break;
+        self.leftToProcess--;
+        i = self.currentToProcess++;
+        ExtractFMtx.unlock();
+
+    
+        //on extrait les features globales en premier lieu
+        string imgGlobalName = v_result_images_toextract_features_global[i];
+        self.extract_all_features_global(imgGlobalName, (int)i);
+        //puis les features splited
+        for(int offset=0 ; offset< u.SPLIT_FACTOR ; offset++){
+            //pour chaque petite image de l'image
+            
+            string imgName =v_result_images_toextract_features_splited[i*u.SPLIT_FACTOR+offset];
+            //on extrait toutes les features
+            self.extract_all_features_splited(imgName, (int)i , offset*self.nbSplitedFeatures+self.nbGlobalFeatures);
+        }
+    }
+
 }
 
 
@@ -89,15 +137,28 @@ void extractFeature::extract_all_features_splited(string imgName, int nextImage,
                  feature_result.push_back(f->countBlackPixel());
                 break;
             case AREA:
-                feature_result.push_back(f->countArea());
+                feature_result.push_back(f->centerAreaRes().x);
+                feature_result.push_back(f->centerAreaRes().y);
+                feature_result.push_back(f->radiusAreaRes());
+                
+                feature_result.push_back(f->triangleArea1().x);
+                feature_result.push_back(f->triangleArea1().y);
+                
+                feature_result.push_back(f->triangleArea2().x);
+                feature_result.push_back(f->triangleArea2().y);
+                
+                feature_result.push_back(f->triangleArea3().x);
+                feature_result.push_back(f->triangleArea3().y);
+
+                feature_result.push_back(f->lengthContoursArea());
+                feature_result.push_back(f->contoursArea());
+
                 break;
             case HARRIS_CORNERS:
                 feature_result.push_back(f->harrisCornerX());
                 feature_result.push_back(f->harrisCornerY());
                 break;
-            case LENGTH_AREA:
-                feature_result.push_back(f->countLengthArea());
-                break;
+          
             case MASSCENTER:
                 feature_result.push_back(f->massCenterX());
                 feature_result.push_back(f->massCenterY());
@@ -107,6 +168,13 @@ void extractFeature::extract_all_features_splited(string imgName, int nextImage,
                 feature_result.push_back(f->houghLinesHorizontals());
                 feature_result.push_back(f->houghLinesDiagonalPos());
                 feature_result.push_back(f->houghLinesDiagonalNegs());
+                feature_result.push_back(f->nbHoughLinesResult());
+                break;
+            case HOUGH_CIRCLES:
+                feature_result.push_back(f->houghCirclesX());
+                feature_result.push_back(f->houghCirclesY());
+                feature_result.push_back(f->houghCirclesRadius());
+                feature_result.push_back(f->nbHoughCirclesResult());
 
                 break;
 
@@ -143,15 +211,29 @@ void extractFeature::extract_all_features_global(string imgName, unsigned int cu
                 feature_result.push_back(f->countBlackPixel());
                 break;
             case AREA_GLOBAL:
-                feature_result.push_back(f->countArea());
+                feature_result.push_back(f->centerAreaRes().x);
+                feature_result.push_back(f->centerAreaRes().y);
+                feature_result.push_back(f->radiusAreaRes());
+
+                feature_result.push_back(f->triangleArea1().x);
+                feature_result.push_back(f->triangleArea1().y);
+
+                feature_result.push_back(f->triangleArea2().x);
+                feature_result.push_back(f->triangleArea2().y);
+
+                feature_result.push_back(f->triangleArea3().x);
+                feature_result.push_back(f->triangleArea3().y);
+                
+                feature_result.push_back(f->lengthContoursArea());
+                feature_result.push_back(f->contoursArea());
+
+
                 break;
             case HARRIS_CORNERS_GLOBAL:
                 feature_result.push_back(f->harrisCornerX());
                 feature_result.push_back(f->harrisCornerY());
                 break;
-            case LENGTH_AREA_GLOBAL:
-                feature_result.push_back(f->countLengthArea());
-                break;
+          
             case MASSCENTER_GLOBAL:
                 feature_result.push_back(f->massCenterX());
                 feature_result.push_back(f->massCenterY());
@@ -161,7 +243,15 @@ void extractFeature::extract_all_features_global(string imgName, unsigned int cu
                 feature_result.push_back(f->houghLinesHorizontals());
                 feature_result.push_back(f->houghLinesDiagonalPos());
                 feature_result.push_back(f->houghLinesDiagonalNegs());
+                feature_result.push_back(f->nbHoughLinesResult());
 
+                break;
+            case HOUGH_CIRCLES_GLOBAL:
+                feature_result.push_back(f->houghCirclesX());
+                feature_result.push_back(f->houghCirclesY());
+                feature_result.push_back(f->houghCirclesRadius());
+                feature_result.push_back(f->nbHoughCirclesResult());
+                
                 break;
             case ROWS_OR_COLS_GLOBAL:
                 feature_result.push_back(f->isLongerRowsOrCols());

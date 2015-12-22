@@ -29,18 +29,38 @@ public:
 	vector<Vec4i> hierarchy;
 	vector<vector<Point> > contours;
     vector<Moments> imMoments;
+    
+    
+    //Area params
+    vector<Point2f> triangleArea;
+    Point2f centerArea ;
+    float radiusArea;
+    double contourArea;
+    double lengthContourArea;
+    Rect boundRectangleArea; 
 
     Point2f massCenter;
     Point2f cornerHarrisPoint;
     double houghLines [4];
+    double houghCircles [3];
+
+    int nbHoughLines;
+    int nbHoughCircles;
 
 	
 	feature(Mat img, bool _isGlobal, string _imgName) : sourceImg(img), isGlobal(_isGlobal), imgName(_imgName){
         try{
-         cvtColor( img, this->graySourceImg, CV_BGR2GRAY);
+            cvtColor( img, this->graySourceImg, CV_BGR2GRAY);
             massCenter = Point2f(-1,-1);
             cornerHarrisPoint = Point2f(-1,-1);
             houghLines[0] = -1;
+            houghCircles[0] = -1;
+            radiusArea = -1;
+            Point2f p = Point2f(0,0);
+            triangleArea.push_back(p);
+            triangleArea.push_back(p);
+            triangleArea.push_back(p);
+
         }catch(Exception e){
             cout << e.msg <<endl;
             throw e;
@@ -67,18 +87,32 @@ public:
     
     
 
-    double countLengthArea();
-    double countArea();
     
     //1 if rows are bigger than cols else 0;
     int isLongerRowsOrCols();
     
-    
-    
+    //houghLines features
     double houghLinesHorizontals();
     double houghLinesVerticals();
     double houghLinesDiagonalPos();
     double houghLinesDiagonalNegs();
+    int nbHoughLinesResult();
+    
+
+    
+    int nbHoughCirclesResult();
+    double houghCirclesX();
+    double houghCirclesY();
+    double houghCirclesRadius();
+
+    //Area features
+    Point2f centerAreaRes();
+    double radiusAreaRes();
+    Point2f triangleArea1();
+    Point2f triangleArea2();
+    Point2f triangleArea3();
+    double lengthContoursArea();
+    double contoursArea();
 
 
     
@@ -86,6 +120,8 @@ private:
     void countMassCenter();
     void countHarrisCorners();
     void HoughLines();
+    void HoughCircles();
+    void Area();
 
 
 };

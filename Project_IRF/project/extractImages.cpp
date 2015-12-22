@@ -32,7 +32,7 @@ void extractImages::process(){
     if(NB_THREADS ==0)
         NB_THREADS = 1;
     
-    cout <<"Using up to threads :  "<< NB_THREADS <<endl;
+    cout <<"Using " << NB_THREADS << " threads  "<<endl;
     
     //init vars
     leftToProcess=sourcesImages.size();
@@ -43,7 +43,7 @@ void extractImages::process(){
     for(int i=0 ; i < NB_THREADS ; i++){
         vThreads.push_back(std::thread(&extractImages::processTask, std::ref(*this), sourcesImages, templatesImages));
     }
-    //give and to process first time
+    //give hand to process first time
     this_thread::yield();
     
     while(leftToProcess)
@@ -56,14 +56,13 @@ void extractImages::process(){
         //sleep to let others threads proccess
         sleep(1.5); //pour windows a faire
         //pour windows : http://stackoverflow.com/questions/10918206/cross-platform-sleep-function-for-c
+        //ou yield si marche pas
+
     }
     //wait for last threads & join
     for(auto& th : vThreads){
         th.join();
     }
-
-//    double pr=((double)currentToProcess/(double)nbImages)*100;
-//    cout<<"\t"<<setprecision(2)<<std::fixed<< pr<<"%   \r"<< flush ;
 
     
     xt = time(NULL) - xt;

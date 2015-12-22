@@ -154,23 +154,23 @@ void feature::HoughLines(){
     int threshold ;
     int minLinLength;
     int maxLineGap;
-    int AVG;
-
-    //    //TODO check better params
+    int GAP;
     if(isGlobal){
-        resolution = 1;
+        resolution = 3;
         threshold = 30;
-        minLinLength =3;
+        minLinLength =10;
         maxLineGap = 3;
-        AVG= 10;
+        GAP= 10;
     }else{
         //faire en fonction du splitted params
-        resolution = 1;
-        threshold = 10;
-        minLinLength =3;
-        maxLineGap = 5;
-        AVG = 5;
+        resolution = 5;
+        threshold = 30;
+        minLinLength =10;
+        maxLineGap = 10;
+        GAP = 10;
     }
+ 
+    
     
     vector<Vec4i> lines;
     
@@ -179,25 +179,20 @@ void feature::HoughLines(){
     Canny(this->sourceImg, dst, 50, 200, 3);
     cdst = dst.clone();
     HoughLinesP(dst, lines, resolution, CV_PI/180, threshold,minLinLength , maxLineGap );
-    
     double horizontal=0, vertical=0, diagonalPos=0, diagonalNeg=0;
         for( size_t i = 0; i < lines.size(); i++ )
         {
             Vec4i l = lines[i];
             if(u.VERBOSE)line( cdst, Point(l[0], l[1]), Point(l[2], l[3]), Scalar(180,8,255), 3, CV_AA);
           
-            if(abs(l[0] - l[2]) < AVG)             /*check if line is | */
+            if(abs(l[0] - l[2]) < GAP)           /*check if line is | */
                 vertical++;
-            else if(abs(l[1] - l[3]) < AVG)             /*check if line is -*/
+            else if(abs(l[1] - l[3]) < GAP)      /*check if line is - */
                 horizontal++;
             else if(l[1] < l[3])                 /*check if line is \ */
                 diagonalNeg++;
-            else if(l[1] > l[3])                /*check if line is / */
+            else if(l[1] > l[3])                 /*check if line is / */
                 diagonalPos++;
-          
-            
-        
-            
         }
     
     if(lines.size() > 0){
@@ -212,14 +207,18 @@ void feature::HoughLines(){
         houghLines[3] = 0;
         
     }
+    
+    nbHoughLines = (int)lines.size();
     if(u.VERBOSE){
         imshow("Hough lines", cdst);
         waitKey(1);
        // imshow("Canny ", dst);
-
         cout << "Hough :" << imgName << " : " <<  lines.size()<< endl;
     }
  }
+
+
+
 
 double feature::houghLinesVerticals(){
     if(houghLines[0] == -1)
@@ -246,7 +245,93 @@ double feature::houghLinesDiagonalPos(){
     return houghLines[3];
 }
 
-double feature::countArea(){
+int feature::nbHoughLinesResult(){
+    if(houghLines[0] == -1)
+        HoughLines();
+    
+    return nbHoughLines;
+}
+
+
+
+void feature::HoughCircles(){
+    int dp;
+    int minDist ;
+      if(isGlobal){
+        dp = 5;
+        minDist = 3;
+      
+    }else{
+        //faire en fonction du splitted params
+        dp = 8;
+        minDist = 1;
+    }
+    
+    vector<Vec3f> circles;
+    Mat dst, cdst;
+    cdst = this->sourceImg.clone();
+    GaussianBlur( this->graySourceImg, dst, Size(3, 3), 2, 2 );
+
+    double posX =0 , posY = 0, radius = 0 ;
+    cv::HoughCircles(dst, circles, HOUGH_GRADIENT,dp, minDist, 200, 50, 0, 0 );
+    
+    for( size_t i = 0; i < circles.size(); i++ )
+    {
+        posX += cvRound(circles[i][0]);
+        posY += cvRound(circles[i][1]);
+        radius += cvRound(circles[i][2]);
+        // draw the circle center
+        if(u.VERBOSE){
+            Point center(cvRound(circles[i][0]), cvRound(circles[i][1]));
+            circle( cdst, center, 3, Scalar(0,255,0), -1, 8, 0 );
+        }
+    }
+    if(circles.size())
+    {
+        houghCircles[0] =  ( posX /   (double) circles.size() );
+        houghCircles[1] =  ( posY /   (double) circles.size() );
+        houghCircles[2] =  ( radius / (double) circles.size() );
+       
+        houghCircles[0] = houghCircles[0]   / dst.cols *100;
+        houghCircles[1] = houghCircles[1]   / dst.rows *100;
+        houghCircles[2] = houghCircles[2]   / dst.rows *100;
+    }else{
+        houghCircles[0] = 0;houghCircles[1] = 0;houghCircles[2] = 0;
+    }
+    
+    nbHoughCircles =(int) circles.size();
+
+    if(u.VERBOSE){
+        imshow("Hough Cicles", cdst);
+        waitKey(1);
+        cout << "Cicles :" << imgName << " : " <<  circles.size()<< endl;
+    }
+}
+
+double feature::houghCirclesX(){
+    if(houghCircles[0] == -1)HoughCircles();
+    
+    return houghCircles[0];
+}
+double feature::houghCirclesY(){
+    if(houghCircles[0] == -1)HoughCircles();
+    
+    return houghCircles[1];
+}
+
+double feature::houghCirclesRadius(){
+    if(houghCircles[0] == -1)HoughCircles();
+    
+    return houghCircles[2];
+}
+int feature::nbHoughCirclesResult(){
+    if(houghCircles[0] == -1)HoughCircles();
+    
+    return nbHoughCircles;
+}
+
+
+void feature::Area(){
     
     //    //TODO
     //    //
@@ -256,15 +341,12 @@ double feature::countArea(){
     //        //params
     //    }
     Mat src_gray;
-    //RNG rng(12345);
-//    int thresh = 100;
-    //int IMG_GAP = 1;
-  //  cvtColor( src, src_gray, CV_BGR2GRAY );
+
     blur( this->graySourceImg, src_gray, Size(1,1) );
-    Mat img;
+    Mat img, cdst;
     vector<vector<Point> > contours;
     vector<Vec4i> hierarchy;
-    
+    cdst = this->sourceImg.clone();
     /// Detect edges using canny
     Canny( src_gray, img, 0, 300, 3 );
     /// Find contours
@@ -274,70 +356,108 @@ double feature::countArea(){
     
     for(int i = 0 ;i< contours.size() ; i++){
         
-        for(int j= 0 ; j< contours[i].size() ; j++){
-//            if(contours[i][j].x > IMG_GAP && contours[i][j].x < img.cols -IMG_GAP &&
-//               contours[i][j].y > IMG_GAP && contours[i][j].y < img.rows -IMG_GAP ){
-                allcontours.push_back(contours[i][j]);
-                
-                
-//            }
+        for(int j= 0 ; j< contours[i].size() ; j++)
+        {
+            allcontours.push_back(contours[i][j]);
         }
     }
     vector<Point> approx;
-
+    
+  
     if(allcontours.size() >0){
+       
         approxPolyDP(allcontours, approx, 1, true);
-        return (double) contourArea(approx) / (double)(this->graySourceImg.rows * this->graySourceImg.cols);
+        boundRectangleArea =  boundingRect( approx );
 
-    }
-    else
-        return 0;
-}
+        minEnclosingCircle(approx, centerArea, radiusArea);
 
-
-double feature::countLengthArea(){
-    
-    //    //TODO
-    //    //
-    //    if(isGlobal){
-    //        //params
-    //    }else{
-    //        //params
-    //    }
-    Mat src_gray;
-    RNG rng(12345);
-    
-    blur( this->graySourceImg, src_gray, Size(3,3) );
-    Mat canny_output;
-    vector<vector<Point> > contours;
-    vector<Vec4i> hierarchy;
-    
-    /// Detect edges using canny
-    Canny( src_gray, canny_output, 0, 300, 3 );
-    /// Find contours
-    findContours( canny_output, contours, hierarchy, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_NONE, Point(0, 0) );
-    
-    
-    vector<Point> allcontours;
-    
-    for(int i = 0 ;i< contours.size() ; i++){
+        minEnclosingTriangle(approx, triangleArea);
         
-        for(int j= 0 ; j< contours[i].size() ; j++){
-            //            if(contours[i][j].x > IMG_GAP && contours[i][j].x < img.cols -IMG_GAP &&
-            //               contours[i][j].y > IMG_GAP && contours[i][j].y < img.rows -IMG_GAP ){
-            allcontours.push_back(contours[i][j]);
+        contourArea = cv::contourArea(approx);
+        lengthContourArea = arcLength(allcontours, false);
+        
+        if(u.VERBOSE){
+            double x =0, y =0;
+            for(int i = 0 ; i< approx.size(); i++){
+                circle( cdst, approx[i], 3, Scalar(0,255,0), -1, 4, 0 );
+                
+                x += approx[i].x;
+                y += approx[i].y;
+            }
             
+            x /= approx.size();
+            y /= approx.size();
             
-            //            }
+            circle( cdst, Point(x,y) , 3, Scalar(255,0,0), -1, 8, 0 );
+            
+            rectangle(cdst,boundRectangleArea,Scalar(0,0,255));
+          
+            circle(cdst, centerArea,radiusArea,  Scalar(200,200,14) );
+            circle(cdst, centerArea, 3,  Scalar(200,200,200), -1, 8, 0 );
+
+            
+            line(cdst, triangleArea[0],triangleArea[1], Scalar(100,100,100));
+            line(cdst, triangleArea[1],triangleArea[2], Scalar(100,100,100));
+            line(cdst, triangleArea[2],triangleArea[0], Scalar(100,100,100));
+
+            imshow("Area", cdst);
+            waitKey(1);
         }
     }
-    if(allcontours.size() >0){
-        return (double) arcLength(allcontours, false) / (double)(this->graySourceImg.rows * this->graySourceImg.cols);
+    else{
+        contourArea = 0;
+        lengthContourArea = 0;
+        radiusArea = 0 ;
+     
+
+        
+        centerArea = Point(0,0);
         
     }
-    else
-        return 0;
 }
+
+//TODO contourArea
+//TODO lenghtContourArea
+
+Point2f feature::centerAreaRes(){
+    if(radiusArea == -1)Area();
+    centerArea.x = centerArea.x / this->sourceImg.cols * 100;
+    centerArea.y = centerArea.y / this->sourceImg.rows * 100;
+    return centerArea;
+}
+double feature::radiusAreaRes(){
+    if(radiusArea == -1)Area();
+    return radiusArea;
+}
+double feature::contoursArea(){
+    if(radiusArea == -1)Area();
+    return contourArea;
+}
+double feature::lengthContoursArea(){
+    if(radiusArea == -1)Area();
+    return lengthContourArea;
+}
+Point2f feature::triangleArea1(){
+    if(radiusArea == -1)Area();
+    triangleArea[0].x = triangleArea[0].x / this->sourceImg.cols * 100;
+    triangleArea[0].y = triangleArea[0].y / this->sourceImg.rows * 100;
+    return triangleArea[0];
+}
+Point2f feature::triangleArea2(){
+    if(radiusArea == -1)Area();
+    triangleArea[1].x = triangleArea[1].x / this->sourceImg.cols * 100;
+    triangleArea[1].y = triangleArea[1].y / this->sourceImg.rows * 100;
+    return triangleArea[0];
+}
+Point2f feature::triangleArea3(){
+    if(radiusArea == -1)Area();
+    triangleArea[1].x = triangleArea[1].x / this->sourceImg.cols * 100;
+    triangleArea[1].y = triangleArea[1].y / this->sourceImg.rows * 100;
+    return triangleArea[0];
+}
+
+
+
 
 double feature::massCenterX(){
     
@@ -364,15 +484,16 @@ double feature::massCenterY(){
 
 //PRIVATE
 void feature::countMassCenter(){
-    //    //TODO
-    //    //
-    //    if(isGlobal){
-    //        //params
-    //    }else{
-    //        //params
-    //    }
+        //TODO
+        //
+    int thresh;
+    if(isGlobal){
+       thresh  = 140;
+
+    }else{
+        thresh = 100;
+    }
     if(this->massCenter.x == -1 && this->massCenter.y == -1){
-        int thresh = 140;
         Mat src_gray;
         RNG rng(12345);
         
