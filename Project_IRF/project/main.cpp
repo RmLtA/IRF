@@ -236,14 +236,14 @@ void process_features()
         {
             cout << "error : Splitted images are not equivalent to SPLIT_FACTOR" << endl;
             cout << "try again with NORMALIZE to reconstruct images (-normalize) or FEATURES with options [-features -split 9] to tell last nb of splitted images " <<endl;
-            return;
+            exit(0);
         }
         
         if(v_result_images_toextract_features_global.size()== 0)
         {
             cout << "error : Your are not saving normalized images" << endl;
             cout << "change save normalized to true  " <<endl;
-            return;
+            exit(0);
         }
         
         

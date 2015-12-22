@@ -10,7 +10,7 @@ std::mutex OutMtx;           // mutex for critical section
 void extractFeature::compute_features(vector<int>& v_of_attributes_splited, vector<string>& v_result_images_toextract_features_splited,
                                       vector<int>& v_of_attributes_global, vector<string>& v_result_images_toextract_features_global){
 
-    
+    time_t xt = time(NULL);
     utils & u = utils::i();
 	//delete duplicates in v_of_attributes 
 	sort(v_of_attributes_splited.begin(), v_of_attributes_splited.end());
@@ -19,8 +19,6 @@ void extractFeature::compute_features(vector<int>& v_of_attributes_splited, vect
     //delete duplicates in v_of_attributes
     sort(v_of_attributes_global.begin(), v_of_attributes_global.end());
     v_of_attributes_global.erase(unique(v_of_attributes_global.begin(), v_of_attributes_global.end()), v_of_attributes_global.end());
-    
-    
     
     //nombre d'attributs par feature splited.
     nbSplitedFeatures =0;
@@ -81,6 +79,8 @@ void extractFeature::compute_features(vector<int>& v_of_attributes_splited, vect
     }
 
     
+    xt = time(NULL) - xt;    
+    cout << " Temps d'exec.: " << setprecision(2)<< (double)xt/60 <<" min";;
 
     cout <<endl;
     //on ajoute la classe
@@ -114,14 +114,13 @@ void extractFeature::processTask(extractFeature& self, vector<string> v_result_i
             self.extract_all_features_splited(imgName, (int)i , offset*self.nbSplitedFeatures+self.nbGlobalFeatures);
         }
     }
-
 }
 
 
 void extractFeature::extract_all_features_splited(string imgName, int nextImage, int currentPos){
     Mat img = imread(imgName);
     if(img.rows ==0 || img.cols==0){
-        cout << "Extract Feature:: error with " << imgName << endl;
+        //cout << "Extract Feature:: error with " << imgName << endl;
         return; 
     }
     //feature :: is global ? = false
@@ -269,9 +268,63 @@ void extractFeature::extract_all_features_global(string imgName, unsigned int cu
     
     delete f;
     
+    
+
+    
 }
 
-
+string extractFeature::getGlobalFeatureName(int f){
+    switch (f) {
+        case BLACK_PIXEL_GLOBAL:
+            return "Black Pixels Global " + to_string(f);
+            break;
+        case AREA_GLOBAL:
+            return "Area Global " + to_string(f);
+            break;
+        case HARRIS_CORNERS_GLOBAL:
+            return "Harris Corners Global " + to_string(f);
+            break;
+        case MASSCENTER_GLOBAL:
+            return "Mass Center Global " + to_string(f);
+            break;
+        case HOUGH_LINES_GLOBAL:
+            return "Hough Lines Global " + to_string(f);
+            break;
+        case HOUGH_CIRCLES_GLOBAL:
+            return "Hough Circles Global " + to_string(f);
+            break;
+        case ROWS_OR_COLS_GLOBAL:
+            return "Rows (1) or Cols Global " + to_string(f);
+            break;
+        default:
+            return "No Name set";
+    }
+}
+string extractFeature::getSplitedFeatureName(int f){
+    switch (f) {
+        case BLACK_PIXEL:
+            return "Black Pixels " + to_string(f);
+            break;
+        case AREA:
+            return "Area " + to_string(f);
+            break;
+        case HARRIS_CORNERS:
+            return "Harris Corners " + to_string(f);
+            break;
+        case MASSCENTER:
+            return "Mass Center " + to_string(f);
+            break;
+        case HOUGH_LINES:
+            return "Hough Lines " + to_string(f);
+            break;
+        case HOUGH_CIRCLES:
+            return "Hough Circles " + to_string(f);
+            break;
+       
+        default:
+            return "No Name set";
+    }
+}
 
 
 //No modification on adding features

@@ -16,9 +16,9 @@ void normalizeImages::process(){
     if(saveNormalized) op->removeAllResNormalizedFiles();
     op->removeAllResSplittedFiles();
     
-    clock_t prog_b, prog_e;
-    double cpuTime;
-    prog_b = clock();
+    //clock_t prog_b, prog_e;
+    //double cpuTime;
+    //prog_b = clock();
     time_t xt = time(NULL);
     
 
@@ -73,12 +73,12 @@ void normalizeImages::process(){
     
     //output time results
     xt = time(NULL) - xt;
-    prog_e = clock();
+   // prog_e = clock();
     //output operations results
-    cpuTime = (double) ((prog_e - prog_b) / (double)CLOCKS_PER_SEC);
+   // cpuTime = (double) ((prog_e - prog_b) / (double)CLOCKS_PER_SEC);
     cout << endl << setprecision(3)
     << "Total : " << (currentToProcess-nErroImg)*u.SPLIT_FACTOR << " / " << nbImages*u.SPLIT_FACTOR << "\t"
-    << "| Temps d'exec.: " << setprecision(2)<< (double)xt/60. <<" min";;
+    << "| Temps d'exec.: " << setprecision(2)<< (double)xt/60 <<" min";;
 
 
     delete op;

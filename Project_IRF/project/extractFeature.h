@@ -21,10 +21,7 @@ class extractFeature{
 public :
     
     
-    unsigned long int leftToProcess;
-    unsigned long int currentToProcess;
-    
-    unsigned long int toProcess;
+   
 	
 	vector<vector<double>> v_all_numeric_v_attributes_values;
 	vector<string> v_class;
@@ -72,6 +69,9 @@ public :
     void compute_features(vector<int>& v_of_attributes_splited, vector<string>& v_result_images_toextract_features_splited,
                           vector<int>& v_of_attributes_global, vector<string>& v_result_images_toextract_features_global);
     
+    string getSplitedFeatureName(int f);
+    string getGlobalFeatureName(int f);
+
 
     
 private:
@@ -79,6 +79,9 @@ private:
 
     int nbSplitedFeatures;
     int nbGlobalFeatures;
+    unsigned long int leftToProcess;
+    unsigned long int currentToProcess;
+    unsigned long int toProcess;
     
     void extract_all_features_splited(string imgName, int i, int offset);
     void extract_all_features_global(string imgName, unsigned int currImage);

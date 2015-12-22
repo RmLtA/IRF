@@ -168,27 +168,45 @@ string fileOp::getExtName(string name){
 void fileOp::writeARFFFile(extractFeature& extrfeat){
     utils & u = utils::i();
     cout <<  "Saving Arff FILE"<<endl;;
+    stringstream ssFeatures;
+    stringstream ssFilename;
+    ssFilename << "f_g_";
+    for (int i = 0; i < extrfeat.v_attributes_asked_global.size(); i++){
+        ssFeatures << "% " <<extrfeat.getGlobalFeatureName(extrfeat.v_attributes_asked_global[i]) << endl;
+        ssFilename << to_string(extrfeat.v_attributes_asked_global[i]) << "_";
+    }
+    ssFilename <<"s_";
+    for (int i = 0; i < extrfeat.v_attributes_asked_splited.size(); i++){
+        ssFeatures << "% " <<extrfeat.getSplitedFeatureName(extrfeat.v_attributes_asked_splited[i]) << endl;
+        ssFilename << to_string(extrfeat.v_attributes_asked_splited[i]) << "_";
+    }
+    ssFilename << "split_" << u.SPLIT_FACTOR <<".arff";
+    
     string name;
-    cout << "Name of Arff file : " << endl;
+    cout << "Name of Arff file : (press \"d\" for : " <<ssFilename.str() << endl;
     cin >> name;
-    if(name != "" || name != "\0")
+    if((name != "" || name != "\0" )&& name != "d")
         name +=".arff";
     else
-        name = "IRF.arff";
+        name = ssFilename.str();
 
     ofstream pFile(dirResArffdName + name, ios::out);
 
 
     /*Begin Head File*/
     pFile << "%1. Title : " << endl;
-    pFile << "%" << endl;
+    pFile << "% " << ssFilename.str()<<  endl;
     pFile << "%2. Sources : " << endl;
+    pFile << "% Features asked :"<<endl;
+    pFile << ssFeatures.str();
     pFile << "%" << endl;
     pFile << "%" << endl;
     pFile << "%" << endl;
     pFile << "@RELATION Imagette" << endl;
     pFile << endl;
 
+    
+   
     
     pFile << "% Global features from the images :" << endl;
     for (int i = 0; i < extrfeat.v_attributes_asked_global.size(); i++){
