@@ -67,7 +67,7 @@ int main(int argc, const char * argv[]) {
         
         process_extract();
     }
-    
+       
     int nb =1;
     if(u.CREATE_VARIOUS && u.GET_FEATURES){
      
@@ -292,10 +292,8 @@ void process_features()
             "Hough_Lines          ",
             "Hough_Circles        ",
             "Rows or Cols Longer  ",
-            "Pixels (Only for csv)"
-
         };
-        
+        if(u.CSV) v_features_available_global.push_back("Pixels (Only for csv)");
         //Features to extract
         vector<int> v_features_to_extract_global;
         cout <<endl<< "GLOBAL FEATURES" <<endl;
@@ -321,6 +319,9 @@ void process_features()
         
         extract_feature->compute_features(v_features_to_extract_splited,v_result_images_toextract_features_splited,
                                           v_features_to_extract_global, v_result_images_toextract_features_global);
+        
+        
+        
         if(u.CSV)
             op->writeCSV(*extract_feature);
         else
