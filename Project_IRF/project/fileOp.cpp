@@ -168,12 +168,11 @@ string fileOp::getExtName(string name){
 
 void fileOp::writeCSV(extractFeature& extrfeat){
     
-    
-    string name;
-    cout << "Name of CSV file : " << endl;
-    cin >> name;
-    name+=".csv";
+    cout <<  "Saving CSV FILE"<<endl;;
+    string name = setFeatureFilename(extrfeat, true);
+
     ofstream pFile(dirResCSVName + name, ios::out);
+    cout << "Saved as :" << name <<endl;
 
     
     for(int i = 0 ; i < extrfeat.v_all_numeric_v_attributes_values.size() ; i++){
@@ -187,9 +186,8 @@ void fileOp::writeCSV(extractFeature& extrfeat){
     pFile.close();
 }
 
-void fileOp::writeARFFFile(extractFeature& extrfeat){
-    utils & u = utils::i();
-    cout <<  "Saving Arff FILE"<<endl;;
+
+string fileOp::setFeatureFilename(extractFeature& extrfeat, bool isCSV){
     stringstream ssFeatures;
     stringstream ssFilename;
     ssFilename << "f_g_";
@@ -205,22 +203,34 @@ void fileOp::writeARFFFile(extractFeature& extrfeat){
     ssFilename << "split_" << u.SPLIT_FACTOR <<".arff";
     
     string name;
-    cout << "Name of Arff file : (press \"d\" for : " <<ssFilename.str() << endl;
-    cin >> name;
-    if((name != "" || name != "\0" )&& name != "d")
-        name +=".arff";
-    else
+    if(u.RESULT){
+        cout << "Name of " << (isCSV ? "CSV" :"Arff" ) << "file : (press \"d\" for : " <<ssFilename.str() << endl;
+        cin >> name;
+        if((name != "" || name != "\0" )&& name != "d")
+            name += (isCSV ? ".csv" : ".arff") ;
+        else
+            name = ssFilename.str();
+
+    }else{
         name = ssFilename.str();
+    }
+  
+    return name;
+}
 
+void fileOp::writeARFFFile(extractFeature& extrfeat){
+    utils & u = utils::i();
+    cout <<  "Saving Arff FILE"<<endl;;
+    string name = setFeatureFilename(extrfeat, false);
     ofstream pFile(dirResArffName + name, ios::out);
-
+    cout << "Saved as :" << name <<endl;
 
     /*Begin Head File*/
     pFile << "%1. Title : " << endl;
-    pFile << "% " << ssFilename.str()<<  endl;
+//    pFile << "% " << ssFilename.str()<<  endl;
     pFile << "%2. Sources : " << endl;
-    pFile << "% Features asked :"<<endl;
-    pFile << ssFeatures.str();
+//    pFile << "% Features asked :"<<endl;
+//    pFile << ssFeatures.str();
     pFile << "%" << endl;
     pFile << "%" << endl;
     pFile << "%" << endl;

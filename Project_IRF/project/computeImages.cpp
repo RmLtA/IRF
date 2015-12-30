@@ -134,37 +134,37 @@ bool computeImages::findTemplArea(Mat templ, string currentName, bool secondPass
          //if(verbose)  imshow(currentName, ligne);
       
     }else if(maxVal > (myThresholdVal - acceptance ) && secondPass != true){
-        if(verbose)
-        {   stringstream ss;
-            
-            cout << " \t\t ~~~~~~";
-            ss<< "  values ::" ;
-            //<<" minLoc : " << minLoc <<
-            ss<<"  maxLoc : " << maxLoc << " \t";
-            //minVal : " << minVal <<
-            ss<<"  maxVal : " << maxVal;
-            string s = ss.str(); s.resize(100, ' ');
-            cout << s << " trying again..." << endl;;
-            
-        }
+//        if(verbose)
+//        {   stringstream ss;
+//            
+//            cout << " \t\t ~~~~~~";
+//            ss<< "  values ::" ;
+//            //<<" minLoc : " << minLoc <<
+//            ss<<"  maxLoc : " << maxLoc << " \t";
+//            //minVal : " << minVal <<
+//            ss<<"  maxVal : " << maxVal;
+//            string s = ss.str(); s.resize(100, ' ');
+//            cout << s << " trying again..." << endl;;
+//            
+//        }
         return findTemplArea(templ, currentName, true);
     }
     
-    if(verbose)
-    {   stringstream ss;
-
-        cout << (secondPass ? " \t\t\t\t\t\t\t\t ===> " :" \t\t ")
-        << (founded ? "//////" : "||||||");
-        ss<< "  values ::" ;
-        //<<" minLoc : " << minLoc
-        ss<< "  maxLoc : " << maxLoc << " \t";
-        //minVal : " << minVal
-        ss<< "  maxVal : " << maxVal;
-        string s = ss.str(); s.resize(100, ' ');
-        cout << s << "" << (founded ? "found " : " not found ");
-      
-
-    }
+//    if(verbose)
+//    {   stringstream ss;
+//
+//        cout << (secondPass ? " \t\t\t\t\t\t\t\t ===> " :" \t\t ")
+//        << (founded ? "//////" : "||||||");
+//        ss<< "  values ::" ;
+//        //<<" minLoc : " << minLoc
+//        ss<< "  maxLoc : " << maxLoc << " \t";
+//        //minVal : " << minVal
+//        ss<< "  maxVal : " << maxVal;
+//        string s = ss.str(); s.resize(100, ' ');
+//        cout << s << "" << (founded ? "found " : " not found ");
+//      
+//
+//    }
     return founded;
     
 }

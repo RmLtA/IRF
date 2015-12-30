@@ -95,7 +95,8 @@ public:
 
 private:
     vector<string> readDir(string dirName);
-    
+    string setFeatureFilename(extractFeature& extrfeat, bool isCSV);
+
     //vector<string> find_image_name(void);
 
 

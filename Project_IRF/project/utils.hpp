@@ -33,10 +33,10 @@ public:
     bool NORMALIZE = false;
     bool CREATE_VARIOUS = true;
     bool CSV = false;
-
+    bool ARFF = true; //default
     
     int SPLIT_FACTOR = -1;
-
+    int SIZE_IMAGE = 130; //default 
     
     static utils& i()
     {

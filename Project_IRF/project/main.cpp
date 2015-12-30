@@ -70,15 +70,13 @@ int main(int argc, const char * argv[]) {
        
     int nb =1;
     if(u.CREATE_VARIOUS && u.GET_FEATURES){
-     
-        cout << "How many Arff Files ? " << endl;
+        cout << "How many features files ? (" << (u.ARFF ? "Arff " : "") << (u.CSV ? "CSV " : "") << "file)"<< endl;
         cin >> nb;
     }
     
     
-    
     for(int i=0 ; i<nb ; i++){
-        cout << "Creating Arff : "<<i+1<<  endl;
+        cout << "Creating feature file : "<<i+1<<  endl;
         
         if (u.NORMALIZE){
             cout << "\nNormalizing images..." << endl;
@@ -120,8 +118,9 @@ void get_args(int argc, const char * argv[]){
         else if (a == "-a" || a =="-all") u.GET_FEATURES = u.EXTRACT_IMAGES = u.NORMALIZE= true;
         else if (a == "-test" || a =="-t") u.TEST =true;
         else if (a == "-remove") u.REMOVE_SOURCE = true;
-        else if (a == "-csv") u.CSV = true;
-
+        else if (a == "-csv") {u.CSV = true ; u.ARFF = false ; }
+        else if (a == "-arff") {u.ARFF = true;}
+        
         else if (a == "-split" || a== "-s")
         {
             if(i+1 < argc){
@@ -155,6 +154,10 @@ void get_args(int argc, const char * argv[]){
             
             cout << "Autres : "<<endl;
             
+            cout << "\t-csv       |    : creer un fichier csv "<< endl;;
+            cout << "\t-arff      |   : creer un fichier arff "<< endl;;
+            cout << "\t-csv -arff |   : creer un fichier csv et arff "<< endl;;
+
 
             cout << "\t-remove    |    : supprimer les fichiers resultats (a faire avant commit)"<< endl;;
             cout << "\t-help      | -h : cette page"<< endl;;
@@ -203,7 +206,6 @@ void process_normalize()
     if(lastFactor!= u.SPLIT_FACTOR)
     {
         
-        //if(u.VERBOSE)cout <<"Save Normalized is set to : " << SAVE_NORMALIZED << endl;;
         normalizeImages * n = new normalizeImages(DO_SQUARE);
         lastFactor =u.SPLIT_FACTOR;
 
@@ -224,16 +226,17 @@ void process_features()
     fileOp *  op = new fileOp();
     try{
         
-  
-
         //Name of Images used to extract featires
         //ON UTILISE LES IMAGES NORMALIZEES
         //VOIR IMAGES SPLITTED
         vector<string> v_result_images_toextract_features_splited = op->getSplitedImages();
         vector<string> v_result_images_toextract_features_global = op->getNormalizedImages();
+        
+        
+
 
         
-        if(v_result_images_toextract_features_splited.size() % u.SPLIT_FACTOR != 0)
+        if(v_result_images_toextract_features_splited.size() % u.SPLIT_FACTOR != 0 && u.SPLIT_FACTOR != 1)
         {
             cout << "error : Splitted images are not equivalent to SPLIT_FACTOR" << endl;
             cout << "try again with NORMALIZE to reconstruct images (-normalize) or FEATURES with options [-features -split 9] to tell last nb of splitted images " <<endl;
@@ -246,6 +249,10 @@ void process_features()
             cout << "change save normalized to true  " <<endl;
             exit(0);
         }
+        
+        
+     
+
         
         
 
@@ -261,24 +268,27 @@ void process_features()
             "Hough_Circles        "
 
         };
-
-        //Features to extract
-        vector<int> v_features_to_extract_splited;
-        cout <<endl<< "SPLITED FEATURES" <<endl;
-        cout << "All features available for splited image :" << endl;
-        for (int i = 0; i<v_features_available_splited.size();i++){
-            cout << "   -"<<v_features_available_splited[i] << "\t\t\t : Tape "<< i+1<< endl;
-        }
-        cout << "To finish : Tape 0" << endl;
-
         int features_toextract;
-        cin >> features_toextract;
-        while (features_toextract != 0) {
-            if(features_toextract <= v_features_available_splited.size())
-                v_features_to_extract_splited.push_back(features_toextract);
+        vector<int> v_features_to_extract_splited;
+        //if we choosed to split images
+        if(u.SPLIT_FACTOR >1){
+            //Features to extract
+            cout <<endl<< "SPLITED FEATURES" <<endl;
+            cout << "All features available for splited image :" << endl;
+            for (int i = 0; i<v_features_available_splited.size();i++){
+                cout << "   -"<<v_features_available_splited[i] << "\t\t\t : Tape "<< i+1<< endl;
+            }
+            cout << "To finish : Tape 0" << endl;
+
             cin >> features_toextract;
-            
+            while (features_toextract != 0) {
+                if(features_toextract <= v_features_available_splited.size())
+                    v_features_to_extract_splited.push_back(features_toextract);
+                cin >> features_toextract;
+                
+            }
         }
+        
         
         //ici features pour les images globales
         //peuvent etre différentes ==
@@ -292,9 +302,9 @@ void process_features()
             "Hough_Lines          ",
             "Hough_Circles        ",
             "Rows or Cols Longer  ",
+            "All Pixels in B/W    "
         };
-        if(u.CSV) v_features_available_global.push_back("Pixels (Only for csv)");
-        //Features to extract
+        
         vector<int> v_features_to_extract_global;
         cout <<endl<< "GLOBAL FEATURES" <<endl;
         cout << "All features available for the global image :" << endl;
@@ -310,6 +320,14 @@ void process_features()
             cin >> features_toextract;
             
         }
+        
+        //getting size of image to calculate pixels
+        Mat img = imread(v_result_images_toextract_features_global[0]);
+        if(img.rows >= img.cols){
+            u.SIZE_IMAGE = img.rows;
+        }else{
+            u.SIZE_IMAGE = img.cols;
+        }
 
         
         cout << "Ok, computing... "<<endl;
@@ -322,10 +340,9 @@ void process_features()
         
         
         
-        if(u.CSV)
-            op->writeCSV(*extract_feature);
-        else
-            op->writeARFFFile(*extract_feature);
+        if(u.CSV)op->writeCSV(*extract_feature);
+        
+        if(u.ARFF)op->writeARFFFile(*extract_feature);
         
         delete extract_feature;
         

@@ -58,9 +58,9 @@ public :
     vector<int> nb_features_by_attributes_global;
 	extractFeature(){
         //nombre de features differentes par features (voir mass center par exemple (2)
+        utils & u = utils::i();
         nb_features_by_attributes_splited = { 0 ,1 ,11 ,2 ,2 ,5, 4};
-        nb_features_by_attributes_global =  { 0 ,1 ,11 ,2 ,2 ,5, 4, 1, 784 };
-        
+        nb_features_by_attributes_global =  { 0 ,1 ,11 ,2 ,2 ,5, 4, 1, u.SIZE_IMAGE*u.SIZE_IMAGE };
 	}
     
 

@@ -16,23 +16,40 @@ void normalizeImages::process(){
     op->removeAllResNormalizedFiles();
     op->removeAllResSplittedFiles();
     
-    //clock_t prog_b, prog_e;
-    //double cpuTime;
-    //prog_b = clock();
+    
     time_t xt = time(NULL);
     
 
     vector<string> resultImages = op->getResultImages();
     unsigned long int nbImages =resultImages.size();
-
-    cout << "Images to process : "  << nbImages * u.SPLIT_FACTOR << endl;
-    if(squareImg) cout << "Images 'll be resized in : " << sizeImg <<"x"<<sizeImg << " px" <<endl;
+    if(u.RESULT){
+        cout << "Images to process : "  << nbImages * u.SPLIT_FACTOR << endl;
+        cout << "Crop images in squares ?  (Y :1 , N:0)" << endl;
+        int in;
+        cin >>in;
+        squareImg = ((in == 1) ? 1 : 0);
+       
+        int size;
+        cout << "Size to resize images : (press 0 for " << sizeImg << ")"<<endl;
+        cin >> size;
+        if(size) sizeImg = size;
+        cout << "OK, ";
+    }
+    if(squareImg) {
+        cout << "Images 'll be resized in : " << sizeImg <<"x"<<sizeImg << " px" <<endl;
+    }else{
+        cout << "Images 'll be resized with max " << sizeImg <<"px  (height or width)" <<endl;
+    }
+    
+    
+    u.SIZE_IMAGE = sizeImg;
+   
   
     vector<thread> vThreads;
     int NB_THREADS = thread::hardware_concurrency();
     if(NB_THREADS ==0)NB_THREADS = 1;
     
-    cout <<"Using " << NB_THREADS << " threads  "<<endl;
+    if(u.RESULT)cout <<"Using " << NB_THREADS << " threads  "<<endl;
     
     //init vars
     leftToProcess=resultImages.size();
@@ -63,20 +80,16 @@ void normalizeImages::process(){
     cout<<"\t"<<setprecision(2)<<std::fixed<< pr<<"%   \r"<< flush ;
 
     
-    if(u.RESULT){
+    if(u.VERBOSE){
         if(nbImages !=0){ //prevent div 0 
             moy_rows /=nbImages;
             moy_cols /=nbImages;
             cout << "Avg size cols : " << moy_cols << " \t Avg size rows : " << moy_rows <<endl;;
-            cout << "Resized image size : " << sizeImg <<"x" << sizeImg<<endl;
         }
     }
     
     //output time results
     xt = time(NULL) - xt;
-   // prog_e = clock();
-    //output operations results
-   // cpuTime = (double) ((prog_e - prog_b) / (double)CLOCKS_PER_SEC);
     cout << endl << setprecision(3)
     << "Total : " << (currentToProcess-nErroImg)*u.SPLIT_FACTOR << " / " << nbImages*u.SPLIT_FACTOR << "\t"
     << "| Temps d'exec.: " << setprecision(2)<< (double)xt/60 <<" min";;
@@ -109,12 +122,12 @@ void normalizeImages::processTask(normalizeImages& self,vector<string> resultIma
             Mat box = normalizeImages::boundingBox(img, current);
             if(box.rows == 0 || box.cols == 0 )
             {
-                if(u.RESULT)cout << "Error with image : "<< current <<endl;
+                if(u.VERBOSE)cout << "Error with image : "<< current <<endl;
                 self.nErroImg++;
                 continue;
             }
             
-            if(u.RESULT){
+            if(u.VERBOSE){
                 self.moy_cols +=box.cols;
                 self.moy_rows +=box.rows;
             }
@@ -125,18 +138,20 @@ void normalizeImages::processTask(normalizeImages& self,vector<string> resultIma
                 res = box;
             
             
-            if(u.VERBOSE) cout << "\nProcess... : \n" << current;
+//            if(u.VERBOSE) cout << "\nProcess... : \n" << current;
             //cout << i << endl;
             op->writeNormalized(current,res);
             
-            
-            vector<Mat> splited = normalizeImages::splitImage(u.SPLIT_FACTOR, res);
-            for(int j = 0 ; j < splited.size(); j++)
-            {
-                stringstream   ss;
-                ss << current << "_" << j;
-                op->writeSplited(ss.str(),splited[j]);
+            if(u.SPLIT_FACTOR >1){
+                vector<Mat> splited = normalizeImages::splitImage(u.SPLIT_FACTOR, res);
+                for(int j = 0 ; j < splited.size(); j++)
+                {
+                    stringstream   ss;
+                    ss << current << "_" << j;
+                    op->writeSplited(ss.str(),splited[j]);
+                }
             }
+      
                         
         }catch(Exception e){
             cout << "Error with image : "<< current <<endl;

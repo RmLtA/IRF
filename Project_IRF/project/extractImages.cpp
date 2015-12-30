@@ -2,9 +2,6 @@
 //  extractImages.cpp
 //  ProjectIRF
 //
-//  Created by Cyrille Delabre on 08/12/2015.
-//  Copyright © 2015 Cyrille Delabre. All rights reserved.
-//
 
 #include "extractImages.hpp"
         // std::mutex
@@ -64,15 +61,16 @@ void extractImages::process(){
         th.join();
     }
 
+    if(u.RESULT){
+        xt = time(NULL) - xt;
+        prog_e = clock();
+        //output operations results
+        cpuTime = (double) ((prog_e - prog_b) / (double)CLOCKS_PER_SEC);
+        cout << endl << setprecision(2)
+        << "Total imagettes : " << nTotalImg << " / " << 35*(nbImages-nErroImg) << "\t"
+        << "| Temps d'exec.: " << (double)xt/60. <<" min"<<endl;; 
+    }
     
-    xt = time(NULL) - xt;
-    prog_e = clock();
-    //output operations results
-    cpuTime = (double) ((prog_e - prog_b) / (double)CLOCKS_PER_SEC);
-    cout << endl << setprecision(2)
-    << "Total imagettes : " << nTotalImg << " / " << 35*(nbImages-nErroImg) << "\t"
-    << "| Temps d'exec.: " << (double)xt/60. <<" min"<<endl;;
-
     delete op;
 }
 
@@ -101,8 +99,8 @@ void extractImages::processTask(extractImages& self,const vector<string>&  sourc
         
         try{
             pageCourante = op->getFilename(sourceImage);
-            if(u.VERBOSE)output << "Traitement de la source : "<<sourceImage  << " ( " << pageCourante << " )" <<endl;
-            if(u.RESULT && !u.VERBOSE)output << pageCourante << " ::";
+//            if(u.VERBOSE)output << "Traitement de la source : "<<sourceImage  << " ( " << pageCourante << " )" <<endl;
+            if(u.VERBOSE)output << pageCourante << " ::";
             
             
             vector<templateArea> foundTemplate;
@@ -115,7 +113,7 @@ void extractImages::processTask(extractImages& self,const vector<string>&  sourc
                 string templateCourante = op->getFilename(templatesImages[j]);
                 stringstream currentNameStream ; currentNameStream <<pageCourante << "-" << templateCourante << "-" << imagesCount;
                 string s = currentNameStream.str();s.resize(17, ' ');
-                if(u.VERBOSE)output << "\t template ( " << s << " ) : ";
+//                if(u.VERBOSE)output << "\t template ( " << s << " ) : ";
                 
                 Mat templ = imread(templatesImages[j]);
                 if(ll->findTemplArea(templ, currentNameStream.str(), false))
@@ -136,7 +134,7 @@ void extractImages::processTask(extractImages& self,const vector<string>&  sourc
                     j--;
                     
                 }
-                if(u.VERBOSE) cout << endl ;
+//                if(u.VERBOSE) cout << endl ;
                 
             }
             
@@ -144,7 +142,7 @@ void extractImages::processTask(extractImages& self,const vector<string>&  sourc
             
             int totalImagettes =0;
             if(foundTemplate.size() >0){
-                if(u.VERBOSE) output << "saving... " <<endl;;
+//                if(u.VERBOSE) output << "saving... " <<endl;;
                 stringstream ss;
                 // on reordonne les zones matchées
                 sort(foundTemplate.begin(), foundTemplate.end() , compareStruct);
@@ -166,22 +164,22 @@ void extractImages::processTask(extractImages& self,const vector<string>&  sourc
                         op->writeTxtFile(foundTemplate[ligne].name, pageCourante, ligne, col, result[col]);
                         
                     }
-                    if(u.RESULT){
+                    if(u.VERBOSE){
                         stringstream sgs; sgs <<result.size() << "/5";
                         ss<< "\t "<< ligne+1 <<" : " << niceOutput(sgs.str(), result.size() == 5) ;;
                     }
                     totalImagettes += result.size();
                 }
-                if(u.VERBOSE) output << endl;
+//                if(u.VERBOSE) output << endl;
                 
-                if(u.RESULT){
+                if(u.VERBOSE){
                     stringstream sgs; sgs <<totalImagettes << "/35";
                     output << " found :  " << imagesCount << "/7 templates => imagettes : "
                     << ss.str() << " \t total : " << niceOutput(sgs.str(), totalImagettes == 35)  << endl;
                 }
             }else{
                 
-                if(u.VERBOSE || u.RESULT)cout << niceOutput(" Error, image rejected", false) << endl; //sort templ avec position
+                if(u.VERBOSE)cout << niceOutput(" Error, image rejected", false) << endl; //sort templ avec position
                 self.nErroImg++;
                 
             }
@@ -194,8 +192,8 @@ void extractImages::processTask(extractImages& self,const vector<string>&  sourc
         delete ll;
         
         mtxOutput.lock();
-        if(u.RESULT)cout << "End : " << sourceImage <<endl;
-        if(u.VERBOSE || u.RESULT )cout << output.str()<<endl;
+//        if(u.RESULT)cout << "End : " << sourceImage <<endl;
+        if(u.VERBOSE )cout << output.str()<<endl;
         cout<< flush;
         mtxOutput.unlock();
     }

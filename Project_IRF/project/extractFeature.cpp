@@ -46,8 +46,7 @@ void extractFeature::compute_features(vector<int>& v_of_attributes_splited, vect
     vector<thread> vThreads;
     int NB_THREADS = thread::hardware_concurrency();
     if(NB_THREADS ==0)NB_THREADS = 1;
-    
-    cout <<"Using " << NB_THREADS << " threads  "<<endl;
+    if(u.RESULT)cout <<"Using " << NB_THREADS << " threads  "<<endl;
     
     //init vars
     leftToProcess=nbImgTotal;
@@ -77,14 +76,14 @@ void extractFeature::compute_features(vector<int>& v_of_attributes_splited, vect
     for(auto& th : vThreads){
         th.join();
     }
-
-    
-    xt = time(NULL) - xt;    
-    cout << " Temps d'exec.: " << setprecision(2)<< (double)xt/60 <<" min";;
-
-    cout <<endl;
-    //on ajoute la classe
+      //on ajoute la classe
 	addclassto_v_class(v_result_images_toextract_features_global);
+    
+    if(u.RESULT){
+        xt = time(NULL) - xt;
+        cout << " Temps d'exec.: " << setprecision(2)<< (double)xt/60 <<" min";;
+        cout <<endl;
+    }
 }
 
 
@@ -193,7 +192,6 @@ void extractFeature::extract_all_features_splited(string imgName, int nextImage,
 
 void extractFeature::extract_all_features_global(string imgName, unsigned int currImage){
     Mat img = imread(imgName);
-    utils & u = utils::i();
     if(img.rows ==0 || img.cols==0){
         cout << "Extract Feature:: error with " << imgName << endl;
         return;
@@ -257,12 +255,11 @@ void extractFeature::extract_all_features_global(string imgName, unsigned int cu
                 feature_result.push_back(f->isLongerRowsOrCols());
                 break;
             case PIXELS_GLOBAL:
-                if(u.CSV){
+                if(true){
                     vector<int> res = f->getPixels();
                     for(int i=0 ; i<res.size();i++)
                         feature_result.push_back(res[i]);
-                }else
-                    throw "Error : Pixels Globals only for CSV file";
+                }
                 break;
             default:
                 cout << "Unknown feature" << endl;
