@@ -164,12 +164,15 @@ void get_args(int argc, const char * argv[]){
             exit(0);
         }
     }
-    cout << " VERBOSE : " << u.VERBOSE;
-    cout << " RESULT : " << u.RESULT;
-    cout << " TEST : " << u.TEST <<endl;;
-    cout << " EXTRACT_IMAGES : " << u.EXTRACT_IMAGES;
-    cout << " NORMALIZE : " << u.NORMALIZE;
-    cout << " GET_FEATURES : " << u.GET_FEATURES;
+    if(u.RESULT)
+    {
+        cout << " VERBOSE : " << u.VERBOSE;
+        cout << " RESULT : " << u.RESULT;
+        cout << " TEST : " << u.TEST <<endl;;
+        cout << " EXTRACT_IMAGES : " << u.EXTRACT_IMAGES;
+        cout << " NORMALIZE : " << u.NORMALIZE;
+        cout << " GET_FEATURES : " << u.GET_FEATURES;
+    }
 
   
     cout <<endl;
@@ -188,9 +191,8 @@ void process_extract()
 
 void process_normalize()
 {
-    int split_factor = u.SPLIT_FACTOR;
-    
-    cout << "Split images in ? (1..4..9..16..25) :";
+    int split_factor;
+    cout << "Split images in ? (1..4..9..16..25) : (last : " << lastFactor  <<") " <<endl;
     cin >> split_factor;
     while(split_factor != 1 && split_factor != 4 && split_factor != 9 && split_factor != 16 && split_factor != 25){
         cout << "\nOnly 1 or 4 or 9 or 16 or 25: " << flush;
@@ -198,14 +200,13 @@ void process_normalize()
     }
     
     u.SPLIT_FACTOR = split_factor;
-    cout << "OK, Split in : " << u.SPLIT_FACTOR << endl;
+   
     //TODO optimiser
-    fileOp * op = new fileOp();
-    vector<string> splittedImages = op->getSplitedImages();
     //PREVENT TO SPLIT IF SAME AGAIN
     if(lastFactor!= u.SPLIT_FACTOR)
     {
-        
+
+        cout << "OK, Split in : " << u.SPLIT_FACTOR << endl;
         normalizeImages * n = new normalizeImages(DO_SQUARE);
         lastFactor =u.SPLIT_FACTOR;
 
@@ -216,7 +217,6 @@ void process_normalize()
         cout << "Same as before, no need to reprocess" << endl;
     }
     
-    delete op;
 	
 }
 

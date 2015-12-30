@@ -168,11 +168,10 @@ string fileOp::getExtName(string name){
 
 void fileOp::writeCSV(extractFeature& extrfeat){
     
-    cout <<  "Saving CSV FILE"<<endl;;
+    cout <<  "CSV FILE"<<endl;;
     string name = setFeatureFilename(extrfeat, true);
-
+    cout << "Saving..." <<endl;
     ofstream pFile(dirResCSVName + name, ios::out);
-    cout << "Saved as :" << name <<endl;
 
     
     for(int i = 0 ; i < extrfeat.v_all_numeric_v_attributes_values.size() ; i++){
@@ -184,6 +183,9 @@ void fileOp::writeCSV(extractFeature& extrfeat){
     }
     
     pFile.close();
+    
+    cout << "Saved as :" << name <<endl;
+
 }
 
 
@@ -200,7 +202,8 @@ string fileOp::setFeatureFilename(extractFeature& extrfeat, bool isCSV){
         ssFeatures << "% " <<extrfeat.getSplitedFeatureName(extrfeat.v_attributes_asked_splited[i]) << endl;
         ssFilename << to_string(extrfeat.v_attributes_asked_splited[i]) << "_";
     }
-    ssFilename << "split_" << u.SPLIT_FACTOR <<".arff";
+    ssFilename << "split_" << u.SPLIT_FACTOR <<(isCSV ? ".csv" : ".arff") ;
+
     
     string name;
     if(u.RESULT){
@@ -222,8 +225,9 @@ void fileOp::writeARFFFile(extractFeature& extrfeat){
     utils & u = utils::i();
     cout <<  "Saving Arff FILE"<<endl;;
     string name = setFeatureFilename(extrfeat, false);
+    cout << "Saving..." <<endl;
+
     ofstream pFile(dirResArffName + name, ios::out);
-    cout << "Saved as :" << name <<endl;
 
     /*Begin Head File*/
     pFile << "%1. Title : " << endl;
@@ -360,6 +364,8 @@ void fileOp::writeARFFFile(extractFeature& extrfeat){
 
     pFile.close();
     
+
+    cout << "Saved as :" << name <<endl;
 
 }
 
