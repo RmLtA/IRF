@@ -1,0 +1,157 @@
+=== Run information ===
+
+Scheme:weka.classifiers.trees.RandomForest -I 100 -K 0 -S 1
+Relation:     Imagette
+Instances:    3330
+Attributes:   91
+              Hough_Lines_Vertical_Global
+              Hough_Lines_Horizontal_Global
+              Hough_Lines_DiagonalPos_Global
+              Hough_Lines_DiagonalNeg_Global
+              Hough_Lines_Nb_Global
+              Hough_Circles_X_Global
+              Hough_Circles_Y_Global
+              Hough_Circles_Radius_Global
+              Hough_Circles_Nb_Global
+              Hough_Lines_Vertical_0
+              Hough_Lines_Horizontal_0
+              Hough_Lines_DiagonalPos_0
+              Hough_Lines_DiagonalNeg_0
+              Hough_Lines_Nb_0
+              Hough_Circles_X_0
+              Hough_Circles_Y_0
+              Hough_Circles_Radius_0
+              Hough_Circles_Nb_0
+              Hough_Lines_Vertical_1
+              Hough_Lines_Horizontal_1
+              Hough_Lines_DiagonalPos_1
+              Hough_Lines_DiagonalNeg_1
+              Hough_Lines_Nb_1
+              Hough_Circles_X_1
+              Hough_Circles_Y_1
+              Hough_Circles_Radius_1
+              Hough_Circles_Nb_1
+              Hough_Lines_Vertical_2
+              Hough_Lines_Horizontal_2
+              Hough_Lines_DiagonalPos_2
+              Hough_Lines_DiagonalNeg_2
+              Hough_Lines_Nb_2
+              Hough_Circles_X_2
+              Hough_Circles_Y_2
+              Hough_Circles_Radius_2
+              Hough_Circles_Nb_2
+              Hough_Lines_Vertical_3
+              Hough_Lines_Horizontal_3
+              Hough_Lines_DiagonalPos_3
+              Hough_Lines_DiagonalNeg_3
+              Hough_Lines_Nb_3
+              Hough_Circles_X_3
+              Hough_Circles_Y_3
+              Hough_Circles_Radius_3
+              Hough_Circles_Nb_3
+              Hough_Lines_Vertical_4
+              Hough_Lines_Horizontal_4
+              Hough_Lines_DiagonalPos_4
+              Hough_Lines_DiagonalNeg_4
+              Hough_Lines_Nb_4
+              Hough_Circles_X_4
+              Hough_Circles_Y_4
+              Hough_Circles_Radius_4
+              Hough_Circles_Nb_4
+              Hough_Lines_Vertical_5
+              Hough_Lines_Horizontal_5
+              Hough_Lines_DiagonalPos_5
+              Hough_Lines_DiagonalNeg_5
+              Hough_Lines_Nb_5
+              Hough_Circles_X_5
+              Hough_Circles_Y_5
+              Hough_Circles_Radius_5
+              Hough_Circles_Nb_5
+              Hough_Lines_Vertical_6
+              Hough_Lines_Horizontal_6
+              Hough_Lines_DiagonalPos_6
+              Hough_Lines_DiagonalNeg_6
+              Hough_Lines_Nb_6
+              Hough_Circles_X_6
+              Hough_Circles_Y_6
+              Hough_Circles_Radius_6
+              Hough_Circles_Nb_6
+              Hough_Lines_Vertical_7
+              Hough_Lines_Horizontal_7
+              Hough_Lines_DiagonalPos_7
+              Hough_Lines_DiagonalNeg_7
+              Hough_Lines_Nb_7
+              Hough_Circles_X_7
+              Hough_Circles_Y_7
+              Hough_Circles_Radius_7
+              Hough_Circles_Nb_7
+              Hough_Lines_Vertical_8
+              Hough_Lines_Horizontal_8
+              Hough_Lines_DiagonalPos_8
+              Hough_Lines_DiagonalNeg_8
+              Hough_Lines_Nb_8
+              Hough_Circles_X_8
+              Hough_Circles_Y_8
+              Hough_Circles_Radius_8
+              Hough_Circles_Nb_8
+              Class
+Test mode:10-fold cross-validation
+
+=== Classifier model (full training set) ===
+
+Random forest of 100 trees, each constructed while considering 7 random features.
+Out of bag error: 0.0595
+
+
+
+Time taken to build model: 3.47 seconds
+
+=== Stratified cross-validation ===
+=== Summary ===
+
+Correctly Classified Instances        3160               94.8949 %
+Incorrectly Classified Instances       170                5.1051 %
+Kappa statistic                          0.945 
+Mean absolute error                      0.0465
+Root mean squared error                  0.1158
+Relative absolute error                 35.0301 %
+Root relative squared error             44.9575 %
+Total Number of Instances             3330     
+
+=== Detailed Accuracy By Class ===
+
+               TP Rate   FP Rate   Precision   Recall  F-Measure   ROC Area  Class
+                 0.975     0.005      0.936     0.975     0.955      0.999    accident
+                 0.906     0.011      0.858     0.906     0.881      0.995    bomb
+                 0.992     0.003      0.965     0.992     0.978      1        car
+                 0.958     0.002      0.979     0.958     0.968      0.998    casualty
+                 0.978     0.006      0.921     0.978     0.948      0.999    electricity
+                 0.98      0.006      0.93      0.98      0.954      1        fire-brigade
+                 0.911     0.001      0.982     0.911     0.945      0.998    fire
+                 0.88      0.006      0.922     0.88      0.901      0.993    flood
+                 0.895     0.001      0.982     0.895     0.936      0.989    gas
+                 0.992     0.003      0.962     0.992     0.977      1        injury
+                 0.948     0.002      0.973     0.948     0.961      0.999    paramedics
+                 0.971     0.005      0.936     0.971     0.953      0.999    person
+                 0.91      0.001      0.985     0.91      0.946      0.994    police
+                 0.987     0.002      0.969     0.987     0.978      1        road-block
+Weighted Avg.    0.949     0.004      0.95      0.949     0.949      0.997
+
+=== Confusion Matrix ===
+
+   a   b   c   d   e   f   g   h   i   j   k   l   m   n   <-- classified as
+ 233   2   0   0   2   0   0   0   1   0   0   1   0   0 |   a = accident
+   3 212   0   1   9   0   1   2   1   0   0   4   0   1 |   b = bomb
+   0   0 247   0   0   1   0   0   0   0   0   0   0   1 |   c = car
+   1   2   0 229   0   1   0   2   0   1   0   3   0   0 |   d = casualty
+   0   2   0   0 221   1   0   2   0   0   0   0   0   0 |   e = electricity
+   0   0   0   0   1 240   0   0   0   1   2   0   1   0 |   f = fire-brigade
+   2   8   3   0   2   2 224   2   0   0   0   0   0   3 |   g = fire
+   1   2   4   3   0   5   2 213   0   3   1   7   0   1 |   h = flood
+   1   3   0   0   3   1   0   6 213   4   3   1   2   1 |   i = gas
+   0   0   0   0   0   0   0   1   1 252   0   0   0   0 |   j = injury
+   3   0   2   0   0   6   0   1   0   0 220   0   0   0 |   k = paramedics
+   0   4   0   0   1   0   0   2   0   0   0 233   0   0 |   l = person
+   5  12   0   1   0   1   1   0   0   0   0   0 201   0 |   m = police
+   0   0   0   0   1   0   0   0   1   1   0   0   0 222 |   n = road-block
+

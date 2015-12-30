@@ -42,7 +42,6 @@ using namespace cv;
  */
 
 int lastFactor =0;
-static bool SAVE_NORMALIZED = true;
 static bool DO_SQUARE= false;
 utils & u = utils::i();
 
@@ -60,7 +59,7 @@ int main(int argc, const char * argv[]) {
             op->removeAllResSplittedFiles();
         }
         cout << "Ending...  "<<endl;
-        return 0;
+        exit(1);
     }
     
     if(u.EXTRACT_IMAGES){
@@ -121,6 +120,8 @@ void get_args(int argc, const char * argv[]){
         else if (a == "-a" || a =="-all") u.GET_FEATURES = u.EXTRACT_IMAGES = u.NORMALIZE= true;
         else if (a == "-test" || a =="-t") u.TEST =true;
         else if (a == "-remove") u.REMOVE_SOURCE = true;
+        else if (a == "-csv") u.CSV = true;
+
         else if (a == "-split" || a== "-s")
         {
             if(i+1 < argc){
@@ -202,8 +203,8 @@ void process_normalize()
     if(lastFactor!= u.SPLIT_FACTOR)
     {
         
-        if(u.VERBOSE)cout <<"Save Normalized is set to : " << SAVE_NORMALIZED << endl;;
-        normalizeImages * n = new normalizeImages(SAVE_NORMALIZED, DO_SQUARE);
+        //if(u.VERBOSE)cout <<"Save Normalized is set to : " << SAVE_NORMALIZED << endl;;
+        normalizeImages * n = new normalizeImages(DO_SQUARE);
         lastFactor =u.SPLIT_FACTOR;
 
         n->process();
@@ -290,7 +291,8 @@ void process_features()
             "Mass_center          ",
             "Hough_Lines          ",
             "Hough_Circles        ",
-            "Rows or Cols Longer  "
+            "Rows or Cols Longer  ",
+            "Pixels (Only for csv)"
 
         };
         
@@ -319,8 +321,10 @@ void process_features()
         
         extract_feature->compute_features(v_features_to_extract_splited,v_result_images_toextract_features_splited,
                                           v_features_to_extract_global, v_result_images_toextract_features_global);
-
-        op->writeARFFFile(*extract_feature);
+        if(u.CSV)
+            op->writeCSV(*extract_feature);
+        else
+            op->writeARFFFile(*extract_feature);
         
         delete extract_feature;
         

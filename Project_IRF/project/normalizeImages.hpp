@@ -27,23 +27,28 @@
 using namespace std;
 using namespace cv;
 
-static const int MAX_SIZE = 130;
-static const int THRESH_VALUE = 220; // /254
+static const int MAX_SIZE = 500;
+static const int THRESH_VALUE = 250; // /254
 static const int IMG_GAP = 10; //Valeur de décalage (limite rectangle noir autours)
 
 class normalizeImages{
 public :
     utils & u = utils::i();;
-    const bool saveNormalized;
-    const bool squareImg;
+    bool squareImg;
+    int sizeImg;
     double moy_cols, moy_rows;
 
     unsigned long int leftToProcess;
     unsigned long int currentToProcess;
     int nErroImg;
 
-    normalizeImages(bool snormalized, bool simg) : saveNormalized(snormalized), squareImg(simg){
+    normalizeImages(bool simg) : squareImg(simg), sizeImg(MAX_SIZE){
         moy_cols = 0, moy_rows = 0; nErroImg = 0;
+        //force for csv
+        if(u.CSV){
+            squareImg = true;
+            sizeImg = 28;
+        }
     };
     
     
@@ -56,7 +61,7 @@ private:
 
     static Mat boundingBox(const cv::Mat& img,string imgName);
     Mat Box( Mat matInput, string imgName);
-    static Mat getSquareImage(const cv::Mat& img, string imgName);
+    static Mat getSquareImage(const cv::Mat& img, string imgName, int sizeImg);
     static vector<Mat>  splitImage(int x, Mat const & src);
     
 

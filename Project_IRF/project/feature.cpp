@@ -482,6 +482,14 @@ double feature::massCenterY(){
 }
 
 
+vector<int> feature::getPixels(){
+    vector<int> res;
+    for(int i=0 ; i< this->graySourceImg.rows ; i++)
+        for(int j=0 ; j<this->graySourceImg.cols ; j++)
+            res.push_back(graySourceImg.at<uchar>(i,j));
+    return res;
+}
+
 //PRIVATE
 void feature::countMassCenter(){
         //TODO

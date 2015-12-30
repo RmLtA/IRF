@@ -174,8 +174,8 @@ void extractFeature::extract_all_features_splited(string imgName, int nextImage,
                 feature_result.push_back(f->houghCirclesY());
                 feature_result.push_back(f->houghCirclesRadius());
                 feature_result.push_back(f->nbHoughCirclesResult());
-
                 break;
+                
 
             default:
                 cout << "Unknown feature" << endl;
@@ -193,6 +193,7 @@ void extractFeature::extract_all_features_splited(string imgName, int nextImage,
 
 void extractFeature::extract_all_features_global(string imgName, unsigned int currImage){
     Mat img = imread(imgName);
+    utils & u = utils::i();
     if(img.rows ==0 || img.cols==0){
         cout << "Extract Feature:: error with " << imgName << endl;
         return;
@@ -255,7 +256,14 @@ void extractFeature::extract_all_features_global(string imgName, unsigned int cu
             case ROWS_OR_COLS_GLOBAL:
                 feature_result.push_back(f->isLongerRowsOrCols());
                 break;
-                
+            case PIXELS_GLOBAL:
+                if(u.CSV){
+                    vector<int> res = f->getPixels();
+                    for(int i=0 ; i<res.size();i++)
+                        feature_result.push_back(res[i]);
+                }else
+                    throw "Error : Pixels Globals only for CSV file";
+                break;
             default:
                 cout << "Unknown feature" << endl;
                 throw "error";

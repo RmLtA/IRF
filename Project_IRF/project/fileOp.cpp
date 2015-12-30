@@ -165,6 +165,28 @@ string fileOp::getExtName(string name){
     return "null";
 }
 
+
+void fileOp::writeCSV(extractFeature& extrfeat){
+    
+    
+    string name;
+    cout << "Name of CSV file : " << endl;
+    cin >> name;
+    name+=".csv";
+    ofstream pFile(dirResCSVName + name, ios::out);
+
+    
+    for(int i = 0 ; i < extrfeat.v_all_numeric_v_attributes_values.size() ; i++){
+        pFile << extrfeat.v_class[i];
+        for(int j = 0 ; j < extrfeat.v_all_numeric_v_attributes_values[i].size(); j++){
+            pFile <<","<< extrfeat.v_all_numeric_v_attributes_values[i][j];
+        }
+        pFile << endl;
+    }
+    
+    pFile.close();
+}
+
 void fileOp::writeARFFFile(extractFeature& extrfeat){
     utils & u = utils::i();
     cout <<  "Saving Arff FILE"<<endl;;
@@ -190,7 +212,7 @@ void fileOp::writeARFFFile(extractFeature& extrfeat){
     else
         name = ssFilename.str();
 
-    ofstream pFile(dirResArffdName + name, ios::out);
+    ofstream pFile(dirResArffName + name, ios::out);
 
 
     /*Begin Head File*/

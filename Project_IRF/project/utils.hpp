@@ -32,6 +32,8 @@ public:
     bool GET_FEATURES = false;
     bool NORMALIZE = false;
     bool CREATE_VARIOUS = true;
+    bool CSV = false;
+
     
     int SPLIT_FACTOR = -1;
 

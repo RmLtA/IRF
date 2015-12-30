@@ -48,7 +48,8 @@ public :
         MASSCENTER_GLOBAL,
         HOUGH_LINES_GLOBAL,
         HOUGH_CIRCLES_GLOBAL,
-        ROWS_OR_COLS_GLOBAL
+        ROWS_OR_COLS_GLOBAL,
+        PIXELS_GLOBAL
     };
 
 
@@ -58,7 +59,7 @@ public :
 	extractFeature(){
         //nombre de features differentes par features (voir mass center par exemple (2)
         nb_features_by_attributes_splited = { 0 ,1 ,11 ,2 ,2 ,5, 4};
-        nb_features_by_attributes_global =  { 0 ,1 ,11 ,2 ,2 ,5, 4, 1};
+        nb_features_by_attributes_global =  { 0 ,1 ,11 ,2 ,2 ,5, 4, 1, 784 };
         
 	}
     

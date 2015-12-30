@@ -116,6 +116,9 @@ public:
 
 
     
+    //Retrieve pixels
+    vector<int> getPixels();
+    
 private:
     void countMassCenter();
     void countHarrisCorners();

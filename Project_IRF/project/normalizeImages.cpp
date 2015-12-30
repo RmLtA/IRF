@@ -13,7 +13,7 @@ std::mutex OutputMtx;           // mutex for critical section
 
 void normalizeImages::process(){
     fileOp *  op = new fileOp();
-    if(saveNormalized) op->removeAllResNormalizedFiles();
+    op->removeAllResNormalizedFiles();
     op->removeAllResSplittedFiles();
     
     //clock_t prog_b, prog_e;
@@ -26,7 +26,8 @@ void normalizeImages::process(){
     unsigned long int nbImages =resultImages.size();
 
     cout << "Images to process : "  << nbImages * u.SPLIT_FACTOR << endl;
-    
+    if(squareImg) cout << "Images 'll be resized in : " << sizeImg <<"x"<<sizeImg << " px" <<endl;
+  
     vector<thread> vThreads;
     int NB_THREADS = thread::hardware_concurrency();
     if(NB_THREADS ==0)NB_THREADS = 1;
@@ -67,7 +68,7 @@ void normalizeImages::process(){
             moy_rows /=nbImages;
             moy_cols /=nbImages;
             cout << "Avg size cols : " << moy_cols << " \t Avg size rows : " << moy_rows <<endl;;
-            cout << "Resized image size : " << MAX_SIZE <<"x" << MAX_SIZE<<endl;
+            cout << "Resized image size : " << sizeImg <<"x" << sizeImg<<endl;
         }
     }
     
@@ -119,14 +120,14 @@ void normalizeImages::processTask(normalizeImages& self,vector<string> resultIma
             }
             
             if(self.squareImg)
-                res = normalizeImages::getSquareImage(box,current);
+                res = normalizeImages::getSquareImage(box,current, self.sizeImg);
             else
                 res = box;
             
             
             if(u.VERBOSE) cout << "\nProcess... : \n" << current;
             //cout << i << endl;
-            if(self.saveNormalized)op->writeNormalized(current,res);
+            op->writeNormalized(current,res);
             
             
             vector<Mat> splited = normalizeImages::splitImage(u.SPLIT_FACTOR, res);
@@ -177,29 +178,29 @@ vector<Mat>  normalizeImages::splitImage(int x, Mat const & src){
 }
 
 
-cv::Mat normalizeImages::getSquareImage( const cv::Mat& img, string imgName )
+cv::Mat normalizeImages::getSquareImage( const cv::Mat& img, string imgName, int sizeImg)
 {
     int width = img.cols,
     height = img.rows;
     
-    cv::Mat square( MAX_SIZE, MAX_SIZE, img.type() );
+    cv::Mat square( sizeImg, sizeImg, img.type() );
     square.setTo(cv::Scalar(255,255,255));
     int max_dim = ( width >= height ) ? width : height;
-    float scale = ( ( float ) MAX_SIZE ) / max_dim;
+    float scale = ( ( float ) sizeImg ) / max_dim;
     cv::Rect roi;
     if ( width >= height )
     {
-        roi.width = MAX_SIZE;
+        roi.width = sizeImg;
         roi.x = 0;
         roi.height = height * scale;
-        roi.y = ( MAX_SIZE - roi.height ) / 2;
+        roi.y = ( sizeImg - roi.height ) / 2;
     }
     else
     {
         roi.y = 0;
-        roi.height = MAX_SIZE;
+        roi.height = sizeImg;
         roi.width = width * scale;
-        roi.x = ( MAX_SIZE - roi.width ) / 2;
+        roi.x = ( sizeImg - roi.width ) / 2;
     }
     
     cv::resize( img, square( roi ), roi.size() );
@@ -265,61 +266,8 @@ Mat normalizeImages::boundingBox(const cv::Mat& img, string imgName)
         vector<Point> poly(allcontours.size());
         approxPolyDP(Mat(allcontours), poly, 15, true);
         Rect bounRect = boundingRect(Mat(poly));
-//               Scalar color = Scalar(rng.uniform(0, 255), rng.uniform(0, 255), rng.uniform(0, 255));
 
-
-//        Mat drawing = Mat::zeros(threshold_output.size(), CV_8UC3);
-
-//        rectangle(drawing, bounRect.tl(), bounRect.br(), color, 2, 8, 0);
         Mat final(img, bounRect);
-
-//        imshow("Contours " + imgName, drawing);
-//        imshow("final " + imgName, final);
-//        waitKey(1);
-
-
-//
-//        
-//    for (int i = 0; i < contours.size(); i++)
-//    {
-//        approxPolyDP(Mat(contours[i]), contours_poly[i], 15, true);
-//        boundRect[i] = boundingRect(Mat(contours_poly[i]));
-//      //  minEnclosingCircle((Mat)contours_poly[i], center[i], radius[i]);
-//    }
-//    
-//    double max = 0; int k = 0;
-//    /// Draw polygonal contour + bonding rects + circles
-//    Mat drawing = Mat::zeros(threshold_output.size(), CV_8UC3);
-//    Mat dst = Mat::zeros(threshold_output.size(), CV_8UC3);
-//    Scalar color = Scalar(rng.uniform(0, 255), rng.uniform(0, 255), rng.uniform(0, 255));
-//    for (int i = 0; i< contours.size(); i++)
-//    {
-//        
-//        //drawContours(drawing, contours_poly, i, color, 1, 8, vector<Vec4i>(), 0, Point());
-//        if (boundRect[i].area() > max && boundRect[i].area()<src.size().area() - 1000){
-//            
-//            max = boundRect[i].area();
-//            k = i;
-//        }
-//        
-//        //affiche le rectangle
-//        rectangle(drawing, boundRect[i].tl(), boundRect[i].br(), color, 2, 8, 0);
-//        
-//        circle(drawing, center[i], (int)radius[i], color, 2, 8, 0);
-//    }
-//    //rectangle(dst, boundRect[k].tl(), boundRect[k].br(), color, 2, 8, 0);
-//    cout << boundRect[k].area() << endl;
-//    // decouper les images
-//    
-//    Mat final(src, boundRect[k]);
-//    if(VERBOSE){
-//        
-//        imshow("ROI "+ imgName, final);
-//        /// Show in a window
-//        namedWindow("Contours" + imgName, CV_WINDOW_AUTOSIZE);
-//        imshow("Contours" + imgName, drawing);
-//        //imshow("bigger" + imgName, dst);
-//    }
    
     return final;
         
