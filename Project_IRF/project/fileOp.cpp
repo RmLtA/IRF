@@ -202,12 +202,12 @@ string fileOp::setFeatureFilename(extractFeature& extrfeat, bool isCSV){
         ssFeatures << "% " <<extrfeat.getSplitedFeatureName(extrfeat.v_attributes_asked_splited[i]) << endl;
         ssFilename << to_string(extrfeat.v_attributes_asked_splited[i]) << "_";
     }
-    ssFilename << "split_" << u.SPLIT_FACTOR <<(isCSV ? ".csv" : ".arff") ;
+    ssFilename << "split_" << u.SPLIT_FACTOR << "_nbImg_"<<extrfeat.toProcess <<(isCSV ? ".csv" : ".arff") ;
 
     
     string name;
     if(u.RESULT){
-        cout << "Name of " << (isCSV ? "CSV" :"Arff" ) << "file : (press \"d\" for : " <<ssFilename.str() << endl;
+        cout << "Name of " << (isCSV ? "CSV" :"Arff" ) << "file : (Press \"d\" for : " <<ssFilename.str() <<") ";
         cin >> name;
         if((name != "" || name != "\0" )&& name != "d")
             name += (isCSV ? ".csv" : ".arff") ;

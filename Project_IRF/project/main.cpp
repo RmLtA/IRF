@@ -192,10 +192,11 @@ void process_extract()
 void process_normalize()
 {
     int split_factor;
-    cout << "Split images in ? (1..4..9..16..25) : (last : " << lastFactor  <<") " <<endl;
+    cout << "Split images in ? (1..4..9..16..25) : (last : " << lastFactor  <<" | -1 to force split) " <<endl;
     cin >> split_factor;
     while(split_factor != 1 && split_factor != 4 && split_factor != 9 && split_factor != 16 && split_factor != 25){
-        cout << "\nOnly 1 or 4 or 9 or 16 or 25: " << flush;
+        lastFactor =-1;
+        cout << "\n \t Force split in  1 or 4 or 9 or 16 or 25: " << flush;
         cin >> split_factor;
     }
     

@@ -53,7 +53,8 @@ public :
     void process();
 private:
     static void processTask(normalizeImages& self,vector<string> resultImages);
-
+    static vector<string> getImages();
+    
     static Mat boundingBox(const cv::Mat& img,string imgName);
     Mat Box( Mat matInput, string imgName);
     static Mat getSquareImage(const cv::Mat& img, string imgName, int sizeImg);

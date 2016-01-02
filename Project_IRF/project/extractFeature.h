@@ -73,6 +73,7 @@ public :
     string getSplitedFeatureName(int f);
     string getGlobalFeatureName(int f);
 
+    unsigned long int toProcess;
 
     
 private:
@@ -82,7 +83,6 @@ private:
     int nbGlobalFeatures;
     unsigned long int leftToProcess;
     unsigned long int currentToProcess;
-    unsigned long int toProcess;
     
     void extract_all_features_splited(string imgName, int i, int offset);
     void extract_all_features_global(string imgName, unsigned int currImage);

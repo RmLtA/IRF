@@ -56,12 +56,14 @@ public:
             dirResImagesName += test; dirResNormalizedName += test;
             dirResSplitedName +=test;
             dirResArffName +=test;
+            dirResCSVName +=test;
 
         }else{
             dirSourceName += release; dirTemplName += release;
             dirResImagesName +=release; dirResNormalizedName += release;
             dirResSplitedName +=release;
             dirResArffName+=release;
+            dirResCSVName +=release; 
         }
         
         dirResImagesName += "images/";

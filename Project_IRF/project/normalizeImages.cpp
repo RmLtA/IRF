@@ -7,44 +7,48 @@
 //
 
 #include "normalizeImages.hpp"
+#include <future>
+
 
 std::mutex NormalizeMtx;           // mutex for critical section
 std::mutex OutputMtx;           // mutex for critical section
 
-void normalizeImages::process(){
-    fileOp *  op = new fileOp();
-    op->removeAllResNormalizedFiles();
-    op->removeAllResSplittedFiles();
-    
-    
-    time_t xt = time(NULL);
-    
 
-    vector<string> resultImages = op->getResultImages();
-    unsigned long int nbImages =resultImages.size();
-    if(u.RESULT){
-        cout << "Images to process : "  << nbImages * u.SPLIT_FACTOR << endl;
-        cout << "Crop images in squares ?  (Y :1 , N:0)" << endl;
-        int in;
-        cin >>in;
-        squareImg = ((in == 1) ? 1 : 0);
-       
+
+void normalizeImages::process(){
+    auto resultImagesThread = std::async(&normalizeImages::getImages);
+    
+    cout << "Crop images in squares ?  (Y :1 , N:0)" << endl;
+    int in;
+    cin >>in;
+    squareImg = ((in == 1) ? 1 : 0);
+    if(squareImg){
         int size;
         cout << "Size to resize images : (press 0 for " << sizeImg << ")"<<endl;
         cin >> size;
         if(size) sizeImg = size;
         cout << "OK, ";
     }
+    
     if(squareImg) {
         cout << "Images 'll be resized in : " << sizeImg <<"x"<<sizeImg << " px" <<endl;
-    }else{
-        cout << "Images 'll be resized with max " << sizeImg <<"px  (height or width)" <<endl;
     }
+
+    
+    time_t xt = time(NULL);
+    
+    
+    //retrieve async images
+    vector<string> resultImages =resultImagesThread.get();
+    unsigned long int nbImages =resultImages.size();
+    
+    cout << "Images to process : "  << nbImages * u.SPLIT_FACTOR << endl;
+  
     
     
     u.SIZE_IMAGE = sizeImg;
    
-  
+    
     vector<thread> vThreads;
     int NB_THREADS = thread::hardware_concurrency();
     if(NB_THREADS ==0)NB_THREADS = 1;
@@ -95,11 +99,24 @@ void normalizeImages::process(){
     << "| Temps d'exec.: " << setprecision(2)<< (double)xt/60 <<" min";;
 
 
+}
+
+
+//remove result images and get images async
+vector<string> normalizeImages::getImages(){
+    fileOp *  op = new fileOp();
+    op->removeAllResNormalizedFiles();
+    op->removeAllResSplittedFiles();
+//    cout << "Result dir cleaned" << endl;
+    vector<string> resultImages = op->getResultImages();
+//    cout << "Get images done" << endl;
     delete op;
+    return resultImages;
 }
 
 
 
+//process task normalize image for threads async
 void normalizeImages::processTask(normalizeImages& self,vector<string> resultImages)
 {
     utils & u = utils::i();

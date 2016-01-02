@@ -50,6 +50,7 @@ void extractFeature::compute_features(vector<int>& v_of_attributes_splited, vect
     
     //init vars
     leftToProcess=nbImgTotal;
+    toProcess =nbImgTotal;
     currentToProcess= 0;
     
     //init processes
@@ -105,12 +106,14 @@ void extractFeature::processTask(extractFeature& self, vector<string> v_result_i
         string imgGlobalName = v_result_images_toextract_features_global[i];
         self.extract_all_features_global(imgGlobalName, (int)i);
         //puis les features splited
-        for(int offset=0 ; offset< u.SPLIT_FACTOR ; offset++){
-            //pour chaque petite image de l'image
-            
-            string imgName =v_result_images_toextract_features_splited[i*u.SPLIT_FACTOR+offset];
-            //on extrait toutes les features
-            self.extract_all_features_splited(imgName, (int)i , offset*self.nbSplitedFeatures+self.nbGlobalFeatures);
+        if(u.SPLIT_FACTOR >1){
+            for(int offset=0 ; offset< u.SPLIT_FACTOR ; offset++){
+                //pour chaque petite image de l'image
+                
+                string imgName =v_result_images_toextract_features_splited[i*u.SPLIT_FACTOR+offset];
+                //on extrait toutes les features
+                self.extract_all_features_splited(imgName, (int)i , offset*self.nbSplitedFeatures+self.nbGlobalFeatures);
+            }
         }
     }
 }
