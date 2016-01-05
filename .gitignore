@@ -8,6 +8,7 @@ Project_IRF/build/*
 Project_IRF/build
 Project_IRF/project/build/sources/release/*
 Project_IRF/project/build/sources/test/*
+Project_IRF/project/build/sources/test/
 
 Project_IRF/project/build/templates/release/*
 
