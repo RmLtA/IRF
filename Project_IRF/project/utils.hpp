@@ -36,7 +36,8 @@ public:
     bool ARFF = true; //default
     
     int SPLIT_FACTOR = -1;
-    int SIZE_IMAGE = 130; //default 
+    int SIZE_IMAGE = 130; //default
+    bool BW =false;
     
     static utils& i()
     {

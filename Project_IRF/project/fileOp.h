@@ -33,6 +33,8 @@ class fileOp{
     string dirResSplitedName;
     string dirResArffName;
     string dirResCSVName;
+    string dirResByName;
+
     utils & u = utils::i();
 
 
@@ -45,7 +47,7 @@ public:
          dirResSplitedName ="results/";
          dirResArffName ="arff/";
          dirResCSVName ="csv/";
-
+        dirResByName= "results/";
         
         
         string release = "release/";
@@ -57,18 +59,21 @@ public:
             dirResSplitedName +=test;
             dirResArffName +=test;
             dirResCSVName +=test;
+            dirResByName +=test;
 
         }else{
             dirSourceName += release; dirTemplName += release;
             dirResImagesName +=release; dirResNormalizedName += release;
             dirResSplitedName +=release;
             dirResArffName+=release;
-            dirResCSVName +=release; 
+            dirResCSVName +=release;
+            dirResByName +=release;
         }
         
         dirResImagesName += "images/";
         dirResNormalizedName+= "normalized/";
         dirResSplitedName +="splited/";
+        dirResByName +="by_name/";
         
     };
     string getFilename(string name);
@@ -93,6 +98,7 @@ public:
     void writeNormalized(string nam,Mat img);
     void writeARFFFile(extractFeature& extrfeat);
     void writeCSV(extractFeature& extrfeat);
+    void writeByName(string nam, Mat img);
 
 
 private:

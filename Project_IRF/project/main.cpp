@@ -120,6 +120,8 @@ void get_args(int argc, const char * argv[]){
         else if (a == "-remove") u.REMOVE_SOURCE = true;
         else if (a == "-csv") {u.CSV = true ; u.ARFF = false ; }
         else if (a == "-arff") {u.ARFF = true;}
+        else if (a == "-bw") {u.BW = true;}
+
         
         else if (a == "-split" || a== "-s")
         {
@@ -303,7 +305,7 @@ void process_features()
             "Hough_Lines          ",
             "Hough_Circles        ",
             "Rows or Cols Longer  ",
-            "All Pixels in B/W    "
+            "All Pixels (only squares)"
         };
         
         vector<int> v_features_to_extract_global;

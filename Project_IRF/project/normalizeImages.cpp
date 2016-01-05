@@ -96,7 +96,7 @@ void normalizeImages::process(){
     xt = time(NULL) - xt;
     cout << endl << setprecision(3)
     << "Total : " << (currentToProcess-nErroImg)*u.SPLIT_FACTOR << " / " << nbImages*u.SPLIT_FACTOR << "\t"
-    << "| Temps d'exec.: " << setprecision(2)<< (double)xt/60 <<" min";;
+    << "| Temps d'exec.: " << setprecision(2)<< (double)xt/60 <<" min" <<endl;;
 
 
 }
@@ -137,7 +137,7 @@ void normalizeImages::processTask(normalizeImages& self,vector<string> resultIma
         try{
             Mat res;
             Mat box = normalizeImages::boundingBox(img, current);
-            if(box.rows == 0 || box.cols == 0 )
+                      if(box.rows == 0 || box.cols == 0 )
             {
                 if(u.VERBOSE)cout << "Error with image : "<< current <<endl;
                 self.nErroImg++;
@@ -149,6 +149,17 @@ void normalizeImages::processTask(normalizeImages& self,vector<string> resultIma
                 self.moy_rows +=box.rows;
             }
             
+            if(u.BW){
+                cvtColor( box, box, CV_BGR2GRAY);
+                //cv::morphologyEx(box,box,MORPH_OPEN, Mat());
+                // cv::morphologyEx(box,box,MORPH_CLOSE, Mat());
+                cv::erode(box, box, cv::Mat());
+                //cv::erode(box, box, cv::Mat());
+                adaptiveThreshold(box,box,255,ADAPTIVE_THRESH_MEAN_C,THRESH_BINARY,7,1);
+            }
+           
+
+            
             if(self.squareImg)
                 res = normalizeImages::getSquareImage(box,current, self.sizeImg);
             else
@@ -156,7 +167,29 @@ void normalizeImages::processTask(normalizeImages& self,vector<string> resultIma
             
             
 //            if(u.VERBOSE) cout << "\nProcess... : \n" << current;
-            //cout << i << endl;
+//            //cout << i << endl;
+//
+//
+//            threshold(res, res, 240, 255, THRESH_TOZERO_INV);
+            //equalizeHist( res, res );
+        
+//            if(u.VERBOSE)
+//            {
+//                NormalizeMtx.lock();
+//                imshow("normalized" + sourceImage, res);
+//                waitKey(1);
+//                NormalizeMtx.unlock();
+//
+//                
+//
+//            }
+
+            
+            
+//            if(u.BW)
+//                op->writeByName(current,res);
+            
+            
             op->writeNormalized(current,res);
             
             if(u.SPLIT_FACTOR >1){
@@ -214,9 +247,13 @@ cv::Mat normalizeImages::getSquareImage( const cv::Mat& img, string imgName, int
 {
     int width = img.cols,
     height = img.rows;
-    
+//    utils & u = utils::i();
     cv::Mat square( sizeImg, sizeImg, img.type() );
-    square.setTo(cv::Scalar(255,255,255));
+   // if(!u.BW)
+        square.setTo(cv::Scalar(255,255,255));
+   // else
+   //     square.setTo(cv::Scalar(0,0,0));
+
     int max_dim = ( width >= height ) ? width : height;
     float scale = ( ( float ) sizeImg ) / max_dim;
     cv::Rect roi;
@@ -234,8 +271,8 @@ cv::Mat normalizeImages::getSquareImage( const cv::Mat& img, string imgName, int
         roi.width = width * scale;
         roi.x = ( sizeImg - roi.width ) / 2;
     }
-    
-    cv::resize( img, square( roi ), roi.size() );
+   
+    cv::resize( img, square( roi ), roi.size() , 0, 0 ,CV_INTER_AREA  );
     
     return square;
 }
@@ -266,12 +303,12 @@ Mat normalizeImages::boundingBox(const cv::Mat& img, string imgName)
 
         /// Convert image to gray and blur it
         cvtColor(img, src_gray, CV_BGR2GRAY);
-        blur(src_gray, src_gray, Size(3, 3));
+        blur(src_gray, src_gray, Size(5, 5));
             
         threshold(src_gray, threshold_output, THRESH_VALUE, 255, THRESH_BINARY);
         
         /// Find contours
-        findContours(threshold_output, contours, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, Point(1, 1));
+        findContours(threshold_output, contours, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, Point(1,1));
 
         /// Approximate contours to polygons + get bounding rects and circles
         vector<vector<Point> > contours_poly(contours.size());
@@ -296,7 +333,7 @@ Mat normalizeImages::boundingBox(const cv::Mat& img, string imgName)
      
 
         vector<Point> poly(allcontours.size());
-        approxPolyDP(Mat(allcontours), poly, 15, true);
+        approxPolyDP(Mat(allcontours), poly, 5, true);
         Rect bounRect = boundingRect(Mat(poly));
 
         Mat final(img, bounRect);

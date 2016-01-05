@@ -12,6 +12,21 @@ void fileOp::writeNormalized(string nam, Mat img){
 
 }
 
+void fileOp::writeByName(string nam, Mat img){
+    stringstream name_img,name;
+    name << nam;
+    string nameAtt;
+    size_t point0 = nam.find_last_of("/");
+    string res = nam.substr(point0 + 1, nam.size());
+    size_t point = res.find_first_of("_");
+    nameAtt =nam.substr(point0+1, point);
+    
+    name_img << dirResByName <<nameAtt <<"/" <<name.str()<< ".jpg";
+    
+    //enregistrment de l'imagette
+    imwrite(name_img.str(), img);
+
+}
 
 void fileOp::writeSplited(string nam, Mat img){
     stringstream name_img,name;
@@ -294,8 +309,12 @@ void fileOp::writeARFFFile(extractFeature& extrfeat){
             case extractFeature::ROWS_OR_COLS_GLOBAL:
                 pFile<< "@ATTRIBUTE " << " Rows_Or_Cols_Global"<< " NUMERIC" << endl;
                 break;
-                
-                
+            case extractFeature::PIXELS_GLOBAL:
+                int size= u.SIZE_IMAGE;
+                for(int v=0; v<size;v++)
+                    for(int w=0; w<size;w++)
+                        pFile << "@ATTRIBUTE " <<"Pixels_x"<<v<<"_y_"<<w << " NUMERIC" << endl;
+                break;
         }
     }
     pFile << "% Features from the images splited in " <<u.SPLIT_FACTOR << " : " << endl;
@@ -368,4 +387,7 @@ void fileOp::writeARFFFile(extractFeature& extrfeat){
     cout << "Saved as :" << name <<endl;
 
 }
+
+
+
 
