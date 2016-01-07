@@ -30,13 +30,15 @@ using namespace cv;
 static const int MAX_SIZE = 130;
 static const int THRESH_VALUE = 230; // /254
 static const int IMG_GAP = 10; //Valeur de décalage (limite rectangle noir autours)
-
+static const int MIN_SIZE = 40;
 class normalizeImages{
 public :
     utils & u = utils::i();;
     bool squareImg;
     int sizeImg;
     double moy_cols, moy_rows;
+    double max_cols, max_rows;
+    double min_cols, min_rows;
 
     unsigned long int leftToProcess;
     unsigned long int currentToProcess;
@@ -44,6 +46,8 @@ public :
 
     normalizeImages(bool simg) : squareImg(simg), sizeImg(MAX_SIZE){
         moy_cols = 0, moy_rows = 0; nErroImg = 0;
+        min_cols = min_rows = 1000;
+        max_cols = max_rows = 0;
     };
     
     

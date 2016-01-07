@@ -33,7 +33,7 @@ void fileOp::writeSplited(string nam, Mat img){
     name << nam;
     name_img << dirResSplitedName <<name.str()<< ".jpg";
     
-    if (u.VERBOSE)cout << "  " << getFilename(name_img.str());
+   //if (u.VERBOSE)cout << "  " << getFilename(name_img.str());
     //enregistrment de l'imagette
     imwrite(name_img.str(), img);
     

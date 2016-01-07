@@ -86,9 +86,13 @@ void normalizeImages::process(){
     
     if(u.VERBOSE){
         if(nbImages !=0){ //prevent div 0 
-            moy_rows /=nbImages;
-            moy_cols /=nbImages;
-            cout << "Avg size cols : " << moy_cols << " \t Avg size rows : " << moy_rows <<endl;;
+            moy_rows /=(nbImages-nErroImg);
+            moy_cols /=(nbImages-nErroImg);
+            cout << endl << "Avg size cols : " << moy_cols << " \t Avg size rows : " << moy_rows <<endl;;
+            cout << "Min size cols : " << min_cols << " \t Min size rows : " << min_rows <<endl;;
+            cout << "Max size cols : " << max_cols << " \t Max size rows : " << max_rows <<endl;;
+
+
         }
     }
     
@@ -137,16 +141,36 @@ void normalizeImages::processTask(normalizeImages& self,vector<string> resultIma
         try{
             Mat res;
             Mat box = normalizeImages::boundingBox(img, current);
-                      if(box.rows == 0 || box.cols == 0 )
+            if(box.rows == 0 || box.cols == 0 )
             {
                 if(u.VERBOSE)cout << "Error with image : "<< current <<endl;
                 self.nErroImg++;
                 continue;
             }
+            if(!self.squareImg){
+                if(box.rows < MIN_SIZE || box.cols < MIN_SIZE ){
+                    if(u.VERBOSE)cout << "Rejected image : "<< current << " => image res is to low" << endl;
+                    self.nErroImg++;
+                    continue;
+                }
+            }
             
             if(u.VERBOSE){
+                NormalizeMtx.lock();
                 self.moy_cols +=box.cols;
                 self.moy_rows +=box.rows;
+                if(self.min_cols > box.cols)
+                    self.min_cols =  box.cols;
+                if(self.max_cols < box.cols)
+                    self.max_cols = box.cols;
+                    
+                if(self.min_rows > box.rows)
+                    self.min_rows =  box.rows;
+                if(self.max_rows< box.rows)
+                    self.max_rows = box.rows;
+
+                NormalizeMtx.unlock();
+
             }
             
             if(u.BW){
