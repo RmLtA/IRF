@@ -184,7 +184,7 @@ string fileOp::getExtName(string name){
 void fileOp::writeCSV(extractFeature& extrfeat){
     
     cout <<  "CSV FILE"<<endl;;
-    string name = setFeatureFilename(extrfeat, true);
+    string name = setFeatureFilename(extrfeat, true, true);
     cout << "Saving..." <<endl;
     ofstream pFile(dirResCSVName + name, ios::out);
 
@@ -204,7 +204,7 @@ void fileOp::writeCSV(extractFeature& extrfeat){
 }
 
 
-string fileOp::setFeatureFilename(extractFeature& extrfeat, bool isCSV){
+string fileOp::setFeatureFilename(extractFeature& extrfeat, bool isCSV, bool oneSplit){
     stringstream ssFeatures;
     stringstream ssFilename;
     ssFilename << "f_g_";
@@ -217,7 +217,12 @@ string fileOp::setFeatureFilename(extractFeature& extrfeat, bool isCSV){
         ssFeatures << "% " <<extrfeat.getSplitedFeatureName(extrfeat.v_attributes_asked_splited[i]) << endl;
         ssFilename << to_string(extrfeat.v_attributes_asked_splited[i]) << "_";
     }
-    ssFilename << "split_" << u.SPLIT_FACTOR << "_nbImg_"<<extrfeat.toProcess <<(isCSV ? ".csv" : ".arff") ;
+    if(oneSplit)
+        ssFilename << "split_" << u.SPLIT_FACTOR;
+    else
+        ssFilename <<"split_all";
+    
+    ssFilename<< "_nbImg_"<<extrfeat.toProcess <<(isCSV ? ".csv" : ".arff") ;
 
     
     string name;
@@ -239,7 +244,7 @@ string fileOp::setFeatureFilename(extractFeature& extrfeat, bool isCSV){
 void fileOp::writeARFFFile(extractFeature& extrfeat){
     utils & u = utils::i();
     cout <<  "Saving Arff FILE"<<endl;;
-    string name = setFeatureFilename(extrfeat, false);
+    string name = setFeatureFilename(extrfeat, false, true);
     cout << "Saving..." <<endl;
 
     ofstream pFile(dirResArffName + name, ios::out);
@@ -386,6 +391,168 @@ void fileOp::writeARFFFile(extractFeature& extrfeat){
 
     cout << "Saved as :" << name <<endl;
 
+}
+
+
+
+void fileOp::writeARFFFileVariousSplitted(vector<extractFeature>  vector_extrfeat,  int splited_image[]){
+        utils & u = utils::i();
+        cout <<  "Saving Arff FILE"<<endl;;
+        string name = setFeatureFilename(vector_extrfeat[0], false, false);
+        cout << "Saving..." <<endl;
+        
+        ofstream pFile(dirResArffName + name, ios::out);
+        
+        /*Begin Head File*/
+        pFile << "%1. Title : " << endl;
+        //    pFile << "% " << ssFilename.str()<<  endl;
+        pFile << "%2. Sources : " << endl;
+        //    pFile << "% Features asked :"<<endl;
+        //    pFile << ssFeatures.str();
+        pFile << "%" << endl;
+        pFile << "%" << endl;
+        pFile << "%" << endl;
+        pFile << "@RELATION Imagette" << endl;
+        pFile << endl;
+        
+        
+        
+        pFile << "% Global features from the images :" << endl;
+            extractFeature extrfeat = vector_extrfeat[0];
+            for (int i = 0; i < extrfeat.v_attributes_asked_global.size(); i++){
+                int attribut = extrfeat.v_attributes_asked_global[i];
+                switch (attribut){
+                    case extractFeature::BLACK_PIXEL_GLOBAL:
+                        pFile<< "@ATTRIBUTE "<< " Black_Pixel_Global" << " NUMERIC" << endl;;
+                        break;
+                    case extractFeature::AREA_GLOBAL :
+                        pFile<< "@ATTRIBUTE " <<" Airs_Center_X_GLOBAL" << " NUMERIC" << endl;;
+                        
+                        pFile<< "@ATTRIBUTE " <<" Airs_Center_Y_GLOBAL" << " NUMERIC" << endl;;
+                        pFile<< "@ATTRIBUTE " <<" Airs_Radius_GLOBAL"   <<" NUMERIC" << endl;;
+                        
+                        pFile<< "@ATTRIBUTE " <<" Airs_Triangle_1_X_GLOBAL" << " NUMERIC" << endl;;
+                        pFile<< "@ATTRIBUTE " <<" Airs_Triangle_1_Y_GLOBAL" << " NUMERIC" << endl;;
+                        
+                        pFile<< "@ATTRIBUTE " <<" Airs_Triangle_2_X_GLOBAL" << " NUMERIC" << endl;;
+                        pFile<< "@ATTRIBUTE " <<" Airs_Triangle_2_Y_GLOBAL" << " NUMERIC" << endl;;
+                        
+                        pFile<< "@ATTRIBUTE " <<" Airs_Triangle_3_X_GLOBAL" << " NUMERIC" << endl;;
+                        pFile<< "@ATTRIBUTE " <<" Airs_Triangle_3_Y_GLOBAL" << " NUMERIC" << endl;;
+                        
+                        pFile<< "@ATTRIBUTE " <<" Airs_Contours_GLOBAL" << " NUMERIC" << endl;;
+                        pFile<< "@ATTRIBUTE " <<" Airs_Length_Contours_GLOBAL" << " NUMERIC" << endl;;
+                        break;
+                    case extractFeature::HARRIS_CORNERS_GLOBAL:
+                        pFile<< "@ATTRIBUTE " <<" Harris_Corners_X_GLOBAL" << " NUMERIC" << endl;;
+                        pFile<< "@ATTRIBUTE " <<" Harris_Corners_Y_GLOBAL" << " NUMERIC" << endl;;
+                        break;
+                    case extractFeature::MASSCENTER_GLOBAL:
+                        pFile<< "@ATTRIBUTE " << " Mass_Center_X_Global" << " NUMERIC" << endl;
+                        pFile<< "@ATTRIBUTE " << " Mass_Center_Y_Global" << " NUMERIC" << endl;
+                        break;
+                    case extractFeature::HOUGH_LINES_GLOBAL:
+                        pFile<< "@ATTRIBUTE " << " Hough_Lines_Vertical_Global"<< " NUMERIC" << endl;
+                        pFile<< "@ATTRIBUTE " << " Hough_Lines_Horizontal_Global"<< " NUMERIC" << endl;
+                        pFile<< "@ATTRIBUTE " << " Hough_Lines_DiagonalPos_Global"<< " NUMERIC" << endl;
+                        pFile<< "@ATTRIBUTE " << " Hough_Lines_DiagonalNeg_Global"<< " NUMERIC" << endl;
+                        pFile<< "@ATTRIBUTE " << " Hough_Lines_Nb_Global"<< " NUMERIC" << endl;
+                        
+                        break;
+                    case extractFeature::HOUGH_CIRCLES_GLOBAL:
+                        pFile<< "@ATTRIBUTE " << " Hough_Circles_X_Global" << " NUMERIC" << endl;
+                        pFile<< "@ATTRIBUTE " << " Hough_Circles_Y_Global" << " NUMERIC" << endl;
+                        pFile<< "@ATTRIBUTE " << " Hough_Circles_Radius_Global" << " NUMERIC" << endl;
+                        pFile<< "@ATTRIBUTE " << " Hough_Circles_Nb_Global" << " NUMERIC" << endl;
+                        break;
+                    case extractFeature::ROWS_OR_COLS_GLOBAL:
+                        pFile<< "@ATTRIBUTE " << " Rows_Or_Cols_Global"<< " NUMERIC" << endl;
+                        break;
+                    case extractFeature::PIXELS_GLOBAL:
+                        int size= u.SIZE_IMAGE;
+                        for(int v=0; v<size;v++)
+                            for(int w=0; w<size;w++)
+                                pFile << "@ATTRIBUTE " <<"Pixels_x"<<v<<"_y_"<<w << " NUMERIC" << endl;
+                        break;
+                }
+            }
+        
+    for(int hard=0 ; hard < vector_extrfeat.size() ; hard++){
+        pFile << "% Features from the images splited in " <<u.SPLIT_FACTOR << "_"<<splited_image[hard]<<" : " << endl;
+        
+            for(int j =0 ; j < splited_image[hard] ; j++){
+                for (int i = 0; i < extrfeat.v_attributes_asked_splited.size(); i++){
+                    int attribut = extrfeat.v_attributes_asked_splited[i];
+                    switch (attribut){
+                        case extractFeature::BLACK_PIXEL:
+                            pFile<< "@ATTRIBUTE "<< " Black_Pixel_" <<j << "_"<<splited_image[hard]             <<" NUMERIC" << endl;;
+                            break;
+                        case extractFeature::AREA :
+                            pFile<< "@ATTRIBUTE " <<" Airs_Center_X_" <<j <<"_"<<splited_image[hard]            <<" NUMERIC" << endl;;
+                            pFile<< "@ATTRIBUTE " <<" Airs_Center_Y_" <<j <<"_"<<splited_image[hard]            << " NUMERIC" << endl;;
+                            pFile<< "@ATTRIBUTE " <<" Airs_Radius_" <<j <<"_"<<splited_image[hard]              << " NUMERIC" << endl;;
+                            pFile<< "@ATTRIBUTE " <<" Airs_Triangle_1_X_" <<j<<"_"<<splited_image[hard]         << " NUMERIC" << endl;;
+                            pFile<< "@ATTRIBUTE " <<" Airs_Triangle_1_Y_" <<j <<"_"<<splited_image[hard]        << " NUMERIC" << endl;;
+                            pFile<< "@ATTRIBUTE " <<" Airs_Triangle_2_X_" <<j<<"_"<<splited_image[hard]         << " NUMERIC" << endl;;
+                            pFile<< "@ATTRIBUTE " <<" Airs_Triangle_2_Y_" <<j<<"_"<<splited_image[hard]         << " NUMERIC" << endl;;
+                            pFile<< "@ATTRIBUTE " <<" Airs_Triangle_3_X_" <<j <<"_"<<splited_image[hard]        << " NUMERIC" << endl;;
+                            pFile<< "@ATTRIBUTE " <<" Airs_Triangle_3_Y_" <<j <<"_"<<splited_image[hard]        << " NUMERIC" << endl;;
+                            pFile<< "@ATTRIBUTE " <<" Airs_Contours_"     <<j<<"_"<<splited_image[hard]         << " NUMERIC" << endl;;
+                            pFile<< "@ATTRIBUTE " <<" Airs_Length_Contours_"<<j <<"_"<<splited_image[hard]      << " NUMERIC" << endl;;
+                            
+                            break;
+                        case extractFeature::HARRIS_CORNERS:
+                            pFile<< "@ATTRIBUTE " <<" Harris_Corners_X_" <<j<<"_"<<splited_image[hard]          << " NUMERIC" << endl;;
+                            pFile<< "@ATTRIBUTE " <<" Harris_Corners_Y_" <<j<<"_"<<splited_image[hard]          << " NUMERIC" << endl;;
+                            break;
+                            
+                        case extractFeature::MASSCENTER:
+                            pFile<< "@ATTRIBUTE " << " Mass_Center_X_" <<j <<"_"<<splited_image[hard]           << " NUMERIC" << endl;
+                            pFile<< "@ATTRIBUTE " << " Mass_Center_Y_" <<j<<"_"<<splited_image[hard]            << " NUMERIC" << endl;
+                            break;
+                        case extractFeature::HOUGH_LINES:
+                            pFile<< "@ATTRIBUTE " << " Hough_Lines_Vertical_" <<j<<"_"<<splited_image[hard]     << " NUMERIC" << endl;
+                            pFile<< "@ATTRIBUTE " << " Hough_Lines_Horizontal_" <<j <<"_"<<splited_image[hard]  << " NUMERIC" << endl;
+                            pFile<< "@ATTRIBUTE " << " Hough_Lines_DiagonalPos_" <<j<<"_"<<splited_image[hard]  << " NUMERIC" << endl;
+                            pFile<< "@ATTRIBUTE " << " Hough_Lines_DiagonalNeg_" <<j<<"_"<<splited_image[hard]  << " NUMERIC" << endl;
+                            pFile<< "@ATTRIBUTE " << " Hough_Lines_Nb_" <<j <<"_"<<splited_image[hard]          << " NUMERIC" << endl;
+                            break;
+                        case extractFeature::HOUGH_CIRCLES:
+                            pFile<< "@ATTRIBUTE " << " Hough_Circles_X_" <<j<<"_"<<splited_image[hard]          << " NUMERIC" << endl;
+                            pFile<< "@ATTRIBUTE " << " Hough_Circles_Y_" <<j<<"_"<<splited_image[hard]          << " NUMERIC" << endl;
+                            pFile<< "@ATTRIBUTE " << " Hough_Circles_Radius_"<<j<<"_"<<splited_image[hard]      << " NUMERIC" << endl;
+                            pFile<< "@ATTRIBUTE " << " Hough_Circles_Nb_" <<j<<"_"<<splited_image[hard]         << " NUMERIC" << endl;
+                            break;
+                            
+                    }
+                }
+            }
+        }
+        pFile << "@ATTRIBUTE" << " Class " << " {accident, bomb, car, casualty, electricity, fire-brigade, fire, flood, gas, injury, paramedics, person, police, road-block}" << endl;
+        
+        pFile << endl;
+        /*End Head File*/
+        
+        
+        pFile << "@DATA" << endl;
+
+        for(int i = 0 ; i < vector_extrfeat[0].v_all_numeric_v_attributes_values.size() ; i++){
+            for(int hard=0 ; hard < vector_extrfeat.size() ; hard++){
+                extractFeature extrfeat = vector_extrfeat[hard];
+                    for(int j = 0 ; j < extrfeat.v_all_numeric_v_attributes_values[i].size(); j++){
+                        pFile << extrfeat.v_all_numeric_v_attributes_values[i][j] << ",";
+                    }
+                }
+            pFile << vector_extrfeat[0].v_class[i] << endl;
+
+            }
+    
+        pFile.close();
+        
+        
+        cout << "Saved as :" << name <<endl;
+        
+    
 }
 
 

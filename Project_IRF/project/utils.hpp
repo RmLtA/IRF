@@ -34,7 +34,7 @@ public:
     bool CREATE_VARIOUS = true;
     bool CSV = false;
     bool ARFF = true; //default
-    
+    bool ALL = false;
     int SPLIT_FACTOR = -1;
     int SIZE_IMAGE = 130; //default
     bool BW =false;

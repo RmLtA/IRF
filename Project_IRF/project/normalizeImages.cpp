@@ -17,23 +17,28 @@ std::mutex OutputMtx;           // mutex for critical section
 
 void normalizeImages::process(){
     auto resultImagesThread = std::async(&normalizeImages::getImages);
-    
-    cout << "Crop images in squares ?  (Y :1 , N:0)" << endl;
-    int in;
-    cin >>in;
-    squareImg = ((in == 1) ? 1 : 0);
-    if(squareImg){
-        int size;
-        cout << "Size to resize images : (press 0 for " << sizeImg << ")"<<endl;
-        cin >> size;
-        if(size) sizeImg = size;
-        cout << "OK, ";
-    }
-    
-    if(squareImg) {
-        cout << "Images 'll be resized in : " << sizeImg <<"x"<<sizeImg << " px" <<endl;
-    }
+    if(askSquared){
 
+        cout << "Crop images in squares ?  (Y :1 , N:0)" << endl;
+        int in;
+        cin >>in;
+        squareImg = ((in == 1) ? 1 : 0);
+        if(squareImg){
+            int size;
+            cout << "Size to resize images : (press 0 for " << sizeImg << ")"<<endl;
+            cin >> size;
+            if(size) sizeImg = size;
+            cout << "OK, ";
+        }
+        
+        if(squareImg) {
+            cout << "Images 'll be resized in : " << sizeImg <<"x"<<sizeImg << " px" <<endl;
+        }
+        
+ 
+    }else{
+        squareImg = 0;
+    }
     
     time_t xt = time(NULL);
     

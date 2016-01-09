@@ -97,13 +97,14 @@ public:
     void writeSplited(string nam, Mat img);
     void writeNormalized(string nam,Mat img);
     void writeARFFFile(extractFeature& extrfeat);
+    void writeARFFFileVariousSplitted(vector<extractFeature>  vector_extrfeat, int splited_image[]);
     void writeCSV(extractFeature& extrfeat);
     void writeByName(string nam, Mat img);
 
 
 private:
     vector<string> readDir(string dirName);
-    string setFeatureFilename(extractFeature& extrfeat, bool isCSV);
+    string setFeatureFilename(extractFeature& extrfeat, bool isCSV, bool oneSplit);
 
     //vector<string> find_image_name(void);
 

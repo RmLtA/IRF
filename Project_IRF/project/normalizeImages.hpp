@@ -39,15 +39,17 @@ public :
     double moy_cols, moy_rows;
     double max_cols, max_rows;
     double min_cols, min_rows;
+    bool askSquared;
 
     unsigned long int leftToProcess;
     unsigned long int currentToProcess;
     int nErroImg;
 
-    normalizeImages(bool simg) : squareImg(simg), sizeImg(MAX_SIZE){
+    normalizeImages(bool simg, bool ask) : squareImg(simg), sizeImg(MAX_SIZE), askSquared(ask){
         moy_cols = 0, moy_rows = 0; nErroImg = 0;
         min_cols = min_rows = 1000;
         max_cols = max_rows = 0;
+        
     };
     
     
