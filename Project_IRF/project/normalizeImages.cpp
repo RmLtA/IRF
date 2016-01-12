@@ -8,6 +8,7 @@
 
 #include "normalizeImages.hpp"
 #include <future>
+#include <dirent.h>
 
 
 std::mutex NormalizeMtx;           // mutex for critical section
@@ -45,6 +46,19 @@ void normalizeImages::process(){
     
     //retrieve async images
     vector<string> resultImages =resultImagesThread.get();
+    
+    
+    if(u.BW){
+        cout << "How much ?  ("<<resultImages.size()<<")" << endl;
+        int in;
+        cin >>in;
+        
+    
+        random_shuffle(resultImages.begin(), resultImages.end());
+        resultImages.resize(in);
+    }
+    
+    
     unsigned long int nbImages =resultImages.size();
     
     cout << "Images to process : "  << nbImages * u.SPLIT_FACTOR << endl;
@@ -177,16 +191,16 @@ void normalizeImages::processTask(normalizeImages& self,vector<string> resultIma
                 NormalizeMtx.unlock();
 
             }
-            
-            if(u.BW){
-                cvtColor( box, box, CV_BGR2GRAY);
-                //cv::morphologyEx(box,box,MORPH_OPEN, Mat());
-                // cv::morphologyEx(box,box,MORPH_CLOSE, Mat());
-                cv::erode(box, box, cv::Mat());
-                //cv::erode(box, box, cv::Mat());
-                adaptiveThreshold(box,box,255,ADAPTIVE_THRESH_MEAN_C,THRESH_BINARY,7,1);
-            }
-           
+//            
+//            if(u.BW){
+//                cvtColor( box, box, CV_BGR2GRAY);
+//                //cv::morphologyEx(box,box,MORPH_OPEN, Mat());
+//                // cv::morphologyEx(box,box,MORPH_CLOSE, Mat());
+//                cv::erode(box, box, cv::Mat());
+//                //cv::erode(box, box, cv::Mat());
+//                adaptiveThreshold(box,box,255,ADAPTIVE_THRESH_MEAN_C,THRESH_BINARY,7,1);
+//            }
+//           
 
             
             if(self.squareImg)
@@ -215,11 +229,10 @@ void normalizeImages::processTask(normalizeImages& self,vector<string> resultIma
 
             
             
-//            if(u.BW)
-//                op->writeByName(current,res);
-            
-            
-            op->writeNormalized(current,res);
+            if(u.BW)
+                op->writeByName(current,res);
+            else
+                op->writeNormalized(current,res);
             
             if(u.SPLIT_FACTOR >1){
                 vector<Mat> splited = normalizeImages::splitImage(u.SPLIT_FACTOR, res);

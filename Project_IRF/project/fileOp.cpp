@@ -21,11 +21,33 @@ void fileOp::writeByName(string nam, Mat img){
     size_t point = res.find_first_of("_");
     nameAtt =nam.substr(point0+1, point);
     
-    name_img << dirResByName <<nameAtt <<"/" <<name.str()<< ".jpg";
+    name_img << dirResByName <<label_to_i(nameAtt) <<"/" <<name.str()<< ".jpg";
     
+           
     //enregistrment de l'imagette
     imwrite(name_img.str(), img);
 
+}
+
+
+int fileOp::label_to_i(string label){
+    if(label == "accident")  return 0;
+    else if(label == "bomb") return 1;
+    else if(label == "car") return 2;
+    else if(label == "casualty") return 3;
+    else if(label == "electricity") return 4;
+    else if(label == "fire-brigade") return 5;
+    else if(label == "fire") return 6;
+    else if(label == "flood") return 7;
+    else if(label == "gas") return 8;
+    else if(label == "injury") return 9;
+    else if(label == "paramedics") return 10;
+    else if(label == "person") return 11;
+    else if(label == "police") return 12;
+    else if(label == "road-block") return 13;
+    
+    return -1;
+    
 }
 
 void fileOp::writeSplited(string nam, Mat img){
