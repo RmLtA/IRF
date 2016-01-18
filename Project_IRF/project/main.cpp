@@ -212,7 +212,6 @@ void process_normalize(int norm, bool ask)
         
         u.SPLIT_FACTOR = split_factor;
         
-        //TODO optimiser
         //PREVENT TO SPLIT IF SAME AGAIN
         if(lastFactor!= u.SPLIT_FACTOR)
         {
@@ -427,8 +426,6 @@ void process_features_all()
     
     fileOp *  op = new fileOp();
     op->writeARFFFileVariousSplitted(vector_extr_features,splited_image);
-//    process_normalize(4);
-//    extractFeature * first_4 = process_features(false);
     
 }
 
