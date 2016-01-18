@@ -27,10 +27,10 @@
 using namespace std;
 using namespace cv;
 
-static const int MAX_SIZE = 130;
+static const int MAX_SIZE = 130; //si choix faire carré avec image
 static const int THRESH_VALUE = 230; // /254
-static const int IMG_GAP = 10; //Valeur de décalage (limite rectangle noir autours)
-static const int MIN_SIZE = 40;
+static const int IMG_GAP = 10; //valeur de décalage (limite rectangle noir autours)
+static const int MIN_SIZE = 40; //valeur minimum de selection (sinon trop de bruit)
 class normalizeImages{
 public :
     utils & u = utils::i();;
@@ -65,10 +65,6 @@ private:
     Mat Box( Mat matInput, string imgName);
     static Mat getSquareImage(const cv::Mat& img, string imgName, int sizeImg);
     static vector<Mat>  splitImage(int x, Mat const & src);
-    
-
-
-    
     
 };
 

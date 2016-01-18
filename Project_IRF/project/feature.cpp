@@ -28,9 +28,7 @@ double feature::countBlackPixel(){
 // Count the number of Harris Corner and get the mass center of all the points
 //PRIVATE
 void feature::countHarrisCorners(){
-    //TODO check the params
-    //try to get values that are the same for the same type...
-    //check for splited images and global...
+ 
     int thresh;
     int blockSize;
     int apertureSize;
@@ -84,7 +82,6 @@ void feature::countHarrisCorners(){
         moyX =0;
         moyY =0;
     }
-   // if(u.VERBOSE)circle( display, Point( moyX, moyY ), 5,  Scalar(3), 2, 8, 0 );
    
     cornerHarrisPoint = Point2f(moyX, moyX);
     if(u.VERBOSE){
@@ -170,12 +167,9 @@ void feature::HoughLines(){
         GAP = 10;
     }
  
-    
-    
     vector<Vec4i> lines;
     
     Mat dst, cdst;
-    //check canny params also...
     Canny(this->sourceImg, dst, 50, 200, 3);
     cdst = dst.clone();
     HoughLinesP(dst, lines, resolution, CV_PI/180, threshold,minLinLength , maxLineGap );
@@ -305,6 +299,9 @@ void feature::HoughCircles(){
         imshow("Hough Cicles", cdst);
         waitKey(1);
         cout << "Cicles :" << imgName << " : " <<  circles.size()<< endl;
+        stringstream res;
+        res << "test/" << this->imgName;
+        imwrite(res.str(), cdst);
     }
 }
 
@@ -332,17 +329,9 @@ int feature::nbHoughCirclesResult(){
 
 
 void feature::Area(){
-    
-    //    //TODO
-    //    //
-    //    if(isGlobal){
-    //        //params
-    //    }else{
-    //        //params
-    //    }
     Mat src_gray;
 
-    blur( this->graySourceImg, src_gray, Size(1,1) );
+    blur(this->graySourceImg, src_gray, Size(1,1) );
     Mat img, cdst;
     vector<vector<Point> > contours;
     vector<Vec4i> hierarchy;
@@ -379,7 +368,7 @@ void feature::Area(){
         if(u.VERBOSE){
             double x =0, y =0;
             for(int i = 0 ; i< approx.size(); i++){
-                circle( cdst, approx[i], 3, Scalar(0,255,0), -1, 4, 0 );
+                //circle( cdst, approx[i], 3, Scalar(0,255,0), -1, 4, 0 );
                 
                 x += approx[i].x;
                 y += approx[i].y;
@@ -388,36 +377,51 @@ void feature::Area(){
             x /= approx.size();
             y /= approx.size();
             
-            circle( cdst, Point(x,y) , 3, Scalar(255,0,0), -1, 8, 0 );
             
+            RNG rng(12345);
+            Scalar value = Scalar( 255,255,255 );
+            int borderType = BORDER_CONSTANT;
+            int border = 15;
+            copyMakeBorder( cdst, cdst, border, border, border, border, borderType, value );
+            
+            circle( cdst, Point(x+border,y+border) , 3, Scalar(255,0,0), -1, 8, 0 );
+            boundRectangleArea.x += border;
+            boundRectangleArea.y += border;
+
             rectangle(cdst,boundRectangleArea,Scalar(0,0,255));
-          
+            centerArea.x += border;
+            centerArea.y += border;
+
             circle(cdst, centerArea,radiusArea,  Scalar(200,200,14) );
             circle(cdst, centerArea, 3,  Scalar(200,200,200), -1, 8, 0 );
 
+            for(int i=0 ; i< triangleArea.size() ; i++){
+                triangleArea[i].x += border;
+                triangleArea[i].y += border;
+
+            }
             
             line(cdst, triangleArea[0],triangleArea[1], Scalar(100,100,100));
             line(cdst, triangleArea[1],triangleArea[2], Scalar(100,100,100));
             line(cdst, triangleArea[2],triangleArea[0], Scalar(100,100,100));
+          
 
             imshow("Area", cdst);
             waitKey(1);
+            stringstream res;
+            res << "test/" << this->imgName;
+            imwrite(res.str(), cdst);
         }
     }
     else{
         contourArea = 0;
         lengthContourArea = 0;
-        radiusArea = 0 ;
-     
-
-        
+        radiusArea = 0 ;      
         centerArea = Point(0,0);
-        
     }
 }
 
-//TODO contourArea
-//TODO lenghtContourArea
+
 
 Point2f feature::centerAreaRes(){
     if(radiusArea == -1)Area();
@@ -456,9 +460,6 @@ Point2f feature::triangleArea3(){
     return triangleArea[0];
 }
 
-
-
-
 double feature::massCenterX(){
     
     if(this->massCenter.x == -1 && this->massCenter.y == -1)
@@ -469,7 +470,6 @@ double feature::massCenterX(){
     else
         return 0;
 }
-
 
 double feature::massCenterY(){
     if(this->massCenter.x == -1 && this->massCenter.y == -1)
@@ -489,73 +489,6 @@ vector<int> feature::getPixels(){
             res.push_back(graySourceImg.at<uchar>(i,j));
     return res;
 }
-//
-//
-//Mat thresh_bernsen(Mat& gray,int ksize,int contrast_limit)
-//{
-//    
-//    Mat ret = Mat::zeros(gray.size(),gray.type());
-//    for(int i=0;i<gray.cols;i++ )
-//    {
-//        for(int j=0;j<gray.rows;j++ )
-//        {
-//            double mn=999,mx=0;
-//            int ti=0,tj=0;
-//            int tlx=i-ksize/2;
-//            int tly=j-ksize/2;
-//            int brx=i+ksize/2;
-//            int bry=j+ksize/2;
-//            if(tlx<0) tlx=0;
-//            if(tly<0) tly=0;
-//            if(brx>=gray.cols) brx=gray.cols-1;
-//            if(bry>=gray.rows) bry=gray.rows-1;
-//            
-//            minMaxIdx(gray(Rect(Point(tlx,tly),Point(brx,bry))),&mn,&mx,0,0);
-//            /* this does the above
-//             for(int ik=-ksize/2;ik<=ksize/2;ik++)
-//             {
-//             for(int jk=-ksize/2;jk<=ksize/2;jk++)
-//             {
-//             ti=i+ik;
-//             tj=j+jk;
-//             if(ti>0 && ti<gray.cols && tj>0 && tj<gray.rows)
-//             {
-//             uchar pix = gray.at<uchar>(tj,ti);
-//             if(pix<mn) mn=pix;
-//             if(pix>mx) mx=pix;
-//             }
-//             }
-//             }*/
-//            int median = 0.5 * (mn+mx);
-//            if(median<contrast_limit)
-//            {
-//                ret.at<uchar>(j,i)=0;
-//            }else
-//            {
-//                uchar pix = gray.at<uchar>(j,i);
-//                ret.at<uchar>(j,i) = pix>median?255:0;
-//            }
-//        }
-//    }
-//    return ret;
-//}
-//int main()
-//{
-//    Mat gray = imread("c:/data/number.jpg",0);
-//    gray=255-gray;
-//    Mat adaptthresh,bernsen;
-//    bernsen=thresh_bernsen(gray,25,40);
-//    imshow("gray",gray);
-//    imshow("adaptthresh",adaptthresh);
-//    imshow("bernsen",bernsen);
-//    waitKey(0);
-//}
-
-
-
-
-
-
 
 //PRIVATE
 void feature::countMassCenter(){

@@ -15,13 +15,10 @@
 #include "computeImages.h"
 #include "feature.h"
 #define NB_MAX_NUMERIC_FEATURE 9
-
+#define THREADS 1
 class extractFeature{
 
 public :
-    
-    
-   
 	
 	vector<vector<double>> v_all_numeric_v_attributes_values;
 	vector<string> v_class;
@@ -51,8 +48,6 @@ public :
         ROWS_OR_COLS_GLOBAL,
         PIXELS_GLOBAL
     };
-
-
 
     vector<int> nb_features_by_attributes_splited;
     vector<int> nb_features_by_attributes_global;
@@ -89,6 +84,7 @@ private:
     vector<double> extract_feature_by_feature(int offset, int feature_attribute, vector<string>& v_result_images_toextract_features);
 
     void addclassto_v_class(vector<string>& v_result_images_toextract_features);
+    string getName(string name);
 
 };
 

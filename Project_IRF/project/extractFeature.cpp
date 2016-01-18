@@ -38,44 +38,46 @@ void extractFeature::compute_features(vector<int>& v_of_attributes_splited, vect
     
     //creation du tableau ˆ la bonne dimension
     v_all_numeric_v_attributes_values = vector<vector<double>>(nbImgTotal, vector<double>(nbSplitedFeatures*u.SPLIT_FACTOR+nbGlobalFeatures));
-
-	
-
-    
-    //pour toutes les images
-    vector<thread> vThreads;
-    int NB_THREADS = thread::hardware_concurrency();
-    if(NB_THREADS ==0)NB_THREADS = 1;
-    if(u.RESULT)cout <<"Using " << NB_THREADS << " threads  "<<endl;
-    
     //init vars
     leftToProcess=nbImgTotal;
     toProcess =nbImgTotal;
     currentToProcess= 0;
+	
+    if(THREADS){
     
-    //init processes
-    for(int i=0 ; i < NB_THREADS ; i++){
-        vThreads.push_back(std::thread(&extractFeature::processTask, std::ref(*this), v_result_images_toextract_features_splited, v_result_images_toextract_features_global));
-    }
-    //give hand to process first time
-    this_thread::yield();
-    
-    while(leftToProcess)
-    {
-        OutMtx.lock();
-        //output current %
-        double pr=((double)currentToProcess/(double)nbImgTotal)*100;
-        cout<<"\t"<<setprecision(2)<<std::fixed<< pr<<"%   \r"<< flush ;
-        OutMtx.unlock();
-        //sleep to let others threads procced
-        sleep(1.5); //pour windows a faire
-        //pour windows : http://stackoverflow.com/questions/10918206/cross-platform-sleep-function-for-c
-        //ou yield si marche pas
+        //pour toutes les images
+        vector<thread> vThreads;
+        int NB_THREADS = thread::hardware_concurrency();
+        if(NB_THREADS ==0)NB_THREADS = 1;
+        if(u.RESULT)cout <<"Using " << NB_THREADS << " threads  "<<endl;
+        
+        //init processes
+        for(int i=0 ; i < NB_THREADS ; i++){
+            vThreads.push_back(std::thread(&extractFeature::processTask, std::ref(*this), v_result_images_toextract_features_splited, v_result_images_toextract_features_global));
+        }
+        //give hand to process first time
+        this_thread::yield();
+        
+        while(leftToProcess)
+        {
+            OutMtx.lock();
+            //output current %
+            double pr=((double)currentToProcess/(double)nbImgTotal)*100;
+            cout<<"\t"<<setprecision(2)<<std::fixed<< pr<<"%   \r"<< flush ;
+            OutMtx.unlock();
+            //sleep to let others threads procced
+            sleep(1.5); //pour windows a faire
+            //pour windows : http://stackoverflow.com/questions/10918206/cross-platform-sleep-function-for-c
+            //ou yield si marche pas
 
-    }
-    //wait for last threads & join
-    for(auto& th : vThreads){
-        th.join();
+        }
+        //wait for last threads & join
+        for(auto& th : vThreads){
+            th.join();
+        }
+        
+    }else{
+        extractFeature::processTask(*this, v_result_images_toextract_features_splited, v_result_images_toextract_features_global);
     }
       //on ajoute la classe
 	addclassto_v_class(v_result_images_toextract_features_global);
@@ -101,7 +103,6 @@ void extractFeature::processTask(extractFeature& self, vector<string> v_result_i
         i = self.currentToProcess++;
         ExtractFMtx.unlock();
 
-    
         //on extrait les features globales en premier lieu
         string imgGlobalName = v_result_images_toextract_features_global[i];
         self.extract_all_features_global(imgGlobalName, (int)i);
@@ -126,7 +127,7 @@ void extractFeature::extract_all_features_splited(string imgName, int nextImage,
         return; 
     }
     //feature :: is global ? = false
-    feature* f = new feature(img, false, imgName);
+    feature* f = new feature(img, false, getName(imgName));
     vector<double> feature_result;
 
     for(int j = 0 ; j < v_attributes_asked_splited.size() ; j++)
@@ -200,14 +201,13 @@ void extractFeature::extract_all_features_global(string imgName, unsigned int cu
         return;
     }
     //feature :: is global = true
-    feature* f = new feature(img, true, imgName);
+    feature* f = new feature(img, true, getName(imgName));
     vector<double> feature_result;
     
     for(int j = 0 ; j < v_attributes_asked_global.size() ; j++)
     {
         int feature_attribute = v_attributes_asked_global[j];
         switch (feature_attribute){
-                
             case BLACK_PIXEL_GLOBAL:
                 feature_result.push_back(f->countBlackPixel());
                 break;
@@ -227,7 +227,6 @@ void extractFeature::extract_all_features_global(string imgName, unsigned int cu
                 
                 feature_result.push_back(f->lengthContoursArea());
                 feature_result.push_back(f->contoursArea());
-
 
                 break;
             case HARRIS_CORNERS_GLOBAL:
@@ -275,10 +274,6 @@ void extractFeature::extract_all_features_global(string imgName, unsigned int cu
         v_all_numeric_v_attributes_values[currImage][i] = feature_result[i];
     
     delete f;
-    
-    
-
-    
 }
 
 string extractFeature::getGlobalFeatureName(int f){
@@ -343,5 +338,13 @@ void extractFeature::addclassto_v_class(vector<string>& v_result_images_toextrac
 		size_t point = res.find_first_of("_");
 		v_class.push_back(v_result_images_toextract_features[i].substr(point0+1, point));
 	}
+}
+
+
+string extractFeature::getName(string name)
+{
+    size_t point0 = name.find_last_of("/");
+    string res = name.substr(point0 + 1, name.size());
+    return res;
 }
 
