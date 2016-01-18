@@ -10,7 +10,7 @@
 using namespace std;
 using namespace cv;
 
-static int thresh = 145; //100
+static int thresh = 145; 
 
 class feature{
 
@@ -69,7 +69,7 @@ public:
 
 	
 	// Count the number of black pixels
-    //return % of black points
+    	//return % of black points
 	double countBlackPixel();
 
 
