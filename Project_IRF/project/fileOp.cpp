@@ -6,7 +6,6 @@ void fileOp::writeNormalized(string nam, Mat img){
 	name << nam;
 	name_img << dirResNormalizedName <<name.str()<< ".jpg";
 
-	//if (verbose)cout << "  " << getFilename(name_img.str());
 	//enregistrment de l'imagette
 	imwrite(name_img.str(), img);
 
@@ -55,7 +54,7 @@ void fileOp::writeSplited(string nam, Mat img){
     name << nam;
     name_img << dirResSplitedName <<name.str()<< ".jpg";
     
-   //if (u.VERBOSE)cout << "  " << getFilename(name_img.str());
+
     //enregistrment de l'imagette
     imwrite(name_img.str(), img);
     
@@ -85,7 +84,7 @@ void fileOp::writeTxtFile(string templ, string sourceName, int row, int columm, 
     name <<dirResImagesName << tmp.str() << ".txt";
     name_img <<dirResImagesName<<tmp.str() << ".jpg";
     
-   // if(u.VERBOSE)cout<< "  " << getFilename(name_img.str());
+
     //enregistrment de l'imagette
     imwrite(name_img.str(), image);
     if(u.RESULT){
