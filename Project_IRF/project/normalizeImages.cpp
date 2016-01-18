@@ -191,44 +191,13 @@ void normalizeImages::processTask(normalizeImages& self,vector<string> resultIma
                 NormalizeMtx.unlock();
 
             }
-//            
-//            if(u.BW){
-//                cvtColor( box, box, CV_BGR2GRAY);
-//                //cv::morphologyEx(box,box,MORPH_OPEN, Mat());
-//                // cv::morphologyEx(box,box,MORPH_CLOSE, Mat());
-//                cv::erode(box, box, cv::Mat());
-//                //cv::erode(box, box, cv::Mat());
-//                adaptiveThreshold(box,box,255,ADAPTIVE_THRESH_MEAN_C,THRESH_BINARY,7,1);
-//            }
-//           
 
             
             if(self.squareImg)
                 res = normalizeImages::getSquareImage(box,current, self.sizeImg);
             else
                 res = box;
-            
-            
-//            if(u.VERBOSE) cout << "\nProcess... : \n" << current;
-//            //cout << i << endl;
-//
-//
-//            threshold(res, res, 240, 255, THRESH_TOZERO_INV);
-            //equalizeHist( res, res );
-        
-//            if(u.VERBOSE)
-//            {
-//                NormalizeMtx.lock();
-//                imshow("normalized" + sourceImage, res);
-//                waitKey(1);
-//                NormalizeMtx.unlock();
-//
-//                
-//
-//            }
 
-            
-            
             if(u.BW)
                 op->writeByName(current,res);
             else
