@@ -106,7 +106,6 @@ private:
     vector<string> readDir(string dirName);
     string setFeatureFilename(extractFeature& extrfeat, bool isCSV, bool oneSplit);
     int label_to_i(string label);
-    //vector<string> find_image_name(void);
 
 
 
