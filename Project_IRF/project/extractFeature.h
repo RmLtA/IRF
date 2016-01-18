@@ -25,8 +25,8 @@ public :
 	vector<int> v_attributes_asked_splited;
     vector<int> v_attributes_asked_global;
 
-	//Respect the order,  attention l'ordre ici est important, le même que dans le main pour v_features_available si modification
-	//car c'est le numéro  que l'utilisateur va prendre en compte car instructions imprimées à l'écran
+	//Respecter l'ordre,  attention l'ordre ici est important, le mÃªme que dans le main pour v_features_available si modification
+	//car c'est le numÃ©ro  que l'utilisateur va prendre en compte car instructions imprimÃ©es Ã  l'Ã©cran
 	//Si ajout de features, ajouter une constante ! il y a un 2e enum dans fileOp.h
 	enum Features_Available_Splited
     {
