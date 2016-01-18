@@ -1,7 +1,5 @@
 #include "feature.h"
 
-//TODO : SI feature est de l'image globale ou si c'est d'une image splited
-// voir extractfeatures
 
 // Count the number of black pixels
 double feature::countBlackPixel(){
