@@ -3,7 +3,7 @@
 std::mutex ExtractFMtx;           // mutex for critical section
 std::mutex OutMtx;           // mutex for critical section
 
-//Si ajout de features, pas besion de modification
+//Si ajout de features, pas besoin de modification
 
 //v_features_to_extract == vector des features
 //v_result_images_toextract_features = vector des images
@@ -36,7 +36,7 @@ void extractFeature::compute_features(vector<int>& v_of_attributes_splited, vect
     int nbImgTotal = (int) v_result_images_toextract_features_global.size();
     
     
-    //creation du tableau ˆ la bonne dimension
+    //creation du tableau Ë† la bonne dimension
     v_all_numeric_v_attributes_values = vector<vector<double>>(nbImgTotal, vector<double>(nbSplitedFeatures*u.SPLIT_FACTOR+nbGlobalFeatures));
     //init vars
     leftToProcess=nbImgTotal;
@@ -123,7 +123,6 @@ void extractFeature::processTask(extractFeature& self, vector<string> v_result_i
 void extractFeature::extract_all_features_splited(string imgName, int nextImage, int currentPos){
     Mat img = imread(imgName);
     if(img.rows ==0 || img.cols==0){
-        //cout << "Extract Feature:: error with " << imgName << endl;
         return; 
     }
     //feature :: is global ? = false
